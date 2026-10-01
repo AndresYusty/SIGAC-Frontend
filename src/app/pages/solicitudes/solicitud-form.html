@@ -1,0 +1,49 @@
+<div class="page-head">
+  <div>
+    <p class="kicker">Radicación</p>
+    <h1>{{ id() ? 'Corregir solicitud' : 'Nueva solicitud' }}</h1>
+    <p class="lead">Los anexos deben ser PDF de hasta 10 MB.</p>
+  </div>
+  <a routerLink="/solicitudes" class="btn btn-ghost">Volver</a>
+</div>
+
+<form class="card grid" [formGroup]="form" (ngSubmit)="submit()" style="max-width: 820px">
+  <label class="field">
+    <span>Título</span>
+    <input formControlName="titulo" />
+  </label>
+  <label class="field">
+    <span>Solicitante</span>
+    <input formControlName="solicitante" />
+  </label>
+  <div class="grid grid-2">
+    <label class="field">
+      <span>Tipo</span>
+      <select formControlName="tipoSolicitud">
+        @for (t of tipos; track t) {
+          <option [value]="t">{{ t }}</option>
+        }
+      </select>
+    </label>
+    <label class="field">
+      <span>Programa</span>
+      <select formControlName="programaId">
+        <option value="">Sin programa</option>
+        @for (p of programas(); track p.id) {
+          <option [value]="p.id">{{ p.nombre }}</option>
+        }
+      </select>
+    </label>
+  </div>
+  <label class="field">
+    <span>Descripción</span>
+    <textarea formControlName="descripcion"></textarea>
+  </label>
+  <label class="field">
+    <span>Anexos PDF</span>
+    <input type="file" accept="application/pdf" multiple (change)="onFiles($event)" />
+  </label>
+  <div class="row-actions">
+    <button class="btn" type="submit" [disabled]="saving()">{{ saving() ? 'Guardando…' : 'Guardar' }}</button>
+  </div>
+</form>

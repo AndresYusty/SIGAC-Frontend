@@ -1,0 +1,27 @@
+<div class="page-head">
+  <div>
+    <p class="kicker">Cuenta</p>
+    <h1>Mi perfil</h1>
+  </div>
+</div>
+<div class="grid grid-2">
+  <article class="card">
+    <h2>{{ auth.user()?.nombre }}</h2>
+    <p>{{ auth.user()?.email }}</p>
+    <p class="lead">{{ auth.user()?.facultadNombre || 'Ámbito institucional' }}</p>
+    <p>
+      @for (r of auth.user()?.roles ?? []; track r) {
+        <span class="chip">{{ etiquetaRol(r) }}</span>
+      }
+    </p>
+    @if (auth.user()?.ultimoAcceso) {
+      <p class="muted">Último acceso: {{ auth.user()?.ultimoAcceso | date: 'dd/MM/yyyy HH:mm' }}</p>
+    }
+  </article>
+  <form class="card" [formGroup]="form" (ngSubmit)="guardar()">
+    <h2>Cambiar contraseña</h2>
+    <label class="field"><span>Actual</span><input type="password" formControlName="claveActual" /></label>
+    <label class="field"><span>Nueva</span><input type="password" formControlName="claveNueva" /></label>
+    <button class="btn" style="margin-top: 0.8rem" type="submit" [disabled]="saving()">Actualizar</button>
+  </form>
+</div>

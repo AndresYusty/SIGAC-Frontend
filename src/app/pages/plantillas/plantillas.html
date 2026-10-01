@@ -1,0 +1,66 @@
+<div class="page-head">
+  <div>
+    <p class="kicker">Perfil técnico</p>
+    <h1>Plantillas de acta</h1>
+    <p class="lead">Solo variables del catálogo oficial y XHTML bien formado.</p>
+  </div>
+</div>
+<div class="split">
+  <div class="grid">
+    <article class="card">
+      <div class="toolbar">
+        <label class="field grow">
+          <span>Tipo de consejo</span>
+          <select [(ngModel)]="tipoConsejoId" (ngModelChange)="load()">
+            @for (t of tipos(); track t.id) {
+              <option [ngValue]="t.id">{{ t.nombre }}</option>
+            }
+          </select>
+        </label>
+      </div>
+      <table>
+        <thead><tr><th>Nombre</th><th>Ver.</th><th>Estado</th><th></th></tr></thead>
+        <tbody>
+          @for (p of list(); track p.id) {
+            <tr>
+              <td>{{ p.nombre }}</td>
+              <td>{{ p.version }}</td>
+              <td><span class="badge" [class]="p.activa ? 'ok' : 'muted'">{{ p.activa ? 'Activa' : 'Histórica' }}</span></td>
+              <td class="row-actions">
+                <button class="btn btn-ghost" type="button" (click)="abrir(p)">Editar</button>
+                @if (!p.activa) {
+                  <button class="btn btn-ghost" type="button" (click)="activar(p.id)">Activar</button>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </article>
+    <article class="card">
+      <h2>{{ selected ? 'Nueva versión' : 'Nueva plantilla' }}</h2>
+      <label class="field"><span>Nombre</span><input [(ngModel)]="nombre" /></label>
+      <label class="field"><span>Comentario</span><input [(ngModel)]="comentario" /></label>
+      <label class="field"><span>Contenido XHTML</span><textarea class="editor" [(ngModel)]="contenido"></textarea></label>
+      @if (errores().length) {
+        <ul>
+          @for (e of errores(); track e) { <li class="error-text">{{ e }}</li> }
+        </ul>
+      }
+      <div class="row-actions" style="margin-top: 0.8rem">
+        <button class="btn btn-secondary" type="button" (click)="validar()">Validar</button>
+        <button class="btn btn-ocre" type="button" (click)="preview()">Previsualizar PDF</button>
+        <button class="btn" type="button" (click)="guardar()">Guardar versión</button>
+      </div>
+    </article>
+  </div>
+  <article class="card">
+    <h2>Variables</h2>
+    @for (v of vars(); track v.nombre) {
+      <div class="timeline-item" style="margin-bottom: 0.7rem">
+        <code>{{ '$' + '{' + v.nombre + '}' }}</code>
+        <div class="muted">{{ v.descripcion }} · {{ v.ejemplo }}</div>
+      </div>
+    }
+  </article>
+</div>

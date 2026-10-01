@@ -1,0 +1,65 @@
+@if (s(); as sol) {
+  <div class="page-head">
+    <div>
+      <p class="kicker">{{ sol.codigo }}</p>
+      <h1>{{ sol.titulo }}</h1>
+      <p class="lead">{{ sol.facultad }} · {{ tipo[sol.tipoSolicitud] }} · Radicó {{ sol.radicador }}</p>
+    </div>
+    <div class="row-actions">
+      <span class="badge" [class]="tone[sol.estado]">{{ etiqueta[sol.estado] }}</span>
+      @if (auth.has('ROLE_SECRETARIA_2') && (sol.estado === 'RADICADO' || sol.estado === 'DEVUELTO')) {
+        <a [routerLink]="['/solicitudes', sol.id, 'editar']" class="btn btn-secondary">Corregir</a>
+      }
+      <a routerLink="/solicitudes" class="btn btn-ghost">Volver</a>
+    </div>
+  </div>
+
+  <div class="split">
+    <article class="card">
+      <h2>Descripción</h2>
+      <p>{{ sol.descripcion }}</p>
+      <h3 style="margin-top: 1.2rem">Anexos</h3>
+      @for (a of sol.anexos; track a.id) {
+        <div class="check-row">
+          <div>
+            <strong>{{ a.nombre }}</strong>
+            <div class="muted">{{ bytes(a.tamanoBytes) }}</div>
+          </div>
+          <button class="btn btn-ghost" type="button" (click)="descargar(a.id, a.nombre)">Descargar</button>
+        </div>
+      }
+      @if (!sol.anexos.length) {
+        <p class="muted">Sin anexos.</p>
+      }
+    </article>
+    <div class="grid">
+      @if (auth.has('ROLE_SECRETARIA_1') && sol.estado === 'RADICADO') {
+        <article class="card">
+          <h2>Evaluación</h2>
+          <p class="lead">La Secretaría 1 aprueba, rechaza o devuelve con motivo.</p>
+          <label class="field" style="margin: 0.8rem 0">
+            <span>Motivo (rechazo o devolución)</span>
+            <textarea [(ngModel)]="motivo"></textarea>
+          </label>
+          <div class="row-actions">
+            <button class="btn" type="button" (click)="aprobar()">Aprobar</button>
+            <button class="btn btn-ocre" type="button" (click)="devolver()">Devolver</button>
+            <button class="btn btn-danger" type="button" (click)="rechazar()">Rechazar</button>
+          </div>
+        </article>
+      }
+      <article class="card">
+        <h2>Historial</h2>
+        <div class="timeline">
+          @for (h of hist(); track $index) {
+            <div class="timeline-item">
+              <strong>{{ h.estadoNuevo ? etiqueta[h.estadoNuevo] : '' }}</strong>
+              <div class="muted">{{ h.usuario }} · {{ h.fecha | date: 'dd/MM/yyyy HH:mm' }}</div>
+              @if (h.motivo) { <p>{{ h.motivo }}</p> }
+            </div>
+          }
+        </div>
+      </article>
+    </div>
+  </div>
+}

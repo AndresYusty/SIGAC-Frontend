@@ -1,0 +1,50 @@
+<div class="page-head">
+  <div>
+    <p class="kicker">Estructura</p>
+    <h1>Jerarquía institucional</h1>
+    <p class="lead">Universidad · Sede · Facultad · Programa</p>
+  </div>
+</div>
+<div class="grid grid-2">
+  <article class="card">
+    <h2>Universidades</h2>
+    @for (u of unis(); track u.id) {
+      <button class="tree-node" type="button" (click)="selectUni(u.id)" [style.border-color]="uni === u.id ? 'var(--vino)' : ''">{{ u.nombre }}</button>
+    }
+    <div class="toolbar">
+      <label class="field grow"><span>Nombre</span><input [(ngModel)]="uniNombre" /></label>
+      <button class="btn" type="button" (click)="crearUni()">Agregar</button>
+    </div>
+  </article>
+  <article class="card">
+    <h2>Sedes</h2>
+    @for (s of sedes(); track s.id) {
+      <button class="tree-node" type="button" (click)="selectSede(s.id)" [style.border-color]="sede === s.id ? 'var(--vino)' : ''">{{ s.nombre }} <span class="muted">{{ s.ciudad }}</span></button>
+    }
+    <div class="toolbar">
+      <label class="field grow"><span>Nombre</span><input [(ngModel)]="sedeNombre" /></label>
+      <label class="field"><span>Ciudad</span><input [(ngModel)]="sedeCiudad" /></label>
+      <button class="btn" type="button" (click)="crearSede()">Agregar</button>
+    </div>
+  </article>
+  <article class="card">
+    <h2>Facultades</h2>
+    @for (f of facs(); track f.id) {
+      <button class="tree-node" type="button" (click)="selectFac(f.id)" [style.border-color]="fac === f.id ? 'var(--vino)' : ''">{{ f.nombre }}</button>
+    }
+    <div class="toolbar">
+      <label class="field grow"><span>Nombre</span><input [(ngModel)]="facNombre" /></label>
+      <button class="btn" type="button" (click)="crearFac()">Agregar</button>
+    </div>
+  </article>
+  <article class="card">
+    <h2>Programas</h2>
+    @for (p of progs(); track p.id) {
+      <div class="tree-node">{{ p.nombre }}</div>
+    }
+    <div class="toolbar">
+      <label class="field grow"><span>Nombre</span><input [(ngModel)]="progNombre" /></label>
+      <button class="btn" type="button" (click)="crearProg()">Agregar</button>
+    </div>
+  </article>
+</div>

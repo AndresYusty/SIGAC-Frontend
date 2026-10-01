@@ -1,0 +1,52 @@
+@if (acta(); as a) {
+  <div class="page-head">
+    <div>
+      <p class="kicker">{{ a.consecutivo }}</p>
+      <h1>{{ a.tipoConsejo }}</h1>
+      <p class="lead">{{ a.facultad }} · {{ a.fechaSesion | date: 'dd/MM/yyyy' }}</p>
+    </div>
+    <div class="row-actions">
+      <span class="badge" [class]="tone[a.estado]">{{ etiqueta[a.estado] }}</span>
+      <button class="btn btn-secondary" type="button" (click)="vista()">Vista previa PDF</button>
+      <a routerLink="/actas" class="btn btn-ghost">Volver</a>
+    </div>
+  </div>
+  @if (a.observacionRechazo) {
+    <p class="card" style="margin-bottom: 1rem; border-left: 5px solid var(--vino)">Observación de devolución: {{ a.observacionRechazo }}</p>
+  }
+  <div class="split">
+    <article class="card">
+      <h2>Contenido</h2>
+      @if (auth.has('ROLE_SECRETARIA_1') && (a.estado === 'BORRADOR' || a.estado === 'EN_EDICION')) {
+        <textarea class="editor" [(ngModel)]="contenido"></textarea>
+        <div class="row-actions" style="margin-top: 0.8rem">
+          <button class="btn" type="button" (click)="guardar()">Guardar</button>
+          <button class="btn btn-ocre" type="button" (click)="enviar()">Enviar a firma</button>
+        </div>
+      } @else {
+        <div [innerHTML]="html()"></div>
+      }
+      @if (a.estado === 'PENDIENTE_DE_FIRMA' && auth.has('ROLE_PRESIDENTE', 'ROLE_SECRETARIA_1')) {
+        <label class="field" style="margin-top: 1rem">
+          <span>Observación para devolver</span>
+          <textarea [(ngModel)]="observacion"></textarea>
+        </label>
+        <div class="row-actions">
+          <button class="btn" type="button" (click)="firmar()">Aprobar y firmar</button>
+          <button class="btn btn-danger" type="button" (click)="devolver()">Devolver</button>
+        </div>
+      }
+      @if (a.firmadoPor) {
+        <p class="muted" style="margin-top: 1rem">Firmada por {{ a.firmadoPor }} el {{ a.firmadoEn | date: 'dd/MM/yyyy HH:mm' }}</p>
+      }
+    </article>
+    <article class="card">
+      <h2>PDF</h2>
+      @if (pdf) {
+        <iframe class="preview-frame" [src]="pdf" title="Vista previa del acta"></iframe>
+      } @else {
+        <p class="muted">Genere la vista previa para revisar el PDF/A.</p>
+      }
+    </article>
+  </div>
+}

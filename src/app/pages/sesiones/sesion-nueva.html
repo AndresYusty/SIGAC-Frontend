@@ -1,0 +1,27 @@
+<div class="page-head">
+  <div>
+    <p class="kicker">Agenda</p>
+    <h1>Programar sesión</h1>
+    <p class="lead">La fecha debe ser posterior al momento actual.</p>
+  </div>
+  <a routerLink="/sesiones" class="btn btn-ghost">Volver</a>
+</div>
+<form class="card grid" style="max-width: 640px" [formGroup]="form" (ngSubmit)="submit()">
+  <label class="field">
+    <span>Tipo de consejo</span>
+    <select formControlName="tipoConsejoId">
+      @for (t of tipos(); track t.id) {
+        <option [ngValue]="t.id">{{ t.codigo }} · {{ t.nombre }}</option>
+      }
+    </select>
+  </label>
+  <label class="field">
+    <span>Fecha y hora</span>
+    <input type="datetime-local" formControlName="fechaProgramada" />
+  </label>
+  <label class="field">
+    <span>Lugar</span>
+    <input formControlName="lugar" placeholder="Sala de juntas / enlace virtual" />
+  </label>
+  <button class="btn" type="submit" [disabled]="saving()">Crear sesión</button>
+</form>

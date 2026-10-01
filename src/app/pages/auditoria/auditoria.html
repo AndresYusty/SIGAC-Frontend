@@ -1,0 +1,36 @@
+<div class="page-head">
+  <div>
+    <p class="kicker">Seguridad</p>
+    <h1>Bitácora de auditoría</h1>
+    <p class="lead">Registro append-only de eventos del sistema.</p>
+  </div>
+</div>
+<div class="toolbar">
+  <label class="field"><span>Evento</span><input [(ngModel)]="evento" placeholder="EVENT_…" /></label>
+  <label class="field"><span>Usuario</span><input [(ngModel)]="usuario" /></label>
+  <button class="btn" type="button" (click)="load()">Filtrar</button>
+</div>
+<article class="card table-wrap">
+  <table>
+    <thead>
+      <tr><th>Fecha</th><th>Evento</th><th>Usuario</th><th>Entidad</th><th>IP</th><th>Detalle</th></tr>
+    </thead>
+    <tbody>
+      @for (a of page()?.content ?? []; track a.id) {
+        <tr>
+          <td>{{ a.fecha | date: 'dd/MM/yyyy HH:mm:ss' }}</td>
+          <td>{{ a.evento }}</td>
+          <td>{{ a.usuarioEmail }}</td>
+          <td>{{ a.entidad }} {{ a.entidadId }}</td>
+          <td>{{ a.ip }}</td>
+          <td>{{ a.detalle }}</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</article>
+<div class="pager">
+  <button class="btn btn-ghost" type="button" [disabled]="page()?.first" (click)="load((page()?.number ?? 1) - 1)">Anterior</button>
+  <span>Página {{ (page()?.number ?? 0) + 1 }} de {{ page()?.totalPages || 1 }}</span>
+  <button class="btn btn-ghost" type="button" [disabled]="page()?.last" (click)="load((page()?.number ?? -1) + 1)">Siguiente</button>
+</div>

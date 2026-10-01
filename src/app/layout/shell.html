@@ -1,0 +1,55 @@
+<div class="app-shell">
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <span class="logo-plate">
+        <img src="/USCO_Logo.png" alt="Escudo Universidad Surcolombiana" />
+      </span>
+      <div>
+        <strong>Universidad Surcolombiana</strong>
+        <span>SIGAC · Actas y consejos</span>
+      </div>
+    </div>
+    <nav class="nav">
+      @for (item of nav(); track item.path) {
+        <a [routerLink]="item.path" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: item.path === '/' }">{{ item.label }}</a>
+      }
+    </nav>
+    <div class="sidebar-user">
+      <strong>{{ auth.user()?.nombre }}</strong>
+      <span>{{ auth.user()?.roles?.[0] ? etiquetaRol(auth.user()!.roles[0]) : '' }}</span>
+    </div>
+  </aside>
+
+  <div class="workspace">
+    <header class="topbar">
+      <div class="uni">Vigilada Mineducación · <b>Neiva, Huila</b></div>
+      <div class="row-actions">
+        <a routerLink="/perfil" class="btn btn-ghost">Mi perfil</a>
+        <button class="btn btn-secondary" type="button" (click)="logout()">Cerrar sesión</button>
+      </div>
+    </header>
+    <main class="page">
+      <router-outlet />
+    </main>
+    <p class="footer-note">Universidad Surcolombiana · SIGAC {{ year }} </p>
+  </div>
+</div>
+
+<div class="toast-stack">
+  @for (t of toasts.items(); track t.id) {
+    <div class="toast" [class]="t.kind">{{ t.text }}</div>
+  }
+</div>
+
+@if (confirm.open()) {
+  <div class="modal-backdrop" (click)="confirm.close(false)">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <h2>{{ confirm.title() }}</h2>
+      <p class="lead">{{ confirm.message() }}</p>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" type="button" (click)="confirm.close(false)">Cancelar</button>
+        <button class="btn" type="button" (click)="confirm.close(true)">{{ confirm.okLabel() }}</button>
+      </div>
+    </div>
+  </div>
+}

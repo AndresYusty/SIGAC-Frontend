@@ -1,0 +1,98 @@
+@if (sesion(); as s) {
+  <div class="live-banner">
+    <div>
+      <strong>{{ s.tipoConsejo }} · {{ etiqueta[s.estado] }}</strong>
+      <div>{{ s.lugar }} · {{ s.fechaProgramada | date: 'dd/MM/yyyy HH:mm' }}</div>
+    </div>
+    <div class="row-actions">
+      @if (auth.has('ROLE_SECRETARIA_1')) {
+        @if (s.estado === 'CONVOCADA') { <button class="btn btn-ocre" type="button" (click)="act('iniciar')">Iniciar</button> }
+        @if (s.estado === 'INICIADA') { <button class="btn btn-secondary" type="button" (click)="act('suspender')">Suspender</button> }
+        @if (s.estado === 'SUSPENDIDA') { <button class="btn btn-ocre" type="button" (click)="act('reanudar')">Reanudar</button> }
+        @if (s.estado === 'INICIADA' || s.estado === 'SUSPENDIDA') { <button class="btn" type="button" (click)="finalizar()">Finalizar</button> }
+      }
+      <a [routerLink]="['/sesiones', s.id]" class="btn btn-ghost">Salir de la sala</a>
+    </div>
+  </div>
+
+  <div class="split">
+    <div class="grid">
+      @for (p of s.puntos; track p.id) {
+        <article class="card">
+          <h2>{{ p.orden }}. {{ p.titulo }}</h2>
+          <p class="lead">{{ p.descripcion }}</p>
+          @if (p.notasDebate) {
+            <p class="muted" style="margin-top: 0.6rem"><b>Notas:</b> {{ p.notasDebate }}</p>
+          }
+          @if (auth.has('ROLE_SECRETARIA_1') && s.estado === 'INICIADA' && decision[p.id]) {
+            <div class="grid grid-2" style="margin-top: 0.8rem">
+              <label class="field">
+                <span>Resultado</span>
+                <select [(ngModel)]="decision[p.id].resultado">
+                  @for (r of resultados; track r) {
+                    <option [value]="r">{{ resLabel[r] }}</option>
+                  }
+                </select>
+              </label>
+              <label class="field"><span>A favor</span><input type="number" min="0" [(ngModel)]="decision[p.id].votosFavor" /></label>
+              <label class="field"><span>En contra</span><input type="number" min="0" [(ngModel)]="decision[p.id].votosContra" /></label>
+              <label class="field"><span>Abstenciones</span><input type="number" min="0" [(ngModel)]="decision[p.id].abstenciones" /></label>
+            </div>
+            <div class="row-actions" style="margin-top: 0.8rem">
+              <button class="btn" type="button" (click)="registrar(p)">Registrar decisión</button>
+            </div>
+            <label class="field" style="margin-top: 0.8rem">
+              <span>Nota de debate</span>
+              <textarea [(ngModel)]="nota"></textarea>
+            </label>
+            <button class="btn btn-secondary" type="button" (click)="agregarNota(p)">Agregar nota</button>
+          } @else {
+            <p style="margin-top: 0.6rem">
+              @if (p.resultado) {
+                <span class="badge" [class]="tone[p.resultado]">{{ resLabel[p.resultado] }}</span>
+                · {{ p.votosFavor }} a favor / {{ p.votosContra }} en contra / {{ p.abstenciones }} abstenciones
+              } @else {
+                Sin decisión
+              }
+            </p>
+          }
+        </article>
+      }
+      @if (auth.has('ROLE_SECRETARIA_1') && s.estado === 'INICIADA') {
+        <article class="card">
+          <h2>Punto varios</h2>
+          <label class="field"><span>Título</span><input [(ngModel)]="varioTitulo" /></label>
+          <label class="field"><span>Descripción</span><textarea [(ngModel)]="varioDesc"></textarea></label>
+          <button class="btn" type="button" (click)="agregarVario()">Agregar</button>
+        </article>
+      }
+    </div>
+    <article class="card">
+      <h2>Asistencia y quórum</h2>
+      @if (asis(); as a) {
+        <div class="quorum">
+          <div>
+            <strong>{{ a.quorum.presentes }}/{{ a.quorum.integrantes }}</strong>
+            <div class="muted">Requeridos: {{ a.quorum.requeridos }}</div>
+          </div>
+          <div class="quorum-bar"><span [style.width.%]="a.quorum.integrantes ? (100 * a.quorum.presentes / a.quorum.integrantes) : 0"></span></div>
+          <span class="badge" [class]="a.quorum.alcanzado ? 'ok' : 'warn'">{{ a.quorum.alcanzado ? 'Quórum' : 'Sin quórum' }}</span>
+        </div>
+        <div class="check-list" style="margin-top: 1rem">
+          @for (p of a.asistentes; track p.usuarioId) {
+            <label class="check-row">
+              <input type="checkbox" [(ngModel)]="p.presente" [disabled]="!auth.has('ROLE_SECRETARIA_1')" />
+              <div>
+                <strong>{{ p.nombre }}</strong>
+                <div class="muted">{{ p.rol }}</div>
+              </div>
+            </label>
+          }
+        </div>
+        @if (auth.has('ROLE_SECRETARIA_1')) {
+          <button class="btn" style="margin-top: 0.8rem" type="button" (click)="guardarAsistencia()">Guardar asistencia</button>
+        }
+      }
+    </article>
+  </div>
+}

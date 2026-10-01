@@ -1,0 +1,70 @@
+<div class="page-head">
+  <div>
+    <p class="kicker">Módulo 3</p>
+    <h1>Solicitudes</h1>
+    <p class="lead">Radicación, evaluación y seguimiento de asuntos para consejo.</p>
+  </div>
+  @if (auth.has('ROLE_SECRETARIA_2')) {
+    <a routerLink="/solicitudes/nueva" class="btn">Radicar solicitud</a>
+  }
+</div>
+
+<div class="toolbar">
+  <label class="field">
+    <span>Estado</span>
+    <select [(ngModel)]="estado">
+      <option value="">Todos</option>
+      @for (e of estados; track e) {
+        <option [value]="e">{{ etiqueta[e] }}</option>
+      }
+    </select>
+  </label>
+  <label class="field">
+    <span>Código</span>
+    <input [(ngModel)]="codigo" placeholder="SOL-…" />
+  </label>
+  <label class="field">
+    <span>Desde</span>
+    <input type="date" [(ngModel)]="desde" />
+  </label>
+  <label class="field">
+    <span>Hasta</span>
+    <input type="date" [(ngModel)]="hasta" />
+  </label>
+  <button class="btn" type="button" (click)="load()">Filtrar</button>
+</div>
+
+<article class="card table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Código</th>
+        <th>Título</th>
+        <th>Tipo</th>
+        <th>Estado</th>
+        <th>Radicación</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (s of page()?.content ?? []; track s.id) {
+        <tr>
+          <td>{{ s.codigo }}</td>
+          <td>{{ s.titulo }}</td>
+          <td>{{ tipo[s.tipoSolicitud] }}</td>
+          <td><span class="badge" [class]="tone[s.estado]">{{ etiqueta[s.estado] }}</span></td>
+          <td>{{ s.fechaRadicacion | date: 'dd/MM/yyyy HH:mm' }}</td>
+          <td><a [routerLink]="['/solicitudes', s.id]" class="btn btn-ghost">Abrir</a></td>
+        </tr>
+      }
+    </tbody>
+  </table>
+  @if (!page()?.content?.length) {
+    <div class="empty"><h3>No hay solicitudes</h3><p>Ajuste los filtros o radique un nuevo asunto.</p></div>
+  }
+</article>
+<div class="pager">
+  <button class="btn btn-ghost" type="button" [disabled]="page()?.first" (click)="load((page()?.number ?? 1) - 1)">Anterior</button>
+  <span>Página {{ (page()?.number ?? 0) + 1 }} de {{ page()?.totalPages || 1 }}</span>
+  <button class="btn btn-ghost" type="button" [disabled]="page()?.last" (click)="load((page()?.number ?? -1) + 1)">Siguiente</button>
+</div>

@@ -1,0 +1,72 @@
+<div class="page-head">
+  <div>
+    <p class="kicker">Panel</p>
+    <h1>Bienvenido, {{ data()?.usuario || auth.user()?.nombre }}</h1>
+    <p class="lead">{{ auth.user()?.facultadNombre || 'Universidad Surcolombiana' }} · {{ auth.user()?.roles?.[0] ? etiquetaRol(auth.user()!.roles[0]) : '' }}</p>
+  </div>
+</div>
+
+<div class="grid grid-4">
+  @if (num('solicitudesPendientesDeEvaluacion') !== null) {
+    <article class="card stat"><div class="label">Por evaluar</div><div class="value">{{ num('solicitudesPendientesDeEvaluacion') }}</div></article>
+  }
+  @if (num('solicitudesAprobadasSinAgenda') !== null) {
+    <article class="card stat"><div class="label">Sin agenda</div><div class="value">{{ num('solicitudesAprobadasSinAgenda') }}</div></article>
+  }
+  @if (num('sesionesProximas') !== null) {
+    <article class="card stat"><div class="label">Sesiones próximas</div><div class="value">{{ num('sesionesProximas') }}</div></article>
+  }
+  @if (num('actasEnElaboracion') !== null) {
+    <article class="card stat"><div class="label">Actas en elaboración</div><div class="value">{{ num('actasEnElaboracion') }}</div></article>
+  }
+  @if (num('actasPendientesDeFirma') !== null) {
+    <article class="card stat"><div class="label">Pendientes de firma</div><div class="value">{{ num('actasPendientesDeFirma') }}</div></article>
+  }
+  @if (num('sesionesFinalizadas') !== null) {
+    <article class="card stat"><div class="label">Sesiones finalizadas</div><div class="value">{{ num('sesionesFinalizadas') }}</div></article>
+  }
+  @if (num('usuariosActivos') !== null) {
+    <article class="card stat"><div class="label">Usuarios activos</div><div class="value">{{ num('usuariosActivos') }}</div></article>
+  }
+  @if (num('actasPublicadasTotal') !== null) {
+    <article class="card stat"><div class="label">Actas publicadas</div><div class="value">{{ num('actasPublicadasTotal') }}</div></article>
+  }
+</div>
+
+<div class="grid" style="margin-top: 1rem">
+  @if (map('misSolicitudesPorEstado'); as porEstado) {
+    <article class="card table-wrap">
+      <h2>Mis solicitudes</h2>
+      <table>
+        <tbody>
+          @for (e of porEstado | keyvalue; track e.key) {
+            <tr>
+              <td>{{ etiquetaEstado('' + e.key) }}</td>
+              <td>{{ e.value }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+      <a routerLink="/solicitudes" class="btn btn-secondary" style="margin-top: 0.8rem">Ver solicitudes</a>
+    </article>
+  }
+  @if (actas().length) {
+    <article class="card table-wrap">
+      <h2>Últimas actas publicadas</h2>
+      <table>
+        <thead>
+          <tr><th>Consecutivo</th><th>Fecha</th></tr>
+        </thead>
+        <tbody>
+          @for (a of actas(); track a.id) {
+            <tr>
+              <td>{{ a.consecutivo }}</td>
+              <td>{{ a.fechaSesion | date: 'dd/MM/yyyy' }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+      <a routerLink="/repositorio" class="btn btn-secondary" style="margin-top: 0.8rem">Ir al repositorio</a>
+    </article>
+  }
+</div>

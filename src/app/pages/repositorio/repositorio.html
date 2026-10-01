@@ -1,0 +1,72 @@
+<div class="page-head">
+  <div>
+    <p class="kicker">Consulta</p>
+    <h1>Repositorio digital</h1>
+    <p class="lead">Actas publicadas con verificación SHA-256.</p>
+  </div>
+</div>
+<div class="toolbar">
+  <label class="field"><span>Consecutivo</span><input [(ngModel)]="consecutivo" /></label>
+  <label class="field">
+    <span>Tipo</span>
+    <select [(ngModel)]="tipoConsejoId">
+      <option value="">Todos</option>
+      @for (t of tipos(); track t.id) {
+        <option [value]="t.id">{{ t.nombre }}</option>
+      }
+    </select>
+  </label>
+  <label class="field grow"><span>Texto</span><input [(ngModel)]="texto" /></label>
+  <label class="field"><span>Desde</span><input type="date" [(ngModel)]="desde" /></label>
+  <label class="field"><span>Hasta</span><input type="date" [(ngModel)]="hasta" /></label>
+  <button class="btn" type="button" (click)="load()">Buscar</button>
+</div>
+<article class="card table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Consecutivo</th>
+        <th>Consejo</th>
+        <th>Facultad</th>
+        <th>Fecha</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (a of page()?.content ?? []; track a.id) {
+        <tr>
+          <td>{{ a.consecutivo }}</td>
+          <td>{{ a.tipoConsejo }}</td>
+          <td>{{ a.facultad }}</td>
+          <td>{{ a.fechaSesion | date: 'dd/MM/yyyy' }}</td>
+          <td class="row-actions">
+            <button class="btn btn-ghost" type="button" (click)="ver(a.id)">Ver</button>
+            <button class="btn btn-ghost" type="button" (click)="descargar(a.id, a.consecutivo)">Descargar</button>
+            <button class="btn btn-ghost" type="button" (click)="verificar(a.id)">Verificar</button>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+  @if (!page()?.content?.length) {
+    <div class="empty"><h3>Sin resultados</h3></div>
+  }
+</article>
+@if (verif() || pdf) {
+  <div class="grid grid-2" style="margin-top: 1rem">
+    @if (verif(); as v) {
+      <article class="card">
+        <h2>Integridad</h2>
+        <p><span class="badge" [class]="v.integro ? 'ok' : 'danger'">{{ v.integro ? 'Íntegro' : 'Alterado' }}</span></p>
+        <p class="muted">Almacenado: {{ v.hashAlmacenado }}</p>
+        <p class="muted">Calculado: {{ v.hashCalculado }}</p>
+      </article>
+    }
+    @if (pdf) {
+      <article class="card">
+        <h2>Visor</h2>
+        <iframe class="preview-frame" [src]="pdf" title="Acta"></iframe>
+      </article>
+    }
+  </div>
+}

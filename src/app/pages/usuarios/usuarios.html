@@ -1,0 +1,85 @@
+<div class="page-head">
+  <div>
+    <p class="kicker">Administración</p>
+    <h1>Usuarios</h1>
+    <p class="lead">Cuentas, roles y ámbito por facultad.</p>
+  </div>
+  <button class="btn" type="button" (click)="nuevo()">Nuevo usuario</button>
+</div>
+<div class="toolbar">
+  <label class="field grow"><span>Buscar</span><input (input)="search($event)" placeholder="Nombre o correo" /></label>
+</div>
+<article class="card table-wrap">
+  <table>
+    <thead>
+      <tr><th>Nombre</th><th>Correo</th><th>Roles</th><th>Facultad</th><th>Estado</th><th></th></tr>
+    </thead>
+    <tbody>
+      @for (u of page()?.content ?? []; track u.id) {
+        <tr>
+          <td>{{ u.nombre }}</td>
+          <td>{{ u.email }}</td>
+          <td>
+            @for (r of u.roles; track r) {
+              <span class="chip">{{ etiquetaRol(r) }}</span>
+            }
+          </td>
+          <td>{{ u.facultadNombre || '—' }}</td>
+          <td><span class="badge" [class]="u.activo ? 'ok' : 'muted'">{{ u.activo ? 'Activo' : 'Inactivo' }}</span></td>
+          <td class="row-actions">
+            <button class="btn btn-ghost" type="button" (click)="editar(u)">Editar</button>
+            <button class="btn btn-ghost" type="button" (click)="toggle(u)">{{ u.activo ? 'Desactivar' : 'Activar' }}</button>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</article>
+<div class="pager">
+  <button class="btn btn-ghost" type="button" [disabled]="page()?.first" (click)="load((page()?.number ?? 1) - 1)">Anterior</button>
+  <span>Página {{ (page()?.number ?? 0) + 1 }} de {{ page()?.totalPages || 1 }}</span>
+  <button class="btn btn-ghost" type="button" [disabled]="page()?.last" (click)="load((page()?.number ?? -1) + 1)">Siguiente</button>
+</div>
+
+@if (showForm) {
+  <div class="modal-backdrop" (click)="showForm = false">
+    <form class="modal" [formGroup]="form" (click)="$event.stopPropagation()" (ngSubmit)="guardar()">
+      <h2>{{ editing() ? 'Editar usuario' : 'Nuevo usuario' }}</h2>
+      <label class="field"><span>Nombre</span><input formControlName="nombre" /></label>
+      <label class="field"><span>Correo</span><input formControlName="email" [readOnly]="!!editing()" /></label>
+      @if (!editing()) {
+        <label class="field"><span>Contraseña</span><input type="password" formControlName="password" /></label>
+      }
+      <label class="field">
+        <span>Rol</span>
+        <select formControlName="rol">
+          @for (r of roles; track r) {
+            <option [value]="r">{{ etiquetaRol(r) }}</option>
+          }
+        </select>
+      </label>
+      <label class="field">
+        <span>Facultad</span>
+        <select formControlName="facultadId" (change)="loadFacultadProgramas()">
+          <option value="">Ninguna (roles globales)</option>
+          @for (f of facultades(); track f.id) {
+            <option [value]="f.id">{{ f.nombre }}</option>
+          }
+        </select>
+      </label>
+      <label class="field">
+        <span>Programa</span>
+        <select formControlName="programaId">
+          <option value="">Ninguno</option>
+          @for (p of programas(); track p.id) {
+            <option [value]="p.id">{{ p.nombre }}</option>
+          }
+        </select>
+      </label>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" type="button" (click)="showForm = false">Cancelar</button>
+        <button class="btn" type="submit">Guardar</button>
+      </div>
+    </form>
+  </div>
+}

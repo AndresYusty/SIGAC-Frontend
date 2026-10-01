@@ -1,0 +1,50 @@
+<div class="page-head">
+  <div>
+    <p class="kicker">Consejos</p>
+    <h1>Sesiones</h1>
+    <p class="lead">Programación, orden del día y conducción en vivo.</p>
+  </div>
+  @if (auth.has('ROLE_SECRETARIA_1')) {
+    <a routerLink="/sesiones/nueva" class="btn">Programar sesión</a>
+  }
+</div>
+<div class="toolbar">
+  <label class="field">
+    <span>Estado</span>
+    <select [(ngModel)]="estado">
+      <option value="">Todos</option>
+      @for (e of estados; track e) {
+        <option [value]="e">{{ etiqueta[e] }}</option>
+      }
+    </select>
+  </label>
+  <button class="btn" type="button" (click)="load()">Filtrar</button>
+</div>
+<article class="card table-wrap">
+  <table>
+    <thead>
+      <tr><th>Tipo</th><th>Facultad</th><th>Fecha</th><th>Lugar</th><th>Estado</th><th>Puntos</th><th></th></tr>
+    </thead>
+    <tbody>
+      @for (s of page()?.content ?? []; track s.id) {
+        <tr>
+          <td>{{ s.tipoConsejo }}</td>
+          <td>{{ s.facultad }}</td>
+          <td>{{ s.fechaProgramada | date: 'dd/MM/yyyy HH:mm' }}</td>
+          <td>{{ s.lugar }}</td>
+          <td><span class="badge" [class]="tone[s.estado]">{{ etiqueta[s.estado] }}</span></td>
+          <td>{{ s.totalPuntos }}</td>
+          <td><a [routerLink]="['/sesiones', s.id]" class="btn btn-ghost">Abrir</a></td>
+        </tr>
+      }
+    </tbody>
+  </table>
+  @if (!page()?.content?.length) {
+    <div class="empty"><h3>No hay sesiones</h3></div>
+  }
+</article>
+<div class="pager">
+  <button class="btn btn-ghost" type="button" [disabled]="page()?.first" (click)="load((page()?.number ?? 1) - 1)">Anterior</button>
+  <span>Página {{ (page()?.number ?? 0) + 1 }} de {{ page()?.totalPages || 1 }}</span>
+  <button class="btn btn-ghost" type="button" [disabled]="page()?.last" (click)="load((page()?.number ?? -1) + 1)">Siguiente</button>
+</div>

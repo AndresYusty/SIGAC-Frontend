@@ -1,0 +1,70 @@
+@if (sesion(); as s) {
+  <div class="page-head">
+    <div>
+      <p class="kicker">{{ s.tipoConsejo }}</p>
+      <h1>Sesión del {{ s.fechaProgramada | date: 'dd MMMM yyyy, HH:mm' }}</h1>
+      <p class="lead">{{ s.facultad }} · {{ s.lugar }}</p>
+    </div>
+    <div class="row-actions">
+      <span class="badge" [class]="tone[s.estado]">{{ etiqueta[s.estado] }}</span>
+      @if (s.agendaCerrada) {
+        <button class="btn btn-secondary" type="button" (click)="citacion()">Citación PDF</button>
+      }
+      @if (s.estado === 'CONVOCADA' || s.estado === 'INICIADA' || s.estado === 'SUSPENDIDA') {
+        <a [routerLink]="['/sesiones', s.id, 'vivo']" class="btn">Sala en vivo</a>
+      }
+      @if (s.estado === 'FINALIZADA' && auth.has('ROLE_SECRETARIA_1')) {
+        <button class="btn" type="button" (click)="generarActa()">Generar acta</button>
+      }
+      <a routerLink="/sesiones" class="btn btn-ghost">Volver</a>
+    </div>
+  </div>
+
+  @if (auth.has('ROLE_SECRETARIA_1') && !s.agendaCerrada) {
+    <article class="card" style="margin-bottom: 1rem">
+      <h2>Armar orden del día</h2>
+      <div class="toolbar">
+        <label class="field grow">
+          <span>Solicitud aprobada</span>
+          <select [(ngModel)]="solicitudId">
+            <option [ngValue]="null">Seleccione…</option>
+            @for (r of aprobadas(); track r.id) {
+              <option [ngValue]="r.id">{{ r.codigo }} · {{ r.titulo }}</option>
+            }
+          </select>
+        </label>
+        <button class="btn" type="button" (click)="agregar()">Agregar punto</button>
+        <button class="btn btn-ocre" type="button" (click)="cerrar()">Cerrar agenda y citar</button>
+      </div>
+    </article>
+  }
+
+  <article class="card table-wrap">
+    <h2>Orden del día</h2>
+    <table>
+      <thead>
+        <tr><th>#</th><th>Asunto</th><th>Código</th><th>Decisión</th><th></th></tr>
+      </thead>
+      <tbody>
+        @for (p of s.puntos; track p.id; let i = $index) {
+          <tr>
+            <td>{{ p.orden }}</td>
+            <td>{{ p.titulo }}@if (p.esVarios) { <span class="chip">Varios</span> }</td>
+            <td>{{ p.solicitudCodigo || '—' }}</td>
+            <td>{{ p.resultado || 'Pendiente' }}</td>
+            <td class="row-actions">
+              @if (auth.has('ROLE_SECRETARIA_1') && !s.agendaCerrada) {
+                <button class="btn btn-ghost" type="button" (click)="mover(i, -1)">↑</button>
+                <button class="btn btn-ghost" type="button" (click)="mover(i, 1)">↓</button>
+                <button class="btn btn-ghost" type="button" (click)="quitar(p.id)">Quitar</button>
+              }
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+    @if (!s.puntos.length) {
+      <div class="empty"><h3>Sin puntos</h3><p>Agregue solicitudes aprobadas al orden del día.</p></div>
+    }
+  </article>
+}
