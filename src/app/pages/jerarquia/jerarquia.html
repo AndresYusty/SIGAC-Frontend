@@ -2,49 +2,159 @@
   <div>
     <p class="kicker">Estructura</p>
     <h1>Jerarquía institucional</h1>
-    <p class="lead">Universidad · Sede · Facultad · Programa</p>
+    <p class="lead">Configure la estructura académica paso a paso: universidad, sede, facultad y programa.</p>
   </div>
 </div>
-<div class="grid grid-2">
-  <article class="card">
-    <h2>Universidades</h2>
-    @for (u of unis(); track u.id) {
-      <button class="tree-node" type="button" (click)="selectUni(u.id)" [style.border-color]="uni === u.id ? 'var(--vino)' : ''">{{ u.nombre }}</button>
-    }
-    <div class="toolbar">
-      <label class="field grow"><span>Nombre</span><input [(ngModel)]="uniNombre" /></label>
-      <button class="btn" type="button" (click)="crearUni()">Agregar</button>
+
+<div class="wz">
+  <section class="wz-main">
+    <ol class="wz-steps">
+      @for (p of pasos; track p.titulo; let i = $index) {
+        <li>
+          <button
+            type="button"
+            class="wz-step"
+            [class.active]="paso() === i"
+            [class.done]="i < paso() || (i < 3 && seleccion[i]() && paso() !== i)"
+            [disabled]="i > alcanzable()"
+            (click)="irA(i)"
+          >
+            <span class="wz-dot">
+              @if (i < paso()) {
+                <svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7" /></svg>
+              } @else {
+                {{ i + 1 }}
+              }
+            </span>
+            <span class="wz-step-text">
+              <small>Paso {{ i + 1 }}</small>
+              <strong>{{ p.titulo }}</strong>
+            </span>
+          </button>
+        </li>
+      }
+    </ol>
+
+    <div class="wz-body">
+      <header class="wz-head">
+        <div>
+          <h2>{{ actual().titulo }}</h2>
+          <p>{{ actual().descripcion }}</p>
+        </div>
+        @if (!creando()) {
+          <button class="btn btn-secondary" type="button" (click)="abrirFormulario()">
+            <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" /></svg>
+            Registrar {{ actual().singular }}
+          </button>
+        }
+      </header>
+
+      @if (creando()) {
+        <form class="wz-form" (ngSubmit)="guardar()">
+          <h3>Nuevo registro · {{ actual().titulo }}</h3>
+          @if (paso() > 0) {
+            <p class="wz-form-parent">
+              Se asociará a <strong>{{ seleccion[paso() - 1]()?.nombre }}</strong>
+            </p>
+          }
+          <div class="wz-form-grid" [class.two]="paso() === 1">
+            <label class="field">
+              <span>Nombre *</span>
+              <input name="nombre" [(ngModel)]="nombre" required maxlength="160" autocomplete="off"
+                [placeholder]="paso() === 0 ? 'Ej. Universidad Surcolombiana' : paso() === 1 ? 'Ej. Sede Central' : paso() === 2 ? 'Ej. Facultad de Ingeniería' : 'Ej. Ingeniería de Software'" />
+            </label>
+            @if (paso() === 1) {
+              <label class="field">
+                <span>Ciudad *</span>
+                <input name="ciudad" [(ngModel)]="ciudad" required maxlength="120" autocomplete="off" placeholder="Ej. Neiva" />
+              </label>
+            }
+          </div>
+          <div class="wz-form-actions">
+            <button class="btn btn-ghost" type="button" (click)="cerrarFormulario()">Cancelar</button>
+            <button class="btn" type="submit" [disabled]="guardando() || !nombre.trim() || (paso() === 1 && !ciudad.trim())">
+              {{ guardando() ? 'Guardando…' : 'Guardar' }}
+            </button>
+          </div>
+        </form>
+      }
+
+      @if (listas[paso()]().length > 5) {
+        <div class="wz-search">
+          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" /><path d="M20 20l-3.5-3.5" /></svg>
+          <input type="search" placeholder="Buscar {{ actual().singular }}…" [ngModel]="filtro()" (ngModelChange)="filtro.set($event)" />
+        </div>
+      }
+
+      <div class="wz-list" role="listbox">
+        @if (cargando()) {
+          <p class="wz-empty">Cargando…</p>
+        } @else {
+          @for (n of items(); track n.id) {
+            @if (paso() < 3) {
+              <button type="button" class="wz-option" role="option" [class.selected]="seleccionado()?.id === n.id"
+                [attr.aria-selected]="seleccionado()?.id === n.id" (click)="seleccionar(n)">
+                <span class="wz-radio"></span>
+                <span class="wz-option-text">
+                  <strong>{{ n.nombre }}</strong>
+                  @if (n.ciudad) {
+                    <small>{{ n.ciudad }}</small>
+                  }
+                </span>
+              </button>
+            } @else {
+              <div class="wz-option static">
+                <svg viewBox="0 0 24 24"><path d="M4 19.5V5a2 2 0 0 1 2-2h12v16H6a2 2 0 0 0-2 2zM18 19v2H6" /></svg>
+                <span class="wz-option-text"><strong>{{ n.nombre }}</strong></span>
+              </div>
+            }
+          } @empty {
+            <p class="wz-empty">
+              @if (filtro()) {
+                No hay resultados para "{{ filtro() }}".
+              } @else {
+                Aún no hay registros. Use <b>Registrar {{ actual().singular }}</b> para crear el primero.
+              }
+            </p>
+          }
+        }
+      </div>
+
+      <footer class="wz-foot">
+        <button class="btn btn-ghost" type="button" [disabled]="paso() === 0" (click)="anterior()">
+          <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6" /></svg>
+          Anterior
+        </button>
+        @if (paso() < 3) {
+          <button class="btn" type="button" [disabled]="!seleccionado()" (click)="siguiente()">
+            Continuar
+            <svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6" /></svg>
+          </button>
+        } @else {
+          <button class="btn btn-secondary" type="button" (click)="reiniciar()">Iniciar nueva ruta</button>
+        }
+      </footer>
     </div>
-  </article>
-  <article class="card">
-    <h2>Sedes</h2>
-    @for (s of sedes(); track s.id) {
-      <button class="tree-node" type="button" (click)="selectSede(s.id)" [style.border-color]="sede === s.id ? 'var(--vino)' : ''">{{ s.nombre }} <span class="muted">{{ s.ciudad }}</span></button>
-    }
-    <div class="toolbar">
-      <label class="field grow"><span>Nombre</span><input [(ngModel)]="sedeNombre" /></label>
-      <label class="field"><span>Ciudad</span><input [(ngModel)]="sedeCiudad" /></label>
-      <button class="btn" type="button" (click)="crearSede()">Agregar</button>
-    </div>
-  </article>
-  <article class="card">
-    <h2>Facultades</h2>
-    @for (f of facs(); track f.id) {
-      <button class="tree-node" type="button" (click)="selectFac(f.id)" [style.border-color]="fac === f.id ? 'var(--vino)' : ''">{{ f.nombre }}</button>
-    }
-    <div class="toolbar">
-      <label class="field grow"><span>Nombre</span><input [(ngModel)]="facNombre" /></label>
-      <button class="btn" type="button" (click)="crearFac()">Agregar</button>
-    </div>
-  </article>
-  <article class="card">
-    <h2>Programas</h2>
-    @for (p of progs(); track p.id) {
-      <div class="tree-node">{{ p.nombre }}</div>
-    }
-    <div class="toolbar">
-      <label class="field grow"><span>Nombre</span><input [(ngModel)]="progNombre" /></label>
-      <button class="btn" type="button" (click)="crearProg()">Agregar</button>
-    </div>
-  </article>
+  </section>
+
+  <aside class="wz-summary">
+    <h3>Resumen de la ruta</h3>
+    <dl>
+      @for (p of pasos.slice(0, 3); track p.titulo; let i = $index) {
+        <div [class.empty]="!seleccion[i]()">
+          <dt>{{ p.titulo }}</dt>
+          <dd>
+            {{ seleccion[i]()?.nombre ?? 'Sin seleccionar' }}
+            @if (seleccion[i]()?.ciudad) {
+              <small>{{ seleccion[i]()?.ciudad }}</small>
+            }
+          </dd>
+        </div>
+      }
+      <div [class.empty]="paso() < 3">
+        <dt>Programas</dt>
+        <dd>{{ paso() === 3 ? listas[3]().length + ' registrados' : '—' }}</dd>
+      </div>
+    </dl>
+  </aside>
 </div>
