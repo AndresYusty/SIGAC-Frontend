@@ -1,11 +1,11 @@
 import { Component, computed, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { AuthService } from '../core/auth.service';
-import { ConfirmService } from '../core/confirm.service';
-import { RoleName } from '../core/models';
-import { ToastService } from '../core/toast.service';
-import { TranslatePipe } from '../core/translate.pipe';
-import { LangSwitchComponent } from './lang-switch';
+import { RoleName } from '@core/auth/auth.models';
+import { AuthService } from '@core/auth/auth.service';
+import { ConfirmService } from '@core/ui/confirm.service';
+import { ToastService } from '@core/ui/toast.service';
+import { LangSwitchComponent } from '@shared/components/lang-switch';
+import { TranslatePipe } from '@shared/pipes/translate.pipe';
 
 interface NavItem {
   path: string;

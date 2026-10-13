@@ -6,7 +6,8 @@
     "start": "ng serve --proxy-config proxy.conf.json",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "lint:architecture": "node scripts/check-architecture.mjs"
   },
   "private": true,
   "packageManager": "npm@11.19.0",
