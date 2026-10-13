@@ -2,38 +2,39 @@ import { Component, computed, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AuthService } from '../core/auth.service';
 import { ConfirmService } from '../core/confirm.service';
-import { etiquetaRol } from '../core/labels';
+import { RoleName } from '../core/models';
 import { ToastService } from '../core/toast.service';
+import { TranslatePipe } from '../core/translate.pipe';
+import { LangSwitchComponent } from './lang-switch';
 
 interface NavItem {
   path: string;
-  label: string;
-  roles?: string[];
+  labelKey: string;
+  roles?: RoleName[];
 }
 
 @Component({
   selector: 'app-shell',
-  imports: [RouterOutlet, RouterLink, RouterLinkActive],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, TranslatePipe, LangSwitchComponent],
   templateUrl: './shell.html',
 })
 export class ShellComponent {
   readonly auth = inject(AuthService);
   readonly toasts = inject(ToastService);
   readonly confirm = inject(ConfirmService);
-  readonly etiquetaRol = etiquetaRol;
   readonly year = new Date().getFullYear();
 
   private readonly items: NavItem[] = [
-    { path: '/', label: 'Inicio' },
-    { path: '/solicitudes', label: 'Solicitudes', roles: ['ROLE_SECRETARIA_1', 'ROLE_SECRETARIA_2', 'ROLE_ADMIN'] },
-    { path: '/sesiones', label: 'Sesiones', roles: ['ROLE_SECRETARIA_1', 'ROLE_SECRETARIA_2', 'ROLE_PRESIDENTE', 'ROLE_CONSEJERO', 'ROLE_ADMIN'] },
-    { path: '/actas', label: 'Actas', roles: ['ROLE_SECRETARIA_1', 'ROLE_PRESIDENTE', 'ROLE_ADMIN'] },
-    { path: '/repositorio', label: 'Repositorio', roles: ['ROLE_SECRETARIA_1', 'ROLE_SECRETARIA_2', 'ROLE_PRESIDENTE', 'ROLE_CONSEJERO', 'ROLE_ADMIN'] },
-    { path: '/plantillas', label: 'Plantillas', roles: ['ROLE_DEV'] },
-    { path: '/usuarios', label: 'Usuarios', roles: ['ROLE_ADMIN', 'ROLE_DEV'] },
-    { path: '/jerarquia', label: 'Jerarquía', roles: ['ROLE_ADMIN'] },
-    { path: '/configuracion', label: 'Configuración', roles: ['ROLE_ADMIN'] },
-    { path: '/auditoria', label: 'Auditoría', roles: ['ROLE_ADMIN'] },
+    { path: '/', labelKey: 'nav.home' },
+    { path: '/requests', labelKey: 'nav.requests', roles: ['ROLE_SECRETARY_1', 'ROLE_SECRETARY_2', 'ROLE_ADMIN'] },
+    { path: '/sessions', labelKey: 'nav.sessions', roles: ['ROLE_SECRETARY_1', 'ROLE_SECRETARY_2', 'ROLE_PRESIDENT', 'ROLE_COUNCILOR', 'ROLE_ADMIN'] },
+    { path: '/minutes', labelKey: 'nav.minutes', roles: ['ROLE_SECRETARY_1', 'ROLE_PRESIDENT', 'ROLE_ADMIN'] },
+    { path: '/repository', labelKey: 'nav.repository', roles: ['ROLE_SECRETARY_1', 'ROLE_SECRETARY_2', 'ROLE_PRESIDENT', 'ROLE_COUNCILOR', 'ROLE_ADMIN'] },
+    { path: '/templates', labelKey: 'nav.templates', roles: ['ROLE_DEV'] },
+    { path: '/users', labelKey: 'nav.users', roles: ['ROLE_ADMIN', 'ROLE_DEV'] },
+    { path: '/hierarchy', labelKey: 'nav.hierarchy', roles: ['ROLE_ADMIN'] },
+    { path: '/settings', labelKey: 'nav.settings', roles: ['ROLE_ADMIN'] },
+    { path: '/audit', labelKey: 'nav.audit', roles: ['ROLE_ADMIN'] },
   ];
 
   readonly nav = computed(() => this.items.filter((i) => !i.roles || this.auth.has(...i.roles)));

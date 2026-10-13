@@ -4,7 +4,7 @@ export interface ApiError {
   error: string;
   message: string;
   path: string;
-  detalles: string[];
+  details: string[];
 }
 
 export interface Page<T> {
@@ -17,241 +17,256 @@ export interface Page<T> {
   last: boolean;
 }
 
-export interface UsuarioDto {
+export interface UserDto {
   id: number;
-  nombre: string;
+  name: string;
   email: string;
-  activo: boolean;
-  roles: string[];
-  facultadId: number | null;
-  facultadNombre: string | null;
-  programaId: number | null;
-  programaNombre: string | null;
-  ultimoAcceso: string | null;
+  active: boolean;
+  roles: RoleName[];
+  facultyId: number | null;
+  facultyName: string | null;
+  programId: number | null;
+  programName: string | null;
+  lastLogin: string | null;
 }
 
 export interface LoginResponse {
   token: string;
-  tipo: string;
-  expiraEn: string;
-  usuario: UsuarioDto;
+  type: string;
+  expiresAt: string;
+  user: UserDto;
 }
 
-export interface MensajeResponse {
-  mensaje: string;
+export interface MessageResponse {
+  message: string;
 }
 
-export interface SessionState {
-  token: string;
-  tipo: string;
-  expiraEn: string;
-  usuario: UsuarioDto;
-}
+export type AuthSession = LoginResponse;
 
-export interface NodoDto {
+export interface NodeDto {
   id: number;
-  nombre: string;
-  padreId: number | null;
-  ciudad: string | null;
+  name: string;
+  parentId: number | null;
+  city: string | null;
 }
 
-export interface TipoConsejoDto {
+export interface CouncilTypeDto {
   id: number;
-  codigo: string;
-  nombre: string;
+  code: string;
+  name: string;
 }
 
-export interface ParametroDto {
-  clave: string;
-  valor: string;
-  descripcion: string;
+export interface ParameterDto {
+  key: string;
+  value: string;
+  description: string;
 }
 
-export interface VariableDto {
-  nombre: string;
-  tipo: string;
-  descripcion: string;
-  ejemplo: string;
+export interface TemplateVariableDto {
+  name: string;
+  type: string;
+  description: string;
+  example: string;
 }
 
-export interface PlantillaDto {
+export interface TemplateDto {
   id: number;
-  nombre: string;
-  tipoConsejoId: number;
-  tipoConsejoNombre: string;
-  facultadId: number | null;
-  facultadNombre: string | null;
+  name: string;
+  councilTypeId: number;
+  councilTypeName: string;
+  facultyId: number | null;
+  facultyName: string | null;
   version: number;
-  activa: boolean;
-  comentario: string | null;
-  creadoPor: string;
-  creadoEn: string;
-  contenido: string | null;
+  active: boolean;
+  comment: string | null;
+  createdBy: string;
+  createdAt: string;
+  content: string | null;
 }
 
-export type TipoSolicitud = 'ACADEMICA' | 'ADMINISTRATIVA' | 'ESTUDIANTIL' | 'DOCENTE';
-export type EstadoSolicitud = 'RADICADO' | 'DEVUELTO' | 'RECHAZADO' | 'APROBADO' | 'EN_AGENDA' | 'PROCESADO';
-export type EstadoSesion = 'PROGRAMADA' | 'CONVOCADA' | 'INICIADA' | 'SUSPENDIDA' | 'FINALIZADA';
-export type EstadoActa = 'BORRADOR' | 'EN_EDICION' | 'PENDIENTE_DE_FIRMA' | 'PUBLICADA';
-export type ResultadoDecision = 'APROBADO' | 'NEGADO' | 'APLAZADO' | 'CANCELADO';
+export const REQUEST_TYPES = ['ACADEMIC', 'ADMINISTRATIVE', 'STUDENT', 'FACULTY'] as const;
+export const REQUEST_STATUSES = ['FILED', 'RETURNED', 'REJECTED', 'APPROVED', 'ON_AGENDA', 'PROCESSED'] as const;
+export const SESSION_STATUSES = ['SCHEDULED', 'CONVENED', 'STARTED', 'SUSPENDED', 'FINISHED'] as const;
+export const MINUTES_STATUSES = ['DRAFT', 'EDITING', 'PENDING_SIGNATURE', 'PUBLISHED'] as const;
+export const DECISION_RESULTS = ['APPROVED', 'DENIED', 'POSTPONED', 'CANCELLED'] as const;
 
-export interface AnexoDto {
+export type RequestType = (typeof REQUEST_TYPES)[number];
+export type RequestStatus = (typeof REQUEST_STATUSES)[number];
+export type SessionStatus = (typeof SESSION_STATUSES)[number];
+export type MinutesStatus = (typeof MINUTES_STATUSES)[number];
+export type DecisionResult = (typeof DECISION_RESULTS)[number];
+
+export interface AttachmentDto {
   id: number;
-  nombre: string;
-  tamanoBytes: number;
-  hashSha256: string;
+  name: string;
+  sizeBytes: number;
+  sha256Hash: string;
 }
 
-export interface SolicitudDto {
+export interface RequestDto {
   id: number;
-  codigo: string;
-  titulo: string;
-  descripcion: string;
-  solicitante: string;
-  tipoSolicitud: TipoSolicitud;
-  estado: EstadoSolicitud;
-  facultadId: number;
-  facultad: string;
-  programaId: number | null;
-  programa: string | null;
-  radicador: string;
-  fechaRadicacion: string;
-  anexos: AnexoDto[];
+  code: string;
+  title: string;
+  description: string;
+  applicant: string;
+  requestType: RequestType;
+  status: RequestStatus;
+  facultyId: number;
+  faculty: string;
+  programId: number | null;
+  program: string | null;
+  filedBy: string;
+  filedAt: string;
+  attachments: AttachmentDto[];
 }
 
-export interface HistorialDto {
-  estadoAnterior: EstadoSolicitud | null;
-  estadoNuevo: EstadoSolicitud;
-  motivo: string | null;
-  usuario: string;
-  fecha: string;
+export interface RequestHistoryDto {
+  previousStatus: RequestStatus | null;
+  newStatus: RequestStatus;
+  reason: string | null;
+  user: string;
+  date: string;
 }
 
-export interface SesionResumenDto {
+export interface SessionSummaryDto {
   id: number;
-  tipoConsejo: string;
-  facultad: string;
-  fechaProgramada: string;
-  lugar: string;
-  estado: EstadoSesion;
-  agendaCerrada: boolean;
-  totalPuntos: number;
+  councilType: string;
+  faculty: string;
+  scheduledAt: string;
+  location: string;
+  status: SessionStatus;
+  agendaClosed: boolean;
+  totalItems: number;
 }
 
-export interface PuntoDto {
+export interface AgendaItemDto {
   id: number;
-  orden: number;
-  titulo: string;
-  descripcion: string | null;
-  solicitudCodigo: string | null;
-  esVarios: boolean;
-  resultado: ResultadoDecision | null;
-  votosFavor: number;
-  votosContra: number;
-  abstenciones: number;
-  decididoPor: string | null;
-  notasDebate: string | null;
+  order: number;
+  title: string;
+  description: string | null;
+  requestCode: string | null;
+  isMisc: boolean;
+  result: DecisionResult | null;
+  votesFor: number;
+  votesAgainst: number;
+  abstentions: number;
+  decidedBy: string | null;
+  debateNotes: string | null;
 }
 
-export interface SesionDto {
+export interface SessionDto {
   id: number;
-  tipoConsejoId: number;
-  tipoConsejo: string;
-  facultadId: number;
-  facultad: string;
-  fechaProgramada: string;
-  lugar: string;
-  estado: EstadoSesion;
-  agendaCerrada: boolean;
-  inicioReal: string | null;
-  finReal: string | null;
-  puntos: PuntoDto[];
+  councilTypeId: number;
+  councilType: string;
+  facultyId: number;
+  faculty: string;
+  scheduledAt: string;
+  location: string;
+  status: SessionStatus;
+  agendaClosed: boolean;
+  actualStart: string | null;
+  actualEnd: string | null;
+  items: AgendaItemDto[];
 }
 
 export interface QuorumDto {
-  integrantes: number;
-  presentes: number;
-  requeridos: number;
-  porcentaje: number;
-  alcanzado: boolean;
+  members: number;
+  present: number;
+  required: number;
+  percentage: number;
+  reached: boolean;
 }
 
-export interface AsistenteDto {
-  usuarioId: number;
-  nombre: string;
-  rol: string;
-  presente: boolean;
+export interface AttendeeDto {
+  userId: number;
+  name: string;
+  role: RoleName;
+  present: boolean;
 }
 
-export interface AsistenciaDto {
-  estadoSesion: EstadoSesion;
+export interface AttendanceDto {
+  sessionStatus: SessionStatus;
   quorum: QuorumDto;
-  asistentes: AsistenteDto[];
+  attendees: AttendeeDto[];
 }
 
-export interface ActaDto {
+export interface MinutesDto {
   id: number;
-  consecutivo: string;
-  estado: EstadoActa;
-  sesionId: number;
-  tipoConsejo: string;
-  facultad: string;
-  fechaSesion: string;
-  observacionRechazo: string | null;
-  firmadoPor: string | null;
-  firmadoEn: string | null;
-  contenidoHtml: string | null;
+  number: string;
+  status: MinutesStatus;
+  sessionId: number;
+  councilType: string;
+  faculty: string;
+  sessionDate: string;
+  rejectionNote: string | null;
+  signedBy: string | null;
+  signedAt: string | null;
+  contentHtml: string | null;
 }
 
-export interface RepositorioActaDto {
+export interface RepositoryMinutesDto {
   id: number;
-  consecutivo: string;
-  tipoConsejo: string;
-  universidad: string;
-  sede: string;
-  facultad: string;
-  fechaSesion: string;
-  firmadoPor: string;
-  firmadoEn: string;
-  hashSha256: string;
+  number: string;
+  councilType: string;
+  university: string;
+  campus: string;
+  faculty: string;
+  sessionDate: string;
+  signedBy: string;
+  signedAt: string;
+  sha256Hash: string;
 }
 
-export interface VerificacionDto {
-  consecutivo: string;
-  hashAlmacenado: string;
-  hashCalculado: string;
-  integro: boolean;
+export interface VerificationDto {
+  number: string;
+  storedHash: string;
+  computedHash: string;
+  intact: boolean;
 }
 
 export interface AuditLogDto {
   id: number;
-  evento: string;
-  usuarioEmail: string;
+  event: string;
+  userEmail: string;
   ip: string;
-  entidad: string;
-  entidadId: string;
-  detalle: string | null;
-  fecha: string;
+  entity: string;
+  entityId: string;
+  detail: string | null;
+  date: string;
+}
+
+export interface PublishedMinutesSummary {
+  id: number;
+  number: string;
+  sessionDate: string;
+}
+
+export interface DashboardIndicators {
+  myRequestsByStatus?: Partial<Record<RequestStatus, number>>;
+  requestsPendingReview?: number;
+  approvedRequestsWithoutAgenda?: number;
+  upcomingSessions?: number;
+  minutesInProgress?: number;
+  minutesPendingSignature?: number;
+  finishedSessions?: number;
+  latestPublishedMinutes?: PublishedMinutesSummary[];
+  activeUsers?: number;
+  inactiveUsers?: number;
+  publishedMinutesTotal?: number;
 }
 
 export interface DashboardDto {
-  usuario: string;
-  indicadores: Record<string, unknown>;
-}
-
-export interface ActaPublicadaResumen {
-  id: number;
-  consecutivo: string;
-  fechaSesion: string;
+  user: string;
+  indicators: DashboardIndicators;
 }
 
 export const ROLES = [
   'ROLE_ADMIN',
   'ROLE_DEV',
-  'ROLE_SECRETARIA_1',
-  'ROLE_SECRETARIA_2',
-  'ROLE_PRESIDENTE',
-  'ROLE_CONSEJERO',
+  'ROLE_SECRETARY_1',
+  'ROLE_SECRETARY_2',
+  'ROLE_PRESIDENT',
+  'ROLE_COUNCILOR',
 ] as const;
 
-export type RolNombre = (typeof ROLES)[number];
+export type RoleName = (typeof ROLES)[number];

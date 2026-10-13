@@ -1,27 +1,27 @@
 :root {
-  --vino: #8f141b;
-  --vino-oscuro: #5c0e12;
-  --vino-profundo: #3f0a0d;
-  --vino-medio: #b15b60;
-  --vino-suave: #e3c5c6;
-  --vino-claro: #f4e7e8;
-  --gris: #4d626c;
-  --gris-medio: #839198;
-  --gris-claro: #dbe0e2;
-  --gris-papel: #edeff0;
-  --gris-oscuro: #1e262b;
-  --ocre: #dfd4a6;
-  --ocre-fuerte: #c7b363;
-  --ocre-claro: #f5f2e4;
-  --ocre-papel: #f9f6ed;
+  --wine: #8f141b;
+  --wine-dark: #5c0e12;
+  --wine-deep: #3f0a0d;
+  --wine-mid: #b15b60;
+  --wine-soft: #e3c5c6;
+  --wine-light: #f4e7e8;
+  --gray: #4d626c;
+  --gray-mid: #839198;
+  --gray-light: #dbe0e2;
+  --gray-paper: #edeff0;
+  --gray-dark: #1e262b;
+  --ochre: #dfd4a6;
+  --ochre-strong: #c7b363;
+  --ochre-light: #f5f2e4;
+  --ochre-paper: #f9f6ed;
   --ok: #2f6b3c;
   --warn: #9a6b12;
   --danger: #8f141b;
   --info: #35586a;
-  --sombra: 0 10px 30px rgba(30, 38, 43, 0.08);
-  --sombra-suave: 0 2px 10px rgba(30, 38, 43, 0.06);
-  --radio: 14px;
-  --fuente: 'Source Sans 3', 'Segoe UI', sans-serif;
+  --shadow: 0 10px 30px rgba(30, 38, 43, 0.08);
+  --shadow-soft: 0 2px 10px rgba(30, 38, 43, 0.06);
+  --radius: 14px;
+  --font: 'Source Sans 3', 'Segoe UI', sans-serif;
   --display: 'Libre Baskerville', Georgia, serif;
   --sidebar: 272px;
 }
@@ -36,9 +36,9 @@ html,
 body {
   margin: 0;
   min-height: 100%;
-  font-family: var(--fuente);
-  color: var(--gris-oscuro);
-  background: var(--ocre-papel);
+  font-family: var(--font);
+  color: var(--gray-dark);
+  background: var(--ochre-paper);
 }
 
 body {
@@ -48,7 +48,7 @@ body {
 }
 
 a {
-  color: var(--vino);
+  color: var(--wine);
   text-decoration: none;
 }
 
@@ -63,7 +63,7 @@ h1,
 h2,
 h3 {
   font-family: var(--display);
-  color: var(--vino-oscuro);
+  color: var(--wine-dark);
   margin: 0 0 0.4rem;
   letter-spacing: -0.02em;
 }
@@ -79,8 +79,8 @@ p {
 }
 
 .auth-hero {
-  background: linear-gradient(165deg, var(--vino-profundo), var(--vino) 55%, #7a1017);
-  color: var(--ocre);
+  background: linear-gradient(165deg, var(--wine-deep), var(--wine) 55%, #7a1017);
+  color: var(--ochre);
   padding: 2.4rem;
   display: flex;
   flex-direction: column;
@@ -134,7 +134,7 @@ p {
 }
 
 .auth-brand h1 {
-  color: var(--ocre);
+  color: var(--ochre);
   font-size: 1.15rem;
   margin: 0;
 }
@@ -143,7 +143,7 @@ p {
   display: block;
   margin-top: 0.25rem;
   color: #f4e7e8;
-  font-family: var(--fuente);
+  font-family: var(--font);
   letter-spacing: 0.16em;
   text-transform: uppercase;
   font-size: 0.68rem;
@@ -163,7 +163,7 @@ p {
 }
 
 .auth-copy p {
-  color: var(--vino-suave);
+  color: var(--wine-soft);
   line-height: 1.55;
 }
 
@@ -171,11 +171,12 @@ p {
   position: relative;
   z-index: 1;
   font-size: 0.78rem;
-  color: var(--ocre);
+  color: var(--ochre);
   opacity: 0.8;
 }
 
 .auth-panel {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -185,13 +186,13 @@ p {
 .auth-card {
   width: min(440px, 100%);
   background: #fff;
-  border: 1px solid var(--ocre);
-  box-shadow: var(--sombra);
+  border: 1px solid var(--ochre);
+  box-shadow: var(--shadow);
   padding: 2rem 1.7rem 1.6rem;
 }
 
 .auth-card .kicker {
-  color: var(--vino);
+  color: var(--wine);
   letter-spacing: 0.18em;
   text-transform: uppercase;
   font-size: 0.72rem;
@@ -216,7 +217,7 @@ p {
 }
 
 .auth-card .lead {
-  color: var(--gris);
+  color: var(--gray);
   margin-bottom: 1.4rem;
 }
 
@@ -235,14 +236,14 @@ p {
 }
 
 .sidebar {
-  background: linear-gradient(180deg, var(--vino-profundo), var(--vino-oscuro) 40%, #4a0c10);
-  color: var(--ocre-claro);
+  background: linear-gradient(180deg, var(--wine-deep), var(--wine-dark) 40%, #4a0c10);
+  color: var(--ochre-light);
   display: flex;
   flex-direction: column;
   position: sticky;
   top: 0;
   height: 100vh;
-  border-right: 4px solid var(--ocre-fuerte);
+  border-right: 4px solid var(--ochre-strong);
 }
 
 .sidebar-brand {
@@ -263,7 +264,7 @@ p {
   display: block;
   font-family: var(--display);
   font-size: 0.95rem;
-  color: var(--ocre);
+  color: var(--ochre);
 }
 
 .sidebar-brand span {
@@ -271,7 +272,7 @@ p {
   font-size: 0.72rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--vino-suave);
+  color: var(--wine-soft);
 }
 
 .nav {
@@ -297,7 +298,7 @@ p {
 .nav a:hover,
 .nav a.active {
   background: rgba(223, 212, 166, 0.16);
-  color: var(--ocre);
+  color: var(--ochre);
 }
 
 .nav .group {
@@ -305,7 +306,7 @@ p {
   font-size: 0.68rem;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--ocre-fuerte);
+  color: var(--ochre-strong);
 }
 
 .sidebar-user {
@@ -320,7 +321,7 @@ p {
 }
 
 .sidebar-user span {
-  color: var(--ocre);
+  color: var(--ochre);
 }
 
 .workspace {
@@ -334,7 +335,7 @@ p {
 
 .topbar {
   background: #fff;
-  border-bottom: 1px solid var(--ocre);
+  border-bottom: 1px solid var(--ochre);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -345,12 +346,46 @@ p {
 }
 
 .topbar .uni {
-  color: var(--gris);
+  color: var(--gray);
   font-size: 0.9rem;
 }
 
 .topbar .uni b {
-  color: var(--vino);
+  color: var(--wine);
+}
+
+.lang-switch {
+  display: inline-flex;
+  border: 1px solid var(--gray-light);
+  border-radius: 8px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.lang-switch button {
+  border: 0;
+  background: transparent;
+  color: var(--gray);
+  font-weight: 700;
+  font-size: 0.8rem;
+  letter-spacing: 0.06em;
+  padding: 0.5rem 0.7rem;
+  cursor: pointer;
+}
+
+.lang-switch button + button {
+  border-left: 1px solid var(--gray-light);
+}
+
+.lang-switch button.active {
+  background: var(--wine);
+  color: #fff;
+}
+
+.auth-panel .lang-switch {
+  position: absolute;
+  top: 1.2rem;
+  right: 1.4rem;
 }
 
 .page {
@@ -371,7 +406,7 @@ p {
 }
 
 .kicker {
-  color: var(--vino);
+  color: var(--wine);
   letter-spacing: 0.16em;
   text-transform: uppercase;
   font-size: 0.72rem;
@@ -380,7 +415,7 @@ p {
 }
 
 .lead {
-  color: var(--gris);
+  color: var(--gray);
 }
 
 .grid {
@@ -398,9 +433,9 @@ p {
 
 .card {
   background: #fff;
-  border: 1px solid var(--ocre);
-  border-radius: var(--radio);
-  box-shadow: var(--sombra-suave);
+  border: 1px solid var(--ochre);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-soft);
   padding: 1.1rem 1.15rem;
 }
 
@@ -416,11 +451,11 @@ p {
   top: 0;
   bottom: 0;
   width: 5px;
-  background: var(--vino);
+  background: var(--wine);
 }
 
 .stat .label {
-  color: var(--gris);
+  color: var(--gray);
   font-size: 0.82rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -429,7 +464,7 @@ p {
 .stat .value {
   font-family: var(--display);
   font-size: 1.8rem;
-  color: var(--vino-oscuro);
+  color: var(--wine-dark);
   margin-top: 0.35rem;
 }
 
@@ -456,7 +491,7 @@ p {
 .field label {
   font-size: 0.78rem;
   font-weight: 700;
-  color: var(--gris);
+  color: var(--gray);
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
@@ -464,9 +499,9 @@ p {
 input,
 select,
 textarea {
-  border: 1px solid var(--gris-claro);
+  border: 1px solid var(--gray-light);
   background: #fff;
-  color: var(--gris-oscuro);
+  color: var(--gray-dark);
   border-radius: 8px;
   padding: 0.58rem 0.72rem;
   width: 100%;
@@ -475,8 +510,8 @@ textarea {
 input:focus,
 select:focus,
 textarea:focus {
-  outline: 2px solid var(--ocre-fuerte);
-  border-color: var(--vino-medio);
+  outline: 2px solid var(--ochre-strong);
+  border-color: var(--wine-mid);
 }
 
 .password-field {
@@ -494,7 +529,7 @@ textarea:focus {
   transform: translateY(-50%);
   border: 0;
   background: transparent;
-  color: var(--vino);
+  color: var(--wine);
   cursor: pointer;
   padding: 0.35rem;
   display: inline-flex;
@@ -504,7 +539,7 @@ textarea:focus {
 }
 
 .password-toggle:hover {
-  background: var(--vino-claro);
+  background: var(--wine-light);
 }
 
 .password-toggle svg {
@@ -524,7 +559,7 @@ textarea {
   border-radius: 8px;
   padding: 0.58rem 0.95rem;
   font-weight: 700;
-  background: var(--vino);
+  background: var(--wine);
   color: #fff;
   display: inline-flex;
   align-items: center;
@@ -532,7 +567,7 @@ textarea {
 }
 
 .btn:hover {
-  background: var(--vino-oscuro);
+  background: var(--wine-dark);
 }
 
 .btn:disabled {
@@ -542,27 +577,27 @@ textarea {
 
 .btn-secondary {
   background: #fff;
-  color: var(--vino);
-  border: 1px solid var(--vino);
+  color: var(--wine);
+  border: 1px solid var(--wine);
 }
 
 .btn-secondary:hover {
-  background: var(--vino-claro);
+  background: var(--wine-light);
 }
 
 .btn-ghost {
   background: transparent;
-  color: var(--gris);
-  border: 1px solid var(--gris-claro);
+  color: var(--gray);
+  border: 1px solid var(--gray-light);
 }
 
 .btn-danger {
-  background: var(--vino-oscuro);
+  background: var(--wine-dark);
 }
 
-.btn-ocre {
-  background: var(--ocre-fuerte);
-  color: var(--vino-oscuro);
+.btn-ochre {
+  background: var(--ochre-strong);
+  color: var(--wine-dark);
 }
 
 .table-wrap {
@@ -584,15 +619,15 @@ th {
   font-size: 0.75rem;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--gris);
+  color: var(--gray);
   padding: 0.7rem 0.65rem;
-  border-bottom: 2px solid var(--ocre);
+  border-bottom: 2px solid var(--ochre);
   white-space: nowrap;
 }
 
 td {
   padding: 0.72rem 0.65rem;
-  border-bottom: 1px solid var(--gris-papel);
+  border-bottom: 1px solid var(--gray-paper);
   vertical-align: middle;
 }
 
@@ -602,7 +637,7 @@ th:last-child {
 }
 
 tr:hover td {
-  background: var(--ocre-papel);
+  background: var(--ochre-paper);
 }
 
 .badge {
@@ -613,8 +648,8 @@ tr:hover td {
   font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.02em;
-  background: var(--gris-papel);
-  color: var(--gris);
+  background: var(--gray-paper);
+  color: var(--gray);
 }
 
 .badge.ok {
@@ -628,8 +663,8 @@ tr:hover td {
 }
 
 .badge.danger {
-  background: var(--vino-claro);
-  color: var(--vino);
+  background: var(--wine-light);
+  color: var(--wine);
 }
 
 .badge.info {
@@ -638,8 +673,8 @@ tr:hover td {
 }
 
 .badge.muted {
-  background: var(--gris-papel);
-  color: var(--gris);
+  background: var(--gray-paper);
+  color: var(--gray);
 }
 
 .pager {
@@ -648,12 +683,12 @@ tr:hover td {
   justify-content: flex-end;
   gap: 0.7rem;
   margin-top: 1rem;
-  color: var(--gris);
+  color: var(--gray);
 }
 
 .empty {
   text-align: center;
-  color: var(--gris);
+  color: var(--gray);
   padding: 2.2rem 1rem;
 }
 
@@ -662,7 +697,7 @@ tr:hover td {
 }
 
 .error-text {
-  color: var(--vino);
+  color: var(--wine);
   font-size: 0.88rem;
   line-height: 1.4;
   overflow-wrap: anywhere;
@@ -681,8 +716,8 @@ tr:hover td {
 
 .toast {
   background: #fff;
-  border-left: 5px solid var(--gris);
-  box-shadow: var(--sombra);
+  border-left: 5px solid var(--gray);
+  box-shadow: var(--shadow);
   padding: 0.8rem 0.9rem;
   font-size: 0.92rem;
 }
@@ -692,7 +727,7 @@ tr:hover td {
 }
 
 .toast.error {
-  border-color: var(--vino);
+  border-color: var(--wine);
 }
 
 .toast.info {
@@ -713,10 +748,10 @@ tr:hover td {
 .modal {
   background: #fff;
   width: min(520px, 100%);
-  border-radius: var(--radio);
-  border-top: 6px solid var(--vino);
+  border-radius: var(--radius);
+  border-top: 6px solid var(--wine);
   padding: 1.2rem 1.2rem 1rem;
-  box-shadow: var(--sombra);
+  box-shadow: var(--shadow);
 }
 
 .modal-actions {
@@ -733,8 +768,8 @@ tr:hover td {
 }
 
 .chip {
-  background: var(--ocre-claro);
-  color: var(--vino-oscuro);
+  background: var(--ochre-light);
+  color: var(--wine-dark);
   border-radius: 999px;
   padding: 0.12rem 0.55rem;
   font-size: 0.75rem;
@@ -755,7 +790,7 @@ tr:hover td {
 }
 
 .timeline-item {
-  border-left: 3px solid var(--ocre-fuerte);
+  border-left: 3px solid var(--ochre-strong);
   padding-left: 0.8rem;
 }
 
@@ -768,7 +803,7 @@ tr:hover td {
 .quorum-bar {
   flex: 1;
   height: 10px;
-  background: var(--gris-papel);
+  background: var(--gray-paper);
   border-radius: 99px;
   overflow: hidden;
 }
@@ -776,12 +811,12 @@ tr:hover td {
 .quorum-bar span {
   display: block;
   height: 100%;
-  background: var(--vino);
+  background: var(--wine);
 }
 
 .live-banner {
-  background: var(--vino);
-  color: var(--ocre);
+  background: var(--wine);
+  color: var(--ochre);
   padding: 0.7rem 1rem;
   border-radius: 10px;
   display: flex;
@@ -800,18 +835,18 @@ tr:hover td {
 .preview-frame {
   width: 100%;
   min-height: 70vh;
-  border: 1px solid var(--ocre);
+  border: 1px solid var(--ochre);
   background: #fff;
 }
 
 .footer-note {
-  color: var(--gris-medio);
+  color: var(--gray-mid);
   font-size: 0.78rem;
   padding: 0 1.5rem 1.2rem;
 }
 
 .tree-node {
-  border: 1px solid var(--ocre);
+  border: 1px solid var(--ochre);
   border-radius: 10px;
   padding: 0.8rem;
   background: #fff;
@@ -822,7 +857,7 @@ tr:hover td {
 }
 
 .muted {
-  color: var(--gris);
+  color: var(--gray);
   font-size: 0.88rem;
 }
 
@@ -836,7 +871,7 @@ tr:hover td {
   align-items: center;
   gap: 0.6rem;
   padding: 0.45rem 0.2rem;
-  border-bottom: 1px solid var(--gris-papel);
+  border-bottom: 1px solid var(--gray-paper);
 }
 
 @media (max-width: 1100px) {

@@ -1,0 +1,77 @@
+<div class="page-head">
+  <div>
+    <p class="kicker">{{ 'requests.list.kicker' | t }}</p>
+    <h1>{{ 'requests.list.title' | t }}</h1>
+    <p class="lead">{{ 'requests.list.lead' | t }}</p>
+  </div>
+  @if (auth.has('ROLE_SECRETARY_2')) {
+    <a routerLink="/requests/new" class="btn">{{ 'requests.list.file' | t }}</a>
+  }
+</div>
+
+<div class="toolbar">
+  <label class="field">
+    <span>{{ 'common.status' | t }}</span>
+    <select [(ngModel)]="status">
+      <option value="">{{ 'common.all' | t }}</option>
+      @for (s of statuses; track s) {
+        <option [value]="s">{{ 'enums.requestStatus.' + s | t }}</option>
+      }
+    </select>
+  </label>
+  <label class="field">
+    <span>{{ 'common.code' | t }}</span>
+    <input [(ngModel)]="code" [placeholder]="'requests.list.codePlaceholder' | t" />
+  </label>
+  <label class="field">
+    <span>{{ 'common.from' | t }}</span>
+    <input type="date" [(ngModel)]="from" />
+  </label>
+  <label class="field">
+    <span>{{ 'common.to' | t }}</span>
+    <input type="date" [(ngModel)]="to" />
+  </label>
+  <button class="btn" type="button" (click)="load()">{{ 'common.filter' | t }}</button>
+</div>
+
+<article class="card table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>{{ 'common.code' | t }}</th>
+        <th>{{ 'common.title' | t }}</th>
+        <th>{{ 'common.type' | t }}</th>
+        <th>{{ 'common.status' | t }}</th>
+        <th>{{ 'requests.list.filedAt' | t }}</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (r of page()?.content ?? []; track r.id) {
+        <tr>
+          <td>{{ r.code }}</td>
+          <td>{{ r.title }}</td>
+          <td>{{ 'enums.requestType.' + r.requestType | t }}</td>
+          <td><span class="badge" [class]="tone[r.status]">{{ 'enums.requestStatus.' + r.status | t }}</span></td>
+          <td>{{ r.filedAt | localDate: 'dd/MM/yyyy HH:mm' }}</td>
+          <td><a [routerLink]="['/requests', r.id]" class="btn btn-ghost">{{ 'common.open' | t }}</a></td>
+        </tr>
+      }
+    </tbody>
+  </table>
+  @if (!page()?.content?.length) {
+    <div class="empty">
+      <h3>{{ 'requests.list.emptyTitle' | t }}</h3>
+      <p>{{ 'requests.list.emptyText' | t }}</p>
+    </div>
+  }
+</article>
+<div class="pager">
+  <button class="btn btn-ghost" type="button" [disabled]="page()?.first" (click)="load((page()?.number ?? 1) - 1)">
+    {{ 'common.previous' | t }}
+  </button>
+  <span>{{ 'common.pageOf' | t: { page: (page()?.number ?? 0) + 1, total: page()?.totalPages || 1 } }}</span>
+  <button class="btn btn-ghost" type="button" [disabled]="page()?.last" (click)="load((page()?.number ?? -1) + 1)">
+    {{ 'common.next' | t }}
+  </button>
+</div>

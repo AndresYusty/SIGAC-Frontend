@@ -1,0 +1,92 @@
+<div class="page-head">
+  <div>
+    <p class="kicker">{{ 'users.kicker' | t }}</p>
+    <h1>{{ 'users.title' | t }}</h1>
+    <p class="lead">{{ 'users.lead' | t }}</p>
+  </div>
+  <button class="btn" type="button" (click)="create()">{{ 'users.new' | t }}</button>
+</div>
+<div class="toolbar">
+  <label class="field grow"><span>{{ 'common.search' | t }}</span><input (input)="search($event)" [placeholder]="'users.searchPlaceholder' | t" /></label>
+</div>
+<article class="card table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>{{ 'common.name' | t }}</th>
+        <th>{{ 'common.email' | t }}</th>
+        <th>{{ 'common.roles' | t }}</th>
+        <th>{{ 'common.faculty' | t }}</th>
+        <th>{{ 'common.status' | t }}</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (u of page()?.content ?? []; track u.id) {
+        <tr>
+          <td>{{ u.name }}</td>
+          <td>{{ u.email }}</td>
+          <td>
+            @for (r of u.roles; track r) {
+              <span class="chip">{{ 'enums.role.' + r | t }}</span>
+            }
+          </td>
+          <td>{{ u.facultyName || '—' }}</td>
+          <td><span class="badge" [class]="u.active ? 'ok' : 'muted'">{{ (u.active ? 'common.active' : 'common.inactive') | t }}</span></td>
+          <td class="row-actions">
+            <button class="btn btn-ghost" type="button" (click)="edit(u)">{{ 'common.edit' | t }}</button>
+            <button class="btn btn-ghost" type="button" (click)="toggle(u)">{{ (u.active ? 'users.deactivate' : 'users.activate') | t }}</button>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</article>
+<div class="pager">
+  <button class="btn btn-ghost" type="button" [disabled]="page()?.first" (click)="load((page()?.number ?? 1) - 1)">{{ 'common.previous' | t }}</button>
+  <span>{{ 'common.pageOf' | t: { page: (page()?.number ?? 0) + 1, total: page()?.totalPages || 1 } }}</span>
+  <button class="btn btn-ghost" type="button" [disabled]="page()?.last" (click)="load((page()?.number ?? -1) + 1)">{{ 'common.next' | t }}</button>
+</div>
+
+@if (showForm) {
+  <div class="modal-backdrop" (click)="showForm = false">
+    <form class="modal" [formGroup]="form" (click)="$event.stopPropagation()" (ngSubmit)="save()">
+      <h2>{{ (editing() ? 'users.editTitle' : 'users.new') | t }}</h2>
+      <label class="field"><span>{{ 'common.name' | t }}</span><input formControlName="name" /></label>
+      <label class="field"><span>{{ 'common.email' | t }}</span><input formControlName="email" [readOnly]="!!editing()" /></label>
+      @if (!editing()) {
+        <label class="field"><span>{{ 'common.password' | t }}</span><input type="password" formControlName="password" /></label>
+      }
+      <label class="field">
+        <span>{{ 'common.role' | t }}</span>
+        <select formControlName="role">
+          @for (r of roles; track r) {
+            <option [value]="r">{{ 'enums.role.' + r | t }}</option>
+          }
+        </select>
+      </label>
+      <label class="field">
+        <span>{{ 'common.faculty' | t }}</span>
+        <select formControlName="facultyId" (change)="loadFacultyPrograms()">
+          <option value="">{{ 'users.noFaculty' | t }}</option>
+          @for (f of faculties(); track f.id) {
+            <option [value]="f.id">{{ f.name }}</option>
+          }
+        </select>
+      </label>
+      <label class="field">
+        <span>{{ 'common.program' | t }}</span>
+        <select formControlName="programId">
+          <option value="">{{ 'common.none' | t }}</option>
+          @for (p of programs(); track p.id) {
+            <option [value]="p.id">{{ p.name }}</option>
+          }
+        </select>
+      </label>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" type="button" (click)="showForm = false">{{ 'common.cancel' | t }}</button>
+        <button class="btn" type="submit">{{ 'common.save' | t }}</button>
+      </div>
+    </form>
+  </div>
+}

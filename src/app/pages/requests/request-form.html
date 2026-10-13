@@ -1,0 +1,49 @@
+<div class="page-head">
+  <div>
+    <p class="kicker">{{ 'requests.form.kicker' | t }}</p>
+    <h1>{{ (id() ? 'requests.form.editTitle' : 'requests.form.newTitle') | t }}</h1>
+    <p class="lead">{{ 'requests.form.lead' | t }}</p>
+  </div>
+  <a routerLink="/requests" class="btn btn-ghost">{{ 'common.back' | t }}</a>
+</div>
+
+<form class="card grid" [formGroup]="form" (ngSubmit)="submit()" style="max-width: 820px">
+  <label class="field">
+    <span>{{ 'common.title' | t }}</span>
+    <input formControlName="title" />
+  </label>
+  <label class="field">
+    <span>{{ 'requests.form.applicant' | t }}</span>
+    <input formControlName="applicant" />
+  </label>
+  <div class="grid grid-2">
+    <label class="field">
+      <span>{{ 'common.type' | t }}</span>
+      <select formControlName="requestType">
+        @for (type of types; track type) {
+          <option [value]="type">{{ 'enums.requestType.' + type | t }}</option>
+        }
+      </select>
+    </label>
+    <label class="field">
+      <span>{{ 'common.program' | t }}</span>
+      <select formControlName="programId">
+        <option value="">{{ 'requests.form.noProgram' | t }}</option>
+        @for (p of programs(); track p.id) {
+          <option [value]="p.id">{{ p.name }}</option>
+        }
+      </select>
+    </label>
+  </div>
+  <label class="field">
+    <span>{{ 'common.description' | t }}</span>
+    <textarea formControlName="description"></textarea>
+  </label>
+  <label class="field">
+    <span>{{ 'requests.form.attachments' | t }}</span>
+    <input type="file" accept="application/pdf" multiple (change)="onFiles($event)" />
+  </label>
+  <div class="row-actions">
+    <button class="btn" type="submit" [disabled]="saving()">{{ (saving() ? 'common.saving' : 'common.save') | t }}</button>
+  </div>
+</form>

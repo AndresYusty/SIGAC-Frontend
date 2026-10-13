@@ -3,7 +3,7 @@ import { Injectable, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { tap } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { LoginResponse, SessionState, UsuarioDto } from './models';
+import { AuthSession, LoginResponse, MessageResponse, RoleName, UserDto } from './models';
 
 const STORAGE_KEY = 'sigac.session';
 
@@ -11,17 +11,17 @@ const STORAGE_KEY = 'sigac.session';
 export class AuthService {
   private readonly http = inject(HttpClient);
   private readonly router = inject(Router);
-  private readonly sessionSig = signal<SessionState | null>(this.restore());
+  private readonly sessionSig = signal<AuthSession | null>(this.restore());
 
   readonly session = this.sessionSig.asReadonly();
-  readonly user = computed(() => this.sessionSig()?.usuario ?? null);
+  readonly user = computed(() => this.sessionSig()?.user ?? null);
   readonly loggedIn = computed(() => !!this.sessionSig()?.token);
 
   token(): string | null {
     return this.sessionSig()?.token ?? null;
   }
 
-  has(...roles: string[]): boolean {
+  has(...roles: RoleName[]): boolean {
     const mine = this.user()?.roles ?? [];
     return roles.some((r) => mine.includes(r));
   }
@@ -32,29 +32,27 @@ export class AuthService {
       .pipe(tap((res) => this.persist(res)));
   }
 
-  forgot(email: string) {
-    return this.http.post<{ mensaje: string }>(`${environment.apiUrl}/auth/forgot-password`, { email });
+  forgotPassword(email: string) {
+    return this.http.post<MessageResponse>(`${environment.apiUrl}/auth/forgot-password`, { email });
   }
 
-  reset(token: string, nuevaClave: string) {
-    return this.http.post<{ mensaje: string }>(`${environment.apiUrl}/auth/reset-password`, { token, nuevaClave });
+  resetPassword(token: string, newPassword: string) {
+    return this.http.post<MessageResponse>(`${environment.apiUrl}/auth/reset-password`, { token, newPassword });
   }
 
   me() {
-    return this.http.get<UsuarioDto>(`${environment.apiUrl}/users/me`).pipe(
-      tap((usuario) => {
+    return this.http.get<UserDto>(`${environment.apiUrl}/users/me`).pipe(
+      tap((user) => {
         const current = this.sessionSig();
         if (current) {
-          const next = { ...current, usuario };
-          this.sessionSig.set(next);
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+          this.persist({ ...current, user });
         }
       }),
     );
   }
 
-  changePassword(claveActual: string, claveNueva: string) {
-    return this.http.put<{ mensaje: string }>(`${environment.apiUrl}/users/me/password`, { claveActual, claveNueva });
+  changePassword(currentPassword: string, newPassword: string) {
+    return this.http.put<MessageResponse>(`${environment.apiUrl}/users/me/password`, { currentPassword, newPassword });
   }
 
   logout(redirect = true): void {
@@ -65,25 +63,19 @@ export class AuthService {
     }
   }
 
-  private persist(res: LoginResponse): void {
-    const state: SessionState = {
-      token: res.token,
-      tipo: res.tipo,
-      expiraEn: res.expiraEn,
-      usuario: res.usuario,
-    };
-    this.sessionSig.set(state);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  private persist(session: AuthSession): void {
+    this.sessionSig.set(session);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(session));
   }
 
-  private restore(): SessionState | null {
+  private restore(): AuthSession | null {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) {
       return null;
     }
     try {
-      const parsed = JSON.parse(raw) as SessionState;
-      if (!parsed.token || new Date(parsed.expiraEn).getTime() <= Date.now()) {
+      const parsed = JSON.parse(raw) as AuthSession;
+      if (!parsed.token || !parsed.user || new Date(parsed.expiresAt).getTime() <= Date.now()) {
         localStorage.removeItem(STORAGE_KEY);
         return null;
       }

@@ -1,0 +1,33 @@
+<div class="page-head">
+  <div>
+    <p class="kicker">{{ 'profile.kicker' | t }}</p>
+    <h1>{{ 'profile.title' | t }}</h1>
+  </div>
+</div>
+<div class="grid grid-2">
+  <article class="card">
+    <h2>{{ auth.user()?.name }}</h2>
+    <p>{{ auth.user()?.email }}</p>
+    <p class="lead">{{ auth.user()?.facultyName || ('profile.institutionalScope' | t) }}</p>
+    <p>
+      @for (r of auth.user()?.roles ?? []; track r) {
+        <span class="chip">{{ 'enums.role.' + r | t }}</span>
+      }
+    </p>
+    @if (auth.user()?.lastLogin; as lastLogin) {
+      <p class="muted">{{ 'profile.lastLogin' | t: { date: (lastLogin | localDate: 'dd/MM/yyyy HH:mm') } }}</p>
+    }
+  </article>
+  <form class="card" [formGroup]="form" (ngSubmit)="save()">
+    <h2>{{ 'profile.changePassword' | t }}</h2>
+    <label class="field">
+      <span>{{ 'profile.currentPassword' | t }}</span>
+      <input type="password" formControlName="currentPassword" autocomplete="current-password" />
+    </label>
+    <label class="field">
+      <span>{{ 'profile.newPassword' | t }}</span>
+      <input type="password" formControlName="newPassword" autocomplete="new-password" />
+    </label>
+    <button class="btn" style="margin-top: 0.8rem" type="submit" [disabled]="saving()">{{ 'profile.update' | t }}</button>
+  </form>
+</div>

@@ -1,16 +1,20 @@
-import { DatePipe, KeyValuePipe } from '@angular/common';
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { KeyValuePipe } from '@angular/common';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ApiService } from '../../core/api.service';
 import { AuthService } from '../../core/auth.service';
-import { apiMessage } from '../../core/http-utils';
-import { etiquetaRol, ESTADO_SOLICITUD } from '../../core/labels';
-import { ActaPublicadaResumen, DashboardDto, EstadoSolicitud } from '../../core/models';
+import { LocalDatePipe } from '../../core/local-date.pipe';
+import { DashboardDto, DashboardIndicators } from '../../core/models';
 import { ToastService } from '../../core/toast.service';
+import { TranslatePipe } from '../../core/translate.pipe';
+
+type CountKey = {
+  [K in keyof DashboardIndicators]-?: DashboardIndicators[K] extends number | undefined ? K : never;
+}[keyof DashboardIndicators];
 
 @Component({
   selector: 'app-dashboard',
-  imports: [RouterLink, DatePipe, KeyValuePipe],
+  imports: [RouterLink, KeyValuePipe, LocalDatePipe, TranslatePipe],
   templateUrl: './dashboard.html',
 })
 export class DashboardPage implements OnInit {
@@ -18,32 +22,29 @@ export class DashboardPage implements OnInit {
   readonly auth = inject(AuthService);
   private readonly toast = inject(ToastService);
   readonly data = signal<DashboardDto | null>(null);
-  readonly etiquetaRol = etiquetaRol;
-  readonly estadoSol = ESTADO_SOLICITUD;
+
+  readonly countKeys: CountKey[] = [
+    'requestsPendingReview',
+    'approvedRequestsWithoutAgenda',
+    'upcomingSessions',
+    'minutesInProgress',
+    'minutesPendingSignature',
+    'finishedSessions',
+    'activeUsers',
+    'publishedMinutesTotal',
+  ];
+
+  readonly stats = computed(() => {
+    const ind = this.data()?.indicators;
+    return ind ? this.countKeys.filter((k) => typeof ind[k] === 'number').map((k) => ({ key: k, value: ind[k] as number })) : [];
+  });
+  readonly byStatus = computed(() => this.data()?.indicators.myRequestsByStatus ?? null);
+  readonly latestMinutes = computed(() => this.data()?.indicators.latestPublishedMinutes ?? []);
 
   ngOnInit(): void {
     this.api.dashboard().subscribe({
       next: (d) => this.data.set(d),
-      error: (e) => this.toast.error(apiMessage(e)),
+      error: (e) => this.toast.apiError(e),
     });
-  }
-
-  num(key: string): number | null {
-    const v = this.data()?.indicadores?.[key];
-    return typeof v === 'number' ? v : null;
-  }
-
-  map(key: string): Record<string, number> | null {
-    const v = this.data()?.indicadores?.[key];
-    return v && typeof v === 'object' && !Array.isArray(v) ? (v as Record<string, number>) : null;
-  }
-
-  actas(): ActaPublicadaResumen[] {
-    const v = this.data()?.indicadores?.['ultimasActasPublicadas'];
-    return Array.isArray(v) ? (v as ActaPublicadaResumen[]) : [];
-  }
-
-  etiquetaEstado(key: string): string {
-    return this.estadoSol[key as EstadoSolicitud] ?? key;
   }
 }

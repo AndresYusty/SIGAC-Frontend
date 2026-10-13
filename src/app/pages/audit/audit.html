@@ -1,0 +1,53 @@
+<div class="page-head">
+  <div>
+    <p class="kicker">{{ 'audit.kicker' | t }}</p>
+    <h1>{{ 'audit.title' | t }}</h1>
+    <p class="lead">{{ 'audit.lead' | t }}</p>
+  </div>
+</div>
+<div class="toolbar">
+  <label class="field">
+    <span>{{ 'audit.event' | t }}</span>
+    <input [(ngModel)]="event" [placeholder]="'audit.eventPlaceholder' | t" />
+  </label>
+  <label class="field">
+    <span>{{ 'common.user' | t }}</span>
+    <input [(ngModel)]="user" />
+  </label>
+  <button class="btn" type="button" (click)="load()">{{ 'common.filter' | t }}</button>
+</div>
+<article class="card table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>{{ 'common.date' | t }}</th>
+        <th>{{ 'audit.event' | t }}</th>
+        <th>{{ 'common.user' | t }}</th>
+        <th>{{ 'audit.entity' | t }}</th>
+        <th>{{ 'audit.ip' | t }}</th>
+        <th>{{ 'common.detail' | t }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (a of page()?.content ?? []; track a.id) {
+        <tr>
+          <td>{{ a.date | localDate: 'dd/MM/yyyy HH:mm:ss' }}</td>
+          <td>{{ a.event }}</td>
+          <td>{{ a.userEmail }}</td>
+          <td>{{ a.entity }} {{ a.entityId }}</td>
+          <td>{{ a.ip }}</td>
+          <td>{{ a.detail }}</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</article>
+<div class="pager">
+  <button class="btn btn-ghost" type="button" [disabled]="page()?.first" (click)="load((page()?.number ?? 1) - 1)">
+    {{ 'common.previous' | t }}
+  </button>
+  <span>{{ 'common.pageOf' | t: { page: (page()?.number ?? 0) + 1, total: page()?.totalPages || 1 } }}</span>
+  <button class="btn btn-ghost" type="button" [disabled]="page()?.last" (click)="load((page()?.number ?? -1) + 1)">
+    {{ 'common.next' | t }}
+  </button>
+</div>

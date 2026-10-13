@@ -1,0 +1,74 @@
+<div class="page-head">
+  <div>
+    <p class="kicker">{{ 'repository.kicker' | t }}</p>
+    <h1>{{ 'repository.title' | t }}</h1>
+    <p class="lead">{{ 'repository.lead' | t }}</p>
+  </div>
+</div>
+<div class="toolbar">
+  <label class="field"><span>{{ 'common.number' | t }}</span><input [(ngModel)]="number" /></label>
+  <label class="field">
+    <span>{{ 'common.type' | t }}</span>
+    <select [(ngModel)]="councilTypeId">
+      <option value="">{{ 'common.all' | t }}</option>
+      @for (ct of councilTypes(); track ct.id) {
+        <option [value]="ct.id">{{ ct.name }}</option>
+      }
+    </select>
+  </label>
+  <label class="field grow"><span>{{ 'repository.text' | t }}</span><input [(ngModel)]="text" /></label>
+  <label class="field"><span>{{ 'common.from' | t }}</span><input type="date" [(ngModel)]="from" /></label>
+  <label class="field"><span>{{ 'common.to' | t }}</span><input type="date" [(ngModel)]="to" /></label>
+  <button class="btn" type="button" (click)="load()">{{ 'common.search' | t }}</button>
+</div>
+<article class="card table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>{{ 'common.number' | t }}</th>
+        <th>{{ 'repository.council' | t }}</th>
+        <th>{{ 'common.faculty' | t }}</th>
+        <th>{{ 'common.date' | t }}</th>
+        <th>{{ 'common.actions' | t }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (m of page()?.content ?? []; track m.id) {
+        <tr>
+          <td>{{ m.number }}</td>
+          <td>{{ m.councilType }}</td>
+          <td>{{ m.faculty }}</td>
+          <td>{{ m.sessionDate | localDate: 'dd/MM/yyyy' }}</td>
+          <td class="row-actions">
+            <button class="btn btn-ghost" type="button" (click)="view(m.id)">{{ 'common.view' | t }}</button>
+            <button class="btn btn-ghost" type="button" (click)="download(m.id, m.number)">{{ 'common.download' | t }}</button>
+            <button class="btn btn-ghost" type="button" (click)="verify(m.id)">{{ 'repository.verify' | t }}</button>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+  @if (!page()?.content?.length) {
+    <div class="empty"><h3>{{ 'repository.emptyTitle' | t }}</h3></div>
+  }
+</article>
+@if (verification() || pdf) {
+  <div class="grid grid-2" style="margin-top: 1rem">
+    @if (verification(); as v) {
+      <article class="card">
+        <h2>{{ 'repository.integrity' | t }}</h2>
+        <p>
+          <span class="badge" [class]="v.intact ? 'ok' : 'danger'">{{ (v.intact ? 'repository.intact' : 'repository.altered') | t }}</span>
+        </p>
+        <p class="muted">{{ 'repository.storedHash' | t: { hash: v.storedHash } }}</p>
+        <p class="muted">{{ 'repository.computedHash' | t: { hash: v.computedHash } }}</p>
+      </article>
+    }
+    @if (pdf) {
+      <article class="card">
+        <h2>{{ 'repository.viewer' | t }}</h2>
+        <iframe class="preview-frame" [src]="pdf" [title]="'repository.viewerFrameTitle' | t"></iframe>
+      </article>
+    }
+  </div>
+}

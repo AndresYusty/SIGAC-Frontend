@@ -1,6 +1,12 @@
 import { Routes } from '@angular/router';
 import { authGuard, guestGuard, roleGuard } from './core/auth.guard';
+import { RoleName } from './core/models';
 import { ShellComponent } from './layout/shell';
+
+const STAFF: RoleName[] = ['ROLE_SECRETARY_1', 'ROLE_SECRETARY_2', 'ROLE_ADMIN'];
+const COUNCIL: RoleName[] = ['ROLE_SECRETARY_1', 'ROLE_SECRETARY_2', 'ROLE_PRESIDENT', 'ROLE_COUNCILOR', 'ROLE_ADMIN'];
+const MINUTES: RoleName[] = ['ROLE_SECRETARY_1', 'ROLE_PRESIDENT', 'ROLE_ADMIN'];
+const LIVE: RoleName[] = ['ROLE_SECRETARY_1', 'ROLE_PRESIDENT', 'ROLE_COUNCILOR', 'ROLE_ADMIN'];
 
 export const routes: Routes = [
   {
@@ -9,7 +15,7 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/login/login').then((m) => m.LoginPage),
   },
   {
-    path: 'recuperar',
+    path: 'forgot-password',
     canActivate: [guestGuard],
     loadComponent: () => import('./pages/login/forgot').then((m) => m.ForgotPage),
   },
@@ -25,102 +31,102 @@ export const routes: Routes = [
     children: [
       { path: '', loadComponent: () => import('./pages/dashboard/dashboard').then((m) => m.DashboardPage) },
       {
-        path: 'solicitudes',
+        path: 'requests',
         canActivate: [roleGuard],
-        data: { roles: ['ROLE_SECRETARIA_1', 'ROLE_SECRETARIA_2', 'ROLE_ADMIN'] },
-        loadComponent: () => import('./pages/solicitudes/solicitudes').then((m) => m.SolicitudesPage),
+        data: { roles: STAFF },
+        loadComponent: () => import('./pages/requests/requests').then((m) => m.RequestsPage),
       },
       {
-        path: 'solicitudes/nueva',
+        path: 'requests/new',
         canActivate: [roleGuard],
-        data: { roles: ['ROLE_SECRETARIA_2'] },
-        loadComponent: () => import('./pages/solicitudes/solicitud-form').then((m) => m.SolicitudFormPage),
+        data: { roles: ['ROLE_SECRETARY_2'] },
+        loadComponent: () => import('./pages/requests/request-form').then((m) => m.RequestFormPage),
       },
       {
-        path: 'solicitudes/:id/editar',
+        path: 'requests/:id/edit',
         canActivate: [roleGuard],
-        data: { roles: ['ROLE_SECRETARIA_2'] },
-        loadComponent: () => import('./pages/solicitudes/solicitud-form').then((m) => m.SolicitudFormPage),
+        data: { roles: ['ROLE_SECRETARY_2'] },
+        loadComponent: () => import('./pages/requests/request-form').then((m) => m.RequestFormPage),
       },
       {
-        path: 'solicitudes/:id',
+        path: 'requests/:id',
         canActivate: [roleGuard],
-        data: { roles: ['ROLE_SECRETARIA_1', 'ROLE_SECRETARIA_2', 'ROLE_ADMIN'] },
-        loadComponent: () => import('./pages/solicitudes/solicitud-detalle').then((m) => m.SolicitudDetallePage),
+        data: { roles: STAFF },
+        loadComponent: () => import('./pages/requests/request-detail').then((m) => m.RequestDetailPage),
       },
       {
-        path: 'sesiones',
+        path: 'sessions',
         canActivate: [roleGuard],
-        data: { roles: ['ROLE_SECRETARIA_1', 'ROLE_SECRETARIA_2', 'ROLE_PRESIDENTE', 'ROLE_CONSEJERO', 'ROLE_ADMIN'] },
-        loadComponent: () => import('./pages/sesiones/sesiones').then((m) => m.SesionesPage),
+        data: { roles: COUNCIL },
+        loadComponent: () => import('./pages/sessions/sessions').then((m) => m.SessionsPage),
       },
       {
-        path: 'sesiones/nueva',
+        path: 'sessions/new',
         canActivate: [roleGuard],
-        data: { roles: ['ROLE_SECRETARIA_1'] },
-        loadComponent: () => import('./pages/sesiones/sesion-nueva').then((m) => m.SesionNuevaPage),
+        data: { roles: ['ROLE_SECRETARY_1'] },
+        loadComponent: () => import('./pages/sessions/session-new').then((m) => m.SessionNewPage),
       },
       {
-        path: 'sesiones/:id/vivo',
+        path: 'sessions/:id/live',
         canActivate: [roleGuard],
-        data: { roles: ['ROLE_SECRETARIA_1', 'ROLE_PRESIDENTE', 'ROLE_CONSEJERO', 'ROLE_ADMIN'] },
-        loadComponent: () => import('./pages/sesiones/sesion-vivo').then((m) => m.SesionVivoPage),
+        data: { roles: LIVE },
+        loadComponent: () => import('./pages/sessions/session-live').then((m) => m.SessionLivePage),
       },
       {
-        path: 'sesiones/:id',
+        path: 'sessions/:id',
         canActivate: [roleGuard],
-        data: { roles: ['ROLE_SECRETARIA_1', 'ROLE_SECRETARIA_2', 'ROLE_PRESIDENTE', 'ROLE_CONSEJERO', 'ROLE_ADMIN'] },
-        loadComponent: () => import('./pages/sesiones/sesion-detalle').then((m) => m.SesionDetallePage),
+        data: { roles: COUNCIL },
+        loadComponent: () => import('./pages/sessions/session-detail').then((m) => m.SessionDetailPage),
       },
       {
-        path: 'actas',
+        path: 'minutes',
         canActivate: [roleGuard],
-        data: { roles: ['ROLE_SECRETARIA_1', 'ROLE_PRESIDENTE', 'ROLE_ADMIN'] },
-        loadComponent: () => import('./pages/actas/actas').then((m) => m.ActasPage),
+        data: { roles: MINUTES },
+        loadComponent: () => import('./pages/minutes/minutes').then((m) => m.MinutesPage),
       },
       {
-        path: 'actas/:id',
+        path: 'minutes/:id',
         canActivate: [roleGuard],
-        data: { roles: ['ROLE_SECRETARIA_1', 'ROLE_PRESIDENTE', 'ROLE_ADMIN'] },
-        loadComponent: () => import('./pages/actas/acta-detalle').then((m) => m.ActaDetallePage),
+        data: { roles: MINUTES },
+        loadComponent: () => import('./pages/minutes/minutes-detail').then((m) => m.MinutesDetailPage),
       },
       {
-        path: 'repositorio',
+        path: 'repository',
         canActivate: [roleGuard],
-        data: { roles: ['ROLE_SECRETARIA_1', 'ROLE_SECRETARIA_2', 'ROLE_PRESIDENTE', 'ROLE_CONSEJERO', 'ROLE_ADMIN'] },
-        loadComponent: () => import('./pages/repositorio/repositorio').then((m) => m.RepositorioPage),
+        data: { roles: COUNCIL },
+        loadComponent: () => import('./pages/repository/repository').then((m) => m.RepositoryPage),
       },
       {
-        path: 'plantillas',
+        path: 'templates',
         canActivate: [roleGuard],
         data: { roles: ['ROLE_DEV'] },
-        loadComponent: () => import('./pages/plantillas/plantillas').then((m) => m.PlantillasPage),
+        loadComponent: () => import('./pages/templates/templates').then((m) => m.TemplatesPage),
       },
       {
-        path: 'usuarios',
+        path: 'users',
         canActivate: [roleGuard],
         data: { roles: ['ROLE_ADMIN', 'ROLE_DEV'] },
-        loadComponent: () => import('./pages/usuarios/usuarios').then((m) => m.UsuariosPage),
+        loadComponent: () => import('./pages/users/users').then((m) => m.UsersPage),
       },
       {
-        path: 'jerarquia',
+        path: 'hierarchy',
         canActivate: [roleGuard],
         data: { roles: ['ROLE_ADMIN'] },
-        loadComponent: () => import('./pages/jerarquia/jerarquia').then((m) => m.JerarquiaPage),
+        loadComponent: () => import('./pages/hierarchy/hierarchy').then((m) => m.HierarchyPage),
       },
       {
-        path: 'configuracion',
+        path: 'settings',
         canActivate: [roleGuard],
         data: { roles: ['ROLE_ADMIN'] },
-        loadComponent: () => import('./pages/configuracion/configuracion').then((m) => m.ConfiguracionPage),
+        loadComponent: () => import('./pages/settings/settings').then((m) => m.SettingsPage),
       },
       {
-        path: 'auditoria',
+        path: 'audit',
         canActivate: [roleGuard],
         data: { roles: ['ROLE_ADMIN'] },
-        loadComponent: () => import('./pages/auditoria/auditoria').then((m) => m.AuditoriaPage),
+        loadComponent: () => import('./pages/audit/audit').then((m) => m.AuditPage),
       },
-      { path: 'perfil', loadComponent: () => import('./pages/perfil/perfil').then((m) => m.PerfilPage) },
+      { path: 'profile', loadComponent: () => import('./pages/profile/profile').then((m) => m.ProfilePage) },
     ],
   },
   { path: '**', redirectTo: '' },

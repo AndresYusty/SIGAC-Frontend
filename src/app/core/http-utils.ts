@@ -1,28 +1,29 @@
 import { HttpErrorResponse } from '@angular/common/http';
+import { I18nService } from './i18n.service';
 import { ApiError } from './models';
 
-export function apiMessage(err: unknown): string {
+export function apiMessage(err: unknown, i18n: I18nService): string {
   if (!(err instanceof HttpErrorResponse)) {
-    return 'Ocurrió un error inesperado';
+    return i18n.t('errors.unexpected');
   }
   const body = err.error as ApiError | string | null;
   if (body && typeof body === 'object' && 'message' in body && body.message) {
-    const extra = body.detalles?.length ? ` (${body.detalles.join('; ')})` : '';
+    const extra = body.details?.length ? ` (${body.details.join('; ')})` : '';
     return body.message + extra;
   }
   if (typeof body === 'string' && body.trim()) {
     return body;
   }
   if (err.status === 0 || err.status === 502 || err.status === 503 || err.status === 504) {
-    return 'No hay conexión con el servidor SIGAC. Verifique que el backend esté en ejecución en el puerto 8080.';
+    return i18n.t('errors.offline');
   }
   if (err.status === 401) {
-    return 'Sesión no válida o expirada. Inicie sesión nuevamente';
+    return i18n.t('errors.unauthorized');
   }
   if (err.status === 403) {
-    return 'No tiene permisos para realizar esta operación';
+    return i18n.t('errors.forbidden');
   }
-  return err.status ? `Error ${err.status} al comunicarse con el servidor` : 'Error de red';
+  return err.status ? i18n.t('errors.status', { status: err.status }) : i18n.t('errors.network');
 }
 
 export function toQuery(params: Record<string, string | number | boolean | null | undefined>): Record<string, string | number | boolean> {

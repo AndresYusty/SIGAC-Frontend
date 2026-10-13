@@ -1,0 +1,104 @@
+@if (session(); as s) {
+  <div class="live-banner">
+    <div>
+      <strong>{{ s.councilType }} · {{ 'enums.sessionStatus.' + s.status | t }}</strong>
+      <div>{{ s.location }} · {{ s.scheduledAt | localDate: 'dd/MM/yyyy HH:mm' }}</div>
+    </div>
+    <div class="row-actions">
+      @if (auth.has('ROLE_SECRETARY_1')) {
+        @if (s.status === 'CONVENED') { <button class="btn btn-ochre" type="button" (click)="act('start')">{{ 'sessions.live.start' | t }}</button> }
+        @if (s.status === 'STARTED') { <button class="btn btn-secondary" type="button" (click)="act('suspend')">{{ 'sessions.live.suspend' | t }}</button> }
+        @if (s.status === 'SUSPENDED') { <button class="btn btn-ochre" type="button" (click)="act('resume')">{{ 'sessions.live.resume' | t }}</button> }
+        @if (s.status === 'STARTED' || s.status === 'SUSPENDED') { <button class="btn" type="button" (click)="finish()">{{ 'sessions.live.finish' | t }}</button> }
+      }
+      <a [routerLink]="['/sessions', s.id]" class="btn btn-ghost">{{ 'sessions.live.leaveRoom' | t }}</a>
+    </div>
+  </div>
+
+  <div class="split">
+    <div class="grid">
+      @for (item of s.items; track item.id) {
+        <article class="card">
+          <h2>{{ item.order }}. {{ item.title }}</h2>
+          <p class="lead">{{ item.description }}</p>
+          @if (item.debateNotes) {
+            <p class="muted" style="margin-top: 0.6rem"><b>{{ 'sessions.live.notes' | t }}</b> {{ item.debateNotes }}</p>
+          }
+          @if (auth.has('ROLE_SECRETARY_1') && s.status === 'STARTED' && decisions[item.id]) {
+            <div class="grid grid-2" style="margin-top: 0.8rem">
+              <label class="field">
+                <span>{{ 'sessions.live.result' | t }}</span>
+                <select [(ngModel)]="decisions[item.id].result">
+                  @for (r of results; track r) {
+                    <option [value]="r">{{ 'enums.decisionResult.' + r | t }}</option>
+                  }
+                </select>
+              </label>
+              <label class="field"><span>{{ 'sessions.live.votesFor' | t }}</span><input type="number" min="0" [(ngModel)]="decisions[item.id].votesFor" /></label>
+              <label class="field"><span>{{ 'sessions.live.votesAgainst' | t }}</span><input type="number" min="0" [(ngModel)]="decisions[item.id].votesAgainst" /></label>
+              <label class="field"><span>{{ 'sessions.live.abstentions' | t }}</span><input type="number" min="0" [(ngModel)]="decisions[item.id].abstentions" /></label>
+            </div>
+            @if (item.result) {
+              <label class="field" style="margin-top: 0.8rem">
+                <span>{{ 'sessions.live.changeReason' | t }}</span>
+                <input [(ngModel)]="decisions[item.id].changeReason" [placeholder]="'sessions.live.changeReasonPlaceholder' | t" />
+              </label>
+            }
+            <div class="row-actions" style="margin-top: 0.8rem">
+              <button class="btn" type="button" (click)="recordDecision(item)">{{ 'sessions.live.recordDecision' | t }}</button>
+            </div>
+            <label class="field" style="margin-top: 0.8rem">
+              <span>{{ 'sessions.live.debateNote' | t }}</span>
+              <textarea [(ngModel)]="notes[item.id]"></textarea>
+            </label>
+            <button class="btn btn-secondary" type="button" (click)="addNote(item)">{{ 'sessions.live.addNote' | t }}</button>
+          } @else {
+            <p style="margin-top: 0.6rem">
+              @if (item.result) {
+                <span class="badge" [class]="tone[item.result]">{{ 'enums.decisionResult.' + item.result | t }}</span>
+                · {{ 'sessions.live.voteSummary' | t: { votesFor: item.votesFor, votesAgainst: item.votesAgainst, abstentions: item.abstentions } }}
+              } @else {
+                {{ 'sessions.live.noDecision' | t }}
+              }
+            </p>
+          }
+        </article>
+      }
+      @if (auth.has('ROLE_SECRETARY_1') && s.status === 'STARTED') {
+        <article class="card">
+          <h2>{{ 'sessions.live.miscItem' | t }}</h2>
+          <label class="field"><span>{{ 'common.title' | t }}</span><input [(ngModel)]="miscTitle" /></label>
+          <label class="field"><span>{{ 'common.description' | t }}</span><textarea [(ngModel)]="miscDescription"></textarea></label>
+          <button class="btn" type="button" (click)="addMiscItem()">{{ 'common.add' | t }}</button>
+        </article>
+      }
+    </div>
+    <article class="card">
+      <h2>{{ 'sessions.live.attendanceAndQuorum' | t }}</h2>
+      @if (attendance(); as a) {
+        <div class="quorum">
+          <div>
+            <strong>{{ a.quorum.present }}/{{ a.quorum.members }}</strong>
+            <div class="muted">{{ 'sessions.live.required' | t: { count: a.quorum.required } }}</div>
+          </div>
+          <div class="quorum-bar"><span [style.width.%]="a.quorum.members ? (100 * a.quorum.present / a.quorum.members) : 0"></span></div>
+          <span class="badge" [class]="a.quorum.reached ? 'ok' : 'warn'">{{ (a.quorum.reached ? 'sessions.live.quorum' : 'sessions.live.noQuorum') | t }}</span>
+        </div>
+        <div class="check-list" style="margin-top: 1rem">
+          @for (attendee of a.attendees; track attendee.userId) {
+            <label class="check-row">
+              <input type="checkbox" [(ngModel)]="attendee.present" [disabled]="!auth.has('ROLE_SECRETARY_1')" />
+              <div>
+                <strong>{{ attendee.name }}</strong>
+                <div class="muted">{{ 'enums.role.' + attendee.role | t }}</div>
+              </div>
+            </label>
+          }
+        </div>
+        @if (auth.has('ROLE_SECRETARY_1')) {
+          <button class="btn" style="margin-top: 0.8rem" type="button" (click)="saveAttendance()">{{ 'sessions.live.saveAttendance' | t }}</button>
+        }
+      }
+    </article>
+  </div>
+}

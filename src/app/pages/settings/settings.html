@@ -1,0 +1,37 @@
+<div class="page-head">
+  <div>
+    <p class="kicker">{{ 'settings.kicker' | t }}</p>
+    <h1>{{ 'settings.title' | t }}</h1>
+    <p class="lead">{{ 'settings.lead' | t }}</p>
+  </div>
+</div>
+<div class="grid grid-2">
+  <article class="card">
+    <h2>{{ 'settings.councilTypes' | t }}</h2>
+    @for (ct of councilTypes(); track ct.id) {
+      <div class="toolbar">
+        <label class="field"><span>{{ 'common.code' | t }}</span><input [(ngModel)]="ct.code" /></label>
+        <label class="field grow"><span>{{ 'common.name' | t }}</span><input [(ngModel)]="ct.name" /></label>
+        <button class="btn btn-ghost" type="button" (click)="saveCouncilType(ct)">{{ 'common.save' | t }}</button>
+      </div>
+    }
+    <div class="toolbar">
+      <label class="field"><span>{{ 'common.code' | t }}</span><input [(ngModel)]="code" maxlength="10" /></label>
+      <label class="field grow"><span>{{ 'common.name' | t }}</span><input [(ngModel)]="name" /></label>
+      <button class="btn" type="button" (click)="createCouncilType()">{{ 'common.add' | t }}</button>
+    </div>
+  </article>
+  <article class="card">
+    <h2>{{ 'settings.parameters' | t }}</h2>
+    @for (p of parameters(); track p.key) {
+      <div class="toolbar">
+        <label class="field grow">
+          <span>{{ p.key }}</span>
+          <input [(ngModel)]="p.value" />
+          <small class="muted">{{ p.description }}</small>
+        </label>
+        <button class="btn btn-ghost" type="button" (click)="saveParameter(p)">{{ 'common.save' | t }}</button>
+      </div>
+    }
+  </article>
+</div>

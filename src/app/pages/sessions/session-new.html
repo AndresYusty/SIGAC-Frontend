@@ -1,0 +1,27 @@
+<div class="page-head">
+  <div>
+    <p class="kicker">{{ 'sessions.new.kicker' | t }}</p>
+    <h1>{{ 'sessions.new.title' | t }}</h1>
+    <p class="lead">{{ 'sessions.new.lead' | t }}</p>
+  </div>
+  <a routerLink="/sessions" class="btn btn-ghost">{{ 'common.back' | t }}</a>
+</div>
+<form class="card grid" style="max-width: 640px" [formGroup]="form" (ngSubmit)="submit()">
+  <label class="field">
+    <span>{{ 'sessions.councilType' | t }}</span>
+    <select formControlName="councilTypeId">
+      @for (ct of councilTypes(); track ct.id) {
+        <option [ngValue]="ct.id">{{ ct.code }} · {{ ct.name }}</option>
+      }
+    </select>
+  </label>
+  <label class="field">
+    <span>{{ 'sessions.new.dateTime' | t }}</span>
+    <input type="datetime-local" formControlName="scheduledAt" />
+  </label>
+  <label class="field">
+    <span>{{ 'sessions.location' | t }}</span>
+    <input formControlName="location" [placeholder]="'sessions.new.locationPlaceholder' | t" />
+  </label>
+  <button class="btn" type="submit" [disabled]="saving()">{{ 'sessions.new.submit' | t }}</button>
+</form>

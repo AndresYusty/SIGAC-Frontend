@@ -1,0 +1,60 @@
+<div class="page-head">
+  <div>
+    <p class="kicker">{{ 'minutes.kicker' | t }}</p>
+    <h1>{{ 'minutes.title' | t }}</h1>
+    <p class="lead">{{ 'minutes.lead' | t }}</p>
+  </div>
+</div>
+<div class="toolbar">
+  <label class="field">
+    <span>{{ 'common.status' | t }}</span>
+    <select [(ngModel)]="status">
+      <option value="">{{ 'common.all' | t }}</option>
+      @for (s of statuses; track s) {
+        <option [value]="s">{{ 'enums.minutesStatus.' + s | t }}</option>
+      }
+    </select>
+  </label>
+  <button class="btn" type="button" (click)="load()">{{ 'common.filter' | t }}</button>
+</div>
+<article class="card table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>{{ 'common.number' | t }}</th>
+        <th>{{ 'minutes.council' | t }}</th>
+        <th>{{ 'common.faculty' | t }}</th>
+        <th>{{ 'common.date' | t }}</th>
+        <th>{{ 'common.status' | t }}</th>
+        <th>{{ 'common.actions' | t }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (m of page()?.content ?? []; track m.id) {
+        <tr>
+          <td>{{ m.number }}</td>
+          <td>{{ m.councilType }}</td>
+          <td>{{ m.faculty }}</td>
+          <td>{{ m.sessionDate | localDate: 'dd/MM/yyyy' }}</td>
+          <td><span class="badge" [class]="tone[m.status]">{{ 'enums.minutesStatus.' + m.status | t }}</span></td>
+          <td><a [routerLink]="['/minutes', m.id]" class="btn btn-ghost">{{ 'common.open' | t }}</a></td>
+        </tr>
+      }
+    </tbody>
+  </table>
+  @if (!page()?.content?.length) {
+    <div class="empty">
+      <h3>{{ 'minutes.emptyTitle' | t }}</h3>
+      <p>{{ 'minutes.emptyHint' | t }}</p>
+    </div>
+  }
+</article>
+<div class="pager">
+  <button class="btn btn-ghost" type="button" [disabled]="page()?.first" (click)="load((page()?.number ?? 1) - 1)">
+    {{ 'common.previous' | t }}
+  </button>
+  <span>{{ 'common.pageOf' | t: { page: (page()?.number ?? 0) + 1, total: page()?.totalPages || 1 } }}</span>
+  <button class="btn btn-ghost" type="button" [disabled]="page()?.last" (click)="load((page()?.number ?? -1) + 1)">
+    {{ 'common.next' | t }}
+  </button>
+</div>

@@ -1,6 +1,7 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
 import { AuthService } from './auth.service';
+import { RoleName } from './models';
 
 export const authGuard: CanActivateFn = () => {
   const auth = inject(AuthService);
@@ -20,7 +21,7 @@ export const guestGuard: CanActivateFn = () => {
 
 export const roleGuard: CanActivateFn = (route) => {
   const auth = inject(AuthService);
-  const roles = (route.data['roles'] as string[] | undefined) ?? [];
+  const roles = (route.data['roles'] as RoleName[] | undefined) ?? [];
   if (!roles.length || auth.has(...roles)) {
     return true;
   }

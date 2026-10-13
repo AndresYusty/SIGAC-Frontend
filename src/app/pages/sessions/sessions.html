@@ -1,0 +1,58 @@
+<div class="page-head">
+  <div>
+    <p class="kicker">{{ 'sessions.kicker' | t }}</p>
+    <h1>{{ 'sessions.title' | t }}</h1>
+    <p class="lead">{{ 'sessions.lead' | t }}</p>
+  </div>
+  @if (auth.has('ROLE_SECRETARY_1')) {
+    <a routerLink="/sessions/new" class="btn">{{ 'sessions.schedule' | t }}</a>
+  }
+</div>
+<div class="toolbar">
+  <label class="field">
+    <span>{{ 'common.status' | t }}</span>
+    <select [(ngModel)]="status">
+      <option value="">{{ 'common.all' | t }}</option>
+      @for (st of statuses; track st) {
+        <option [value]="st">{{ 'enums.sessionStatus.' + st | t }}</option>
+      }
+    </select>
+  </label>
+  <button class="btn" type="button" (click)="load()">{{ 'common.filter' | t }}</button>
+</div>
+<article class="card table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>{{ 'common.type' | t }}</th>
+        <th>{{ 'common.faculty' | t }}</th>
+        <th>{{ 'common.date' | t }}</th>
+        <th>{{ 'sessions.location' | t }}</th>
+        <th>{{ 'common.status' | t }}</th>
+        <th>{{ 'sessions.items' | t }}</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (s of page()?.content ?? []; track s.id) {
+        <tr>
+          <td>{{ s.councilType }}</td>
+          <td>{{ s.faculty }}</td>
+          <td>{{ s.scheduledAt | localDate: 'dd/MM/yyyy HH:mm' }}</td>
+          <td>{{ s.location }}</td>
+          <td><span class="badge" [class]="tone[s.status]">{{ 'enums.sessionStatus.' + s.status | t }}</span></td>
+          <td>{{ s.totalItems }}</td>
+          <td><a [routerLink]="['/sessions', s.id]" class="btn btn-ghost">{{ 'common.open' | t }}</a></td>
+        </tr>
+      }
+    </tbody>
+  </table>
+  @if (!page()?.content?.length) {
+    <div class="empty"><h3>{{ 'sessions.empty' | t }}</h3></div>
+  }
+</article>
+<div class="pager">
+  <button class="btn btn-ghost" type="button" [disabled]="page()?.first" (click)="load((page()?.number ?? 1) - 1)">{{ 'common.previous' | t }}</button>
+  <span>{{ 'common.pageOf' | t: { page: (page()?.number ?? 0) + 1, total: page()?.totalPages || 1 } }}</span>
+  <button class="btn btn-ghost" type="button" [disabled]="page()?.last" (click)="load((page()?.number ?? -1) + 1)">{{ 'common.next' | t }}</button>
+</div>

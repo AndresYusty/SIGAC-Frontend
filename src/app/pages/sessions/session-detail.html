@@ -1,0 +1,79 @@
+@if (session(); as s) {
+  <div class="page-head">
+    <div>
+      <p class="kicker">{{ s.councilType }}</p>
+      <h1>{{ 'sessions.detail.title' | t: { date: (s.scheduledAt | localDate: 'dd MMMM yyyy, HH:mm') } }}</h1>
+      <p class="lead">{{ s.faculty }} · {{ s.location }}</p>
+    </div>
+    <div class="row-actions">
+      <span class="badge" [class]="tone[s.status]">{{ 'enums.sessionStatus.' + s.status | t }}</span>
+      @if (s.agendaClosed) {
+        <button class="btn btn-secondary" type="button" (click)="downloadSummons()">{{ 'sessions.detail.summonsPdf' | t }}</button>
+      }
+      @if (s.status === 'CONVENED' || s.status === 'STARTED' || s.status === 'SUSPENDED') {
+        <a [routerLink]="['/sessions', s.id, 'live']" class="btn">{{ 'sessions.detail.liveRoom' | t }}</a>
+      }
+      @if (s.status === 'FINISHED' && auth.has('ROLE_SECRETARY_1')) {
+        <button class="btn" type="button" (click)="generateMinutes()">{{ 'sessions.detail.generateMinutes' | t }}</button>
+      }
+      <a routerLink="/sessions" class="btn btn-ghost">{{ 'common.back' | t }}</a>
+    </div>
+  </div>
+
+  @if (auth.has('ROLE_SECRETARY_1') && !s.agendaClosed) {
+    <article class="card" style="margin-bottom: 1rem">
+      <h2>{{ 'sessions.detail.buildAgenda' | t }}</h2>
+      <div class="toolbar">
+        <label class="field grow">
+          <span>{{ 'sessions.detail.approvedRequest' | t }}</span>
+          <select [(ngModel)]="requestId">
+            <option [ngValue]="null">{{ 'common.select' | t }}</option>
+            @for (r of approvedRequests(); track r.id) {
+              <option [ngValue]="r.id">{{ r.code }} · {{ r.title }}</option>
+            }
+          </select>
+        </label>
+        <button class="btn" type="button" (click)="addItem()">{{ 'sessions.detail.addItem' | t }}</button>
+        <button class="btn btn-ochre" type="button" (click)="closeAgenda()">{{ 'sessions.detail.closeAndSummon' | t }}</button>
+      </div>
+    </article>
+  }
+
+  <article class="card table-wrap">
+    <h2>{{ 'sessions.detail.agenda' | t }}</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>{{ 'sessions.detail.subject' | t }}</th>
+          <th>{{ 'common.code' | t }}</th>
+          <th>{{ 'sessions.detail.decision' | t }}</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (item of s.items; track item.id; let i = $index) {
+          <tr>
+            <td>{{ item.order }}</td>
+            <td>{{ item.title }}@if (item.isMisc) { <span class="chip">{{ 'sessions.misc' | t }}</span> }</td>
+            <td>{{ item.requestCode || '—' }}</td>
+            <td>{{ item.result ? ('enums.decisionResult.' + item.result | t) : ('sessions.detail.pending' | t) }}</td>
+            <td class="row-actions">
+              @if (auth.has('ROLE_SECRETARY_1') && !s.agendaClosed) {
+                <button class="btn btn-ghost" type="button" [attr.aria-label]="'sessions.detail.moveUp' | t" [title]="'sessions.detail.moveUp' | t" (click)="move(i, -1)">↑</button>
+                <button class="btn btn-ghost" type="button" [attr.aria-label]="'sessions.detail.moveDown' | t" [title]="'sessions.detail.moveDown' | t" (click)="move(i, 1)">↓</button>
+                <button class="btn btn-ghost" type="button" (click)="removeItem(item.id)">{{ 'sessions.detail.remove' | t }}</button>
+              }
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+    @if (!s.items.length) {
+      <div class="empty">
+        <h3>{{ 'sessions.detail.emptyTitle' | t }}</h3>
+        <p>{{ 'sessions.detail.emptyHint' | t }}</p>
+      </div>
+    }
+  </article>
+}

@@ -1,17 +1,20 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
+import { I18nService, TranslationParams } from './i18n.service';
 
+/** Title, message and button label are translation keys. */
 @Injectable({ providedIn: 'root' })
 export class ConfirmService {
+  private readonly i18n = inject(I18nService);
   readonly open = signal(false);
   readonly title = signal('');
   readonly message = signal('');
-  readonly okLabel = signal('Confirmar');
+  readonly okLabel = signal('');
   private resolver: ((value: boolean) => void) | null = null;
 
-  ask(title: string, message: string, okLabel = 'Confirmar'): Promise<boolean> {
-    this.title.set(title);
-    this.message.set(message);
-    this.okLabel.set(okLabel);
+  ask(titleKey: string, messageKey: string, okKey = 'common.confirm', params?: TranslationParams): Promise<boolean> {
+    this.title.set(this.i18n.t(titleKey, params));
+    this.message.set(this.i18n.t(messageKey, params));
+    this.okLabel.set(this.i18n.t(okKey, params));
     this.open.set(true);
     return new Promise((resolve) => {
       this.resolver = resolve;

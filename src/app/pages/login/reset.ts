@@ -3,28 +3,32 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { AuthService } from '../../core/auth.service';
 import { apiMessage } from '../../core/http-utils';
+import { I18nService } from '../../core/i18n.service';
+import { TranslatePipe } from '../../core/translate.pipe';
+import { LangSwitchComponent } from '../../layout/lang-switch';
 
 @Component({
   selector: 'app-reset',
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink, TranslatePipe, LangSwitchComponent],
   templateUrl: './reset.html',
 })
 export class ResetPage {
   private readonly fb = inject(FormBuilder);
   private readonly auth = inject(AuthService);
   private readonly route = inject(ActivatedRoute);
+  private readonly i18n = inject(I18nService);
   readonly loading = signal(false);
   readonly error = signal('');
-  readonly ok = signal('');
+  readonly success = signal('');
   readonly showPassword = signal(false);
   readonly form = this.fb.nonNullable.group({
-    nuevaClave: ['', [Validators.required, Validators.minLength(8)]],
+    newPassword: ['', [Validators.required, Validators.minLength(8)]],
   });
 
   submit(): void {
     const token = this.route.snapshot.queryParamMap.get('token') ?? '';
     if (!token) {
-      this.error.set('El enlace de recuperación no es válido.');
+      this.error.set(this.i18n.t('reset.invalidLink'));
       return;
     }
     if (this.form.invalid) {
@@ -32,14 +36,14 @@ export class ResetPage {
       return;
     }
     this.loading.set(true);
-    this.auth.reset(token, this.form.controls.nuevaClave.value).subscribe({
+    this.auth.resetPassword(token, this.form.controls.newPassword.value).subscribe({
       next: (res) => {
         this.loading.set(false);
-        this.ok.set(res.mensaje);
+        this.success.set(res.message);
       },
       error: (err) => {
         this.loading.set(false);
-        this.error.set(apiMessage(err));
+        this.error.set(apiMessage(err, this.i18n));
       },
     });
   }

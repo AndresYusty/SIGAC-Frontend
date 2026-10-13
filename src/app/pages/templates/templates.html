@@ -1,0 +1,80 @@
+<div class="page-head">
+  <div>
+    <p class="kicker">{{ 'templates.kicker' | t }}</p>
+    <h1>{{ 'templates.title' | t }}</h1>
+    <p class="lead">{{ 'templates.lead' | t }}</p>
+  </div>
+</div>
+<div class="split">
+  <div class="grid">
+    <article class="card">
+      <div class="toolbar">
+        <label class="field grow">
+          <span>{{ 'templates.councilType' | t }}</span>
+          <select [(ngModel)]="councilTypeId" (ngModelChange)="load()">
+            @for (ct of councilTypes(); track ct.id) {
+              <option [ngValue]="ct.id">{{ ct.name }}</option>
+            }
+          </select>
+        </label>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>{{ 'common.name' | t }}</th>
+            <th>{{ 'templates.versionShort' | t }}</th>
+            <th>{{ 'common.status' | t }}</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (tpl of list(); track tpl.id) {
+            <tr>
+              <td>{{ tpl.name }}</td>
+              <td>{{ tpl.version }}</td>
+              <td>
+                <span class="badge" [class]="tpl.active ? 'ok' : 'muted'">{{ (tpl.active ? 'templates.active' : 'templates.historic') | t }}</span>
+              </td>
+              <td class="row-actions">
+                <button class="btn btn-ghost" type="button" (click)="open(tpl)">{{ 'common.edit' | t }}</button>
+                @if (!tpl.active) {
+                  <button class="btn btn-ghost" type="button" (click)="activate(tpl.id)">{{ 'templates.activate' | t }}</button>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </article>
+    <article class="card">
+      <h2>{{ (selected ? 'templates.newVersion' : 'templates.newTemplate') | t }}</h2>
+      <label class="field"><span>{{ 'common.name' | t }}</span><input [(ngModel)]="name" /></label>
+      <label class="field"><span>{{ 'templates.comment' | t }}</span><input [(ngModel)]="comment" /></label>
+      <label class="field">
+        <span>{{ 'templates.content' | t }}</span>
+        <textarea class="editor" [(ngModel)]="content"></textarea>
+      </label>
+      @if (errors().length) {
+        <ul>
+          @for (e of errors(); track e) {
+            <li class="error-text">{{ e }}</li>
+          }
+        </ul>
+      }
+      <div class="row-actions" style="margin-top: 0.8rem">
+        <button class="btn btn-secondary" type="button" (click)="validate()">{{ 'templates.validate' | t }}</button>
+        <button class="btn btn-ochre" type="button" (click)="preview()">{{ 'templates.previewPdf' | t }}</button>
+        <button class="btn" type="button" (click)="save()">{{ 'templates.saveVersion' | t }}</button>
+      </div>
+    </article>
+  </div>
+  <article class="card">
+    <h2>{{ 'templates.variables' | t }}</h2>
+    @for (v of variables(); track v.name) {
+      <div class="timeline-item" style="margin-bottom: 0.7rem">
+        <code>{{ '$' + '{' + v.name + '}' }}</code>
+        <div class="muted">{{ v.description }} · {{ v.example }}</div>
+      </div>
+    }
+  </article>
+</div>

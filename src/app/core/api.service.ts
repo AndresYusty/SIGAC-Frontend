@@ -2,29 +2,86 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { environment } from '../../environments/environment';
 import {
-  ActaDto,
-  AsistenciaDto,
+  AttendanceDto,
   AuditLogDto,
+  CouncilTypeDto,
   DashboardDto,
-  EstadoActa,
-  EstadoSesion,
-  EstadoSolicitud,
-  HistorialDto,
-  NodoDto,
+  DecisionResult,
+  MinutesDto,
+  MinutesStatus,
+  NodeDto,
   Page,
-  ParametroDto,
-  PlantillaDto,
-  RepositorioActaDto,
-  ResultadoDecision,
-  SesionDto,
-  SesionResumenDto,
-  SolicitudDto,
-  TipoConsejoDto,
-  UsuarioDto,
-  VariableDto,
-  VerificacionDto,
+  ParameterDto,
+  RepositoryMinutesDto,
+  RequestDto,
+  RequestHistoryDto,
+  RequestStatus,
+  RoleName,
+  SessionDto,
+  SessionStatus,
+  SessionSummaryDto,
+  TemplateDto,
+  TemplateVariableDto,
+  UserDto,
+  VerificationDto,
 } from './models';
 import { toQuery } from './http-utils';
+
+export interface UserPayload {
+  name: string;
+  roles: RoleName[];
+  facultyId: number | null;
+  programId: number | null;
+}
+
+export interface NewUserPayload extends UserPayload {
+  email: string;
+  password: string;
+}
+
+export interface TemplatePayload {
+  councilTypeId: number;
+  facultyId: number | null;
+  name: string;
+  content: string;
+  comment: string;
+}
+
+export interface RequestSearch {
+  status?: RequestStatus | '';
+  code?: string;
+  from?: string;
+  to?: string;
+  page?: number;
+  size?: number;
+}
+
+export interface DecisionPayload {
+  result: DecisionResult;
+  votesFor: number;
+  votesAgainst: number;
+  abstentions: number;
+  changeReason?: string;
+}
+
+export interface RepositorySearch {
+  number?: string;
+  councilTypeId?: number | '';
+  from?: string;
+  to?: string;
+  campusId?: number | '';
+  facultyId?: number | '';
+  text?: string;
+  page?: number;
+  size?: number;
+}
+
+export interface AuditSearch {
+  event?: string;
+  user?: string;
+  page?: number;
+  size?: number;
+}
 
 @Injectable({ providedIn: 'root' })
 export class ApiService {
@@ -36,272 +93,223 @@ export class ApiService {
   }
 
   listUsers(q = '', page = 0, size = 20) {
-    return this.http.get<Page<UsuarioDto>>(`${this.base}/users`, { params: toQuery({ q, page, size, sort: 'nombre' }) });
+    return this.http.get<Page<UserDto>>(`${this.base}/users`, { params: toQuery({ q, page, size, sort: 'name' }) });
   }
-
   getUser(id: number) {
-    return this.http.get<UsuarioDto>(`${this.base}/users/${id}`);
+    return this.http.get<UserDto>(`${this.base}/users/${id}`);
+  }
+  createUser(body: NewUserPayload) {
+    return this.http.post<UserDto>(`${this.base}/users`, body);
+  }
+  updateUser(id: number, body: UserPayload) {
+    return this.http.put<UserDto>(`${this.base}/users/${id}`, body);
+  }
+  setUserActive(id: number, active: boolean) {
+    return this.http.patch<UserDto>(`${this.base}/users/${id}/status`, null, { params: { active } });
   }
 
-  createUser(body: {
-    nombre: string;
-    email: string;
-    password: string;
-    roles: string[];
-    facultadId: number | null;
-    programaId: number | null;
-  }) {
-    return this.http.post<UsuarioDto>(`${this.base}/users`, body);
+  listUniversities() {
+    return this.http.get<NodeDto[]>(`${this.base}/hierarchy/universities`);
+  }
+  createUniversity(name: string) {
+    return this.http.post<NodeDto>(`${this.base}/hierarchy/universities`, { name });
+  }
+  updateUniversity(id: number, name: string) {
+    return this.http.put<NodeDto>(`${this.base}/hierarchy/universities/${id}`, { name });
+  }
+  listCampuses(universityId: number) {
+    return this.http.get<NodeDto[]>(`${this.base}/hierarchy/campuses`, { params: { universityId } });
+  }
+  createCampus(name: string, city: string, universityId: number) {
+    return this.http.post<NodeDto>(`${this.base}/hierarchy/campuses`, { name, city, universityId });
+  }
+  updateCampus(id: number, name: string, city: string, universityId: number) {
+    return this.http.put<NodeDto>(`${this.base}/hierarchy/campuses/${id}`, { name, city, universityId });
+  }
+  listFaculties(campusId: number) {
+    return this.http.get<NodeDto[]>(`${this.base}/hierarchy/faculties`, { params: { campusId } });
+  }
+  createFaculty(name: string, campusId: number) {
+    return this.http.post<NodeDto>(`${this.base}/hierarchy/faculties`, { name, campusId });
+  }
+  updateFaculty(id: number, name: string, campusId: number) {
+    return this.http.put<NodeDto>(`${this.base}/hierarchy/faculties/${id}`, { name, campusId });
+  }
+  listPrograms(facultyId: number) {
+    return this.http.get<NodeDto[]>(`${this.base}/hierarchy/programs`, { params: { facultyId } });
+  }
+  createProgram(name: string, facultyId: number) {
+    return this.http.post<NodeDto>(`${this.base}/hierarchy/programs`, { name, facultyId });
+  }
+  updateProgram(id: number, name: string, facultyId: number) {
+    return this.http.put<NodeDto>(`${this.base}/hierarchy/programs/${id}`, { name, facultyId });
   }
 
-  updateUser(
-    id: number,
-    body: { nombre: string; roles: string[]; facultadId: number | null; programaId: number | null },
-  ) {
-    return this.http.put<UsuarioDto>(`${this.base}/users/${id}`, body);
+  listCouncilTypes() {
+    return this.http.get<CouncilTypeDto[]>(`${this.base}/council-types`);
+  }
+  createCouncilType(code: string, name: string) {
+    return this.http.post<CouncilTypeDto>(`${this.base}/council-types`, { code, name });
+  }
+  updateCouncilType(id: number, code: string, name: string) {
+    return this.http.put<CouncilTypeDto>(`${this.base}/council-types/${id}`, { code, name });
+  }
+  listParameters() {
+    return this.http.get<ParameterDto[]>(`${this.base}/parameters`);
+  }
+  updateParameter(key: string, value: string) {
+    return this.http.put<ParameterDto>(`${this.base}/parameters/${key}`, { value });
   }
 
-  setUserActive(id: number, activo: boolean) {
-    return this.http.patch<UsuarioDto>(`${this.base}/users/${id}/estado`, null, { params: { activo } });
+  listTemplates(councilTypeId?: number) {
+    return this.http.get<TemplateDto[]>(`${this.base}/templates`, { params: toQuery({ councilTypeId }) });
+  }
+  getTemplate(id: number) {
+    return this.http.get<TemplateDto>(`${this.base}/templates/${id}`);
+  }
+  listTemplateVariables() {
+    return this.http.get<TemplateVariableDto[]>(`${this.base}/templates/variables`);
+  }
+  validateTemplate(content: string) {
+    return this.http.post<string[]>(`${this.base}/templates/validate`, { content });
+  }
+  saveTemplate(body: TemplatePayload) {
+    return this.http.post<TemplateDto>(`${this.base}/templates`, body);
+  }
+  activateTemplate(id: number) {
+    return this.http.put<TemplateDto>(`${this.base}/templates/${id}/activate`, {});
+  }
+  previewTemplate(content: string) {
+    return this.http.post(`${this.base}/templates/preview`, { content }, { responseType: 'blob' });
   }
 
-  universidades() {
-    return this.http.get<NodoDto[]>(`${this.base}/jerarquia/universidades`);
-  }
-  crearUniversidad(nombre: string) {
-    return this.http.post<NodoDto>(`${this.base}/jerarquia/universidades`, { nombre });
-  }
-  editarUniversidad(id: number, nombre: string) {
-    return this.http.put<NodoDto>(`${this.base}/jerarquia/universidades/${id}`, { nombre });
-  }
-  sedes(universidadId: number) {
-    return this.http.get<NodoDto[]>(`${this.base}/jerarquia/sedes`, { params: { universidadId } });
-  }
-  crearSede(nombre: string, ciudad: string, universidadId: number) {
-    return this.http.post<NodoDto>(`${this.base}/jerarquia/sedes`, { nombre, ciudad, universidadId });
-  }
-  editarSede(id: number, nombre: string, ciudad: string, universidadId: number) {
-    return this.http.put<NodoDto>(`${this.base}/jerarquia/sedes/${id}`, { nombre, ciudad, universidadId });
-  }
-  facultades(sedeId: number) {
-    return this.http.get<NodoDto[]>(`${this.base}/jerarquia/facultades`, { params: { sedeId } });
-  }
-  crearFacultad(nombre: string, sedeId: number) {
-    return this.http.post<NodoDto>(`${this.base}/jerarquia/facultades`, { nombre, sedeId });
-  }
-  editarFacultad(id: number, nombre: string, sedeId: number) {
-    return this.http.put<NodoDto>(`${this.base}/jerarquia/facultades/${id}`, { nombre, sedeId });
-  }
-  programas(facultadId: number) {
-    return this.http.get<NodoDto[]>(`${this.base}/jerarquia/programas`, { params: { facultadId } });
-  }
-  crearPrograma(nombre: string, facultadId: number) {
-    return this.http.post<NodoDto>(`${this.base}/jerarquia/programas`, { nombre, facultadId });
-  }
-  editarPrograma(id: number, nombre: string, facultadId: number) {
-    return this.http.put<NodoDto>(`${this.base}/jerarquia/programas/${id}`, { nombre, facultadId });
-  }
-
-  tiposConsejo() {
-    return this.http.get<TipoConsejoDto[]>(`${this.base}/tipos-consejo`);
-  }
-  crearTipoConsejo(codigo: string, nombre: string) {
-    return this.http.post<TipoConsejoDto>(`${this.base}/tipos-consejo`, { codigo, nombre });
-  }
-  editarTipoConsejo(id: number, codigo: string, nombre: string) {
-    return this.http.put<TipoConsejoDto>(`${this.base}/tipos-consejo/${id}`, { codigo, nombre });
-  }
-  parametros() {
-    return this.http.get<ParametroDto[]>(`${this.base}/parametros`);
-  }
-  actualizarParametro(clave: string, valor: string) {
-    return this.http.put<ParametroDto>(`${this.base}/parametros/${clave}`, { valor });
-  }
-
-  plantillas(tipoConsejoId?: number) {
-    return this.http.get<PlantillaDto[]>(`${this.base}/plantillas`, {
-      params: toQuery({ tipoConsejoId }),
+  searchRequests(params: RequestSearch) {
+    return this.http.get<Page<RequestDto>>(`${this.base}/requests`, {
+      params: toQuery({ ...params, sort: 'filedAt,desc' }),
     });
   }
-  plantilla(id: number) {
-    return this.http.get<PlantillaDto>(`${this.base}/plantillas/${id}`);
+  getRequest(id: number) {
+    return this.http.get<RequestDto>(`${this.base}/requests/${id}`);
   }
-  variablesPlantilla() {
-    return this.http.get<VariableDto[]>(`${this.base}/plantillas/variables`);
+  getRequestHistory(id: number) {
+    return this.http.get<RequestHistoryDto[]>(`${this.base}/requests/${id}/history`);
   }
-  validarPlantilla(contenido: string) {
-    return this.http.post<string[]>(`${this.base}/plantillas/validar`, { contenido });
+  fileRequest(fd: FormData) {
+    return this.http.post<RequestDto>(`${this.base}/requests`, fd);
   }
-  guardarPlantilla(body: {
-    tipoConsejoId: number;
-    facultadId: number | null;
-    nombre: string;
-    contenido: string;
-    comentario: string;
-  }) {
-    return this.http.post<PlantillaDto>(`${this.base}/plantillas`, body);
+  updateRequest(id: number, fd: FormData) {
+    return this.http.put<RequestDto>(`${this.base}/requests/${id}`, fd);
   }
-  activarPlantilla(id: number) {
-    return this.http.put<PlantillaDto>(`${this.base}/plantillas/${id}/activar`, {});
+  approveRequest(id: number) {
+    return this.http.post<RequestDto>(`${this.base}/requests/${id}/approve`, {});
   }
-  previsualizarPlantilla(contenido: string) {
-    return this.http.post(`${this.base}/plantillas/previsualizar`, { contenido }, { responseType: 'blob' });
+  rejectRequest(id: number, reason: string) {
+    return this.http.post<RequestDto>(`${this.base}/requests/${id}/reject`, { reason });
+  }
+  returnRequest(id: number, reason: string) {
+    return this.http.post<RequestDto>(`${this.base}/requests/${id}/return`, { reason });
+  }
+  downloadAttachment(id: number, attachmentId: number) {
+    return this.http.get(`${this.base}/requests/${id}/attachments/${attachmentId}/download`, { responseType: 'blob' });
   }
 
-  buscarSolicitudes(params: {
-    estado?: EstadoSolicitud | '';
-    codigo?: string;
-    desde?: string;
-    hasta?: string;
-    page?: number;
-    size?: number;
-  }) {
-    return this.http.get<Page<SolicitudDto>>(`${this.base}/requests`, {
-      params: toQuery({ ...params, sort: 'fechaRadicacion,desc' }),
+  listSessions(status?: SessionStatus | '', page = 0, size = 20) {
+    return this.http.get<Page<SessionSummaryDto>>(`${this.base}/sessions`, {
+      params: toQuery({ status, page, size, sort: 'scheduledAt,desc' }),
     });
   }
-  solicitud(id: number) {
-    return this.http.get<SolicitudDto>(`${this.base}/requests/${id}`);
+  getSession(id: number) {
+    return this.http.get<SessionDto>(`${this.base}/sessions/${id}`);
   }
-  historialSolicitud(id: number) {
-    return this.http.get<HistorialDto[]>(`${this.base}/requests/${id}/historial`);
+  createSession(councilTypeId: number, scheduledAt: string, location: string) {
+    return this.http.post<SessionDto>(`${this.base}/sessions`, { councilTypeId, scheduledAt, location });
   }
-  radicarSolicitud(fd: FormData) {
-    return this.http.post<SolicitudDto>(`${this.base}/requests`, fd);
+  addAgendaItem(sessionId: number, requestId: number) {
+    return this.http.post<SessionDto>(`${this.base}/sessions/${sessionId}/items`, { requestId });
   }
-  actualizarSolicitud(id: number, fd: FormData) {
-    return this.http.put<SolicitudDto>(`${this.base}/requests/${id}`, fd);
+  removeAgendaItem(sessionId: number, itemId: number) {
+    return this.http.delete<SessionDto>(`${this.base}/sessions/${sessionId}/items/${itemId}`);
   }
-  aprobarSolicitud(id: number) {
-    return this.http.post<SolicitudDto>(`${this.base}/requests/${id}/aprobar`, {});
+  reorderAgendaItems(sessionId: number, itemIds: number[]) {
+    return this.http.put<SessionDto>(`${this.base}/sessions/${sessionId}/items/order`, { itemIds });
   }
-  rechazarSolicitud(id: number, motivo: string) {
-    return this.http.post<SolicitudDto>(`${this.base}/requests/${id}/rechazar`, { motivo });
+  closeAgenda(sessionId: number) {
+    return this.http.post<SessionDto>(`${this.base}/sessions/${sessionId}/close-agenda`, {});
   }
-  devolverSolicitud(id: number, motivo: string) {
-    return this.http.post<SolicitudDto>(`${this.base}/requests/${id}/devolver`, { motivo });
+  downloadSummons(sessionId: number) {
+    return this.http.get(`${this.base}/sessions/${sessionId}/summons`, { responseType: 'blob' });
   }
-  descargarAnexo(id: number, anexoId: number) {
-    return this.http.get(`${this.base}/requests/${id}/anexos/${anexoId}/descargar`, { responseType: 'blob' });
+  getAttendance(sessionId: number) {
+    return this.http.get<AttendanceDto>(`${this.base}/sessions/${sessionId}/attendance`);
+  }
+  saveAttendance(sessionId: number, items: { userId: number; present: boolean }[]) {
+    return this.http.put<AttendanceDto>(`${this.base}/sessions/${sessionId}/attendance`, { items });
+  }
+  startSession(sessionId: number) {
+    return this.http.post<SessionDto>(`${this.base}/sessions/${sessionId}/start`, {});
+  }
+  suspendSession(sessionId: number) {
+    return this.http.post<SessionDto>(`${this.base}/sessions/${sessionId}/suspend`, {});
+  }
+  resumeSession(sessionId: number) {
+    return this.http.post<SessionDto>(`${this.base}/sessions/${sessionId}/resume`, {});
+  }
+  finishSession(sessionId: number) {
+    return this.http.post<SessionDto>(`${this.base}/sessions/${sessionId}/finish`, {});
+  }
+  recordDecision(sessionId: number, itemId: number, body: DecisionPayload) {
+    return this.http.post(`${this.base}/sessions/${sessionId}/items/${itemId}/decision`, body);
+  }
+  saveDebateNotes(sessionId: number, itemId: number, content: string) {
+    return this.http.post(`${this.base}/sessions/${sessionId}/items/${itemId}/notes`, { content });
+  }
+  addMiscItem(sessionId: number, title: string, description: string) {
+    return this.http.post<SessionDto>(`${this.base}/sessions/${sessionId}/misc-items`, { title, description });
   }
 
-  listarSesiones(estado?: EstadoSesion | '', page = 0, size = 20) {
-    return this.http.get<Page<SesionResumenDto>>(`${this.base}/sesiones`, {
-      params: toQuery({ estado, page, size, sort: 'fechaProgramada,desc' }),
+  listMinutes(status?: MinutesStatus | '', page = 0, size = 20) {
+    return this.http.get<Page<MinutesDto>>(`${this.base}/minutes`, {
+      params: toQuery({ status, page, size, sort: 'createdAt,desc' }),
     });
   }
-  sesion(id: number) {
-    return this.http.get<SesionDto>(`${this.base}/sesiones/${id}`);
+  getMinutes(id: number) {
+    return this.http.get<MinutesDto>(`${this.base}/minutes/${id}`);
   }
-  crearSesion(tipoConsejoId: number, fechaProgramada: string, lugar: string) {
-    return this.http.post<SesionDto>(`${this.base}/sesiones`, { tipoConsejoId, fechaProgramada, lugar });
+  generateMinutes(sessionId: number) {
+    return this.http.post<MinutesDto>(`${this.base}/minutes/session/${sessionId}`, {});
   }
-  agregarPunto(sesionId: number, solicitudId: number) {
-    return this.http.post<SesionDto>(`${this.base}/sesiones/${sesionId}/puntos`, { solicitudId });
+  updateMinutesContent(id: number, contentHtml: string) {
+    return this.http.put<MinutesDto>(`${this.base}/minutes/${id}/content`, { contentHtml });
   }
-  quitarPunto(sesionId: number, puntoId: number) {
-    return this.http.delete<SesionDto>(`${this.base}/sesiones/${sesionId}/puntos/${puntoId}`);
+  previewMinutes(id: number) {
+    return this.http.get(`${this.base}/minutes/${id}/preview`, { responseType: 'blob' });
   }
-  reordenarPuntos(sesionId: number, puntoIds: number[]) {
-    return this.http.put<SesionDto>(`${this.base}/sesiones/${sesionId}/puntos/orden`, { puntoIds });
+  sendMinutesForSignature(id: number) {
+    return this.http.post<MinutesDto>(`${this.base}/minutes/${id}/send-for-signature`, {});
   }
-  cerrarAgenda(sesionId: number) {
-    return this.http.post<SesionDto>(`${this.base}/sesiones/${sesionId}/cerrar-agenda`, {});
+  rejectMinutes(id: number, note: string) {
+    return this.http.post<MinutesDto>(`${this.base}/minutes/${id}/reject`, { note });
   }
-  citacion(sesionId: number) {
-    return this.http.get(`${this.base}/sesiones/${sesionId}/citacion`, { responseType: 'blob' });
-  }
-  asistencia(sesionId: number) {
-    return this.http.get<AsistenciaDto>(`${this.base}/sesiones/${sesionId}/asistencia`);
-  }
-  registrarAsistencia(sesionId: number, items: { usuarioId: number; presente: boolean }[]) {
-    return this.http.put<AsistenciaDto>(`${this.base}/sesiones/${sesionId}/asistencia`, { items });
-  }
-  iniciarSesion(sesionId: number) {
-    return this.http.post<SesionDto>(`${this.base}/sesiones/${sesionId}/iniciar`, {});
-  }
-  suspenderSesion(sesionId: number) {
-    return this.http.post<SesionDto>(`${this.base}/sesiones/${sesionId}/suspender`, {});
-  }
-  reanudarSesion(sesionId: number) {
-    return this.http.post<SesionDto>(`${this.base}/sesiones/${sesionId}/reanudar`, {});
-  }
-  finalizarSesion(sesionId: number) {
-    return this.http.post<SesionDto>(`${this.base}/sesiones/${sesionId}/finalizar`, {});
-  }
-  decision(
-    sesionId: number,
-    puntoId: number,
-    body: {
-      resultado: ResultadoDecision;
-      votosFavor: number;
-      votosContra: number;
-      abstenciones: number;
-      motivoModificacion?: string;
-    },
-  ) {
-    return this.http.post(`${this.base}/sesiones/${sesionId}/puntos/${puntoId}/decision`, body);
-  }
-  nota(sesionId: number, puntoId: number, contenido: string) {
-    return this.http.post(`${this.base}/sesiones/${sesionId}/puntos/${puntoId}/notas`, { contenido });
-  }
-  puntoVario(sesionId: number, titulo: string, descripcion: string) {
-    return this.http.post<SesionDto>(`${this.base}/sesiones/${sesionId}/puntos-varios`, { titulo, descripcion });
+  signMinutes(id: number) {
+    return this.http.post<MinutesDto>(`${this.base}/minutes/${id}/approve-and-sign`, {});
   }
 
-  listarActas(estado?: EstadoActa | '', page = 0, size = 20) {
-    return this.http.get<Page<ActaDto>>(`${this.base}/actas`, {
-      params: toQuery({ estado, page, size, sort: 'creadoEn,desc' }),
+  searchRepository(params: RepositorySearch) {
+    return this.http.get<Page<RepositoryMinutesDto>>(`${this.base}/repository/minutes`, {
+      params: toQuery({ ...params, sort: 'sessionDate,desc' }),
     });
   }
-  acta(id: number) {
-    return this.http.get<ActaDto>(`${this.base}/actas/${id}`);
+  verifyMinutes(id: number) {
+    return this.http.get<VerificationDto>(`${this.base}/repository/minutes/${id}/verify`);
   }
-  generarActa(sesionId: number) {
-    return this.http.post<ActaDto>(`${this.base}/actas/sesion/${sesionId}`, {});
+  viewMinutes(id: number) {
+    return this.http.get(`${this.base}/repository/minutes/${id}/viewer`, { responseType: 'blob' });
   }
-  editarActa(id: number, contenidoHtml: string) {
-    return this.http.put<ActaDto>(`${this.base}/actas/${id}/contenido`, { contenidoHtml });
-  }
-  vistaPreviaActa(id: number) {
-    return this.http.get(`${this.base}/actas/${id}/vista-previa`, { responseType: 'blob' });
-  }
-  enviarAFirma(id: number) {
-    return this.http.post<ActaDto>(`${this.base}/actas/${id}/enviar-a-firma`, {});
-  }
-  rechazarActa(id: number, observacion: string) {
-    return this.http.post<ActaDto>(`${this.base}/actas/${id}/rechazar`, { observacion });
-  }
-  firmarActa(id: number) {
-    return this.http.post<ActaDto>(`${this.base}/actas/${id}/aprobar-y-firmar`, {});
+  downloadMinutes(id: number) {
+    return this.http.get(`${this.base}/repository/minutes/${id}/download`, { responseType: 'blob' });
   }
 
-  repositorio(params: {
-    consecutivo?: string;
-    tipoConsejoId?: number | '';
-    desde?: string;
-    hasta?: string;
-    sedeId?: number | '';
-    facultadId?: number | '';
-    texto?: string;
-    page?: number;
-    size?: number;
-  }) {
-    return this.http.get<Page<RepositorioActaDto>>(`${this.base}/repositorio/actas`, {
-      params: toQuery({ ...params, sort: 'fechaSesion,desc' }),
-    });
-  }
-  verificarActa(id: number) {
-    return this.http.get<VerificacionDto>(`${this.base}/repositorio/actas/${id}/verificar`);
-  }
-  visorActa(id: number) {
-    return this.http.get(`${this.base}/repositorio/actas/${id}/visor`, { responseType: 'blob' });
-  }
-  descargarActa(id: number) {
-    return this.http.get(`${this.base}/repositorio/actas/${id}/descargar`, { responseType: 'blob' });
-  }
-
-  auditoria(params: { evento?: string; usuario?: string; page?: number; size?: number }) {
-    return this.http.get<Page<AuditLogDto>>(`${this.base}/auditoria`, { params: toQuery(params) });
+  searchAudit(params: AuditSearch) {
+    return this.http.get<Page<AuditLogDto>>(`${this.base}/audit`, { params: toQuery({ ...params }) });
   }
 }

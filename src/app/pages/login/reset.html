@@ -2,37 +2,38 @@
   <div class="auth-hero">
     <div class="auth-brand">
       <span class="logo-plate">
-        <img src="/USCO_Logo.png" alt="Escudo Universidad Surcolombiana" />
+        <img src="/USCO_Logo.png" [alt]="'app.logoAlt' | t" />
       </span>
       <div>
-        <h1>Universidad Surcolombiana</h1>
+        <h1>{{ 'app.university' | t }}</h1>
         <small>SIGAC</small>
       </div>
     </div>
     <div class="auth-copy">
-      <h2>Nueva contraseña</h2>
-      <p>Mínimo 8 caracteres, con letras y números.</p>
+      <h2>{{ 'reset.heroTitle' | t }}</h2>
+      <p>{{ 'reset.heroText' | t }}</p>
     </div>
-    <p class="auth-legal">Vigilada Mineducación</p>
+    <p class="auth-legal">{{ 'app.accreditation' | t }}</p>
   </div>
   <div class="auth-panel">
+    <app-lang-switch />
     <form class="auth-card" [formGroup]="form" (ngSubmit)="submit()">
-      <p class="kicker">Seguridad</p>
-      <h2>Restablecer contraseña</h2>
+      <p class="kicker">{{ 'reset.kicker' | t }}</p>
+      <h2>{{ 'reset.title' | t }}</h2>
       <div class="field">
-        <label for="clave">Nueva contraseña</label>
+        <label for="newPassword">{{ 'common.newPassword' | t }}</label>
         <div class="password-field">
           <input
-            id="clave"
+            id="newPassword"
             [type]="showPassword() ? 'text' : 'password'"
-            formControlName="nuevaClave"
+            formControlName="newPassword"
           />
           <button
             class="password-toggle"
             type="button"
             (click)="showPassword.set(!showPassword())"
-            [attr.aria-label]="showPassword() ? 'Ocultar contraseña' : 'Mostrar contraseña'"
-            [attr.title]="showPassword() ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+            [attr.aria-label]="(showPassword() ? 'common.hidePassword' : 'common.showPassword') | t"
+            [attr.title]="(showPassword() ? 'common.hidePassword' : 'common.showPassword') | t"
           >
             @if (showPassword()) {
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -49,9 +50,9 @@
         </div>
       </div>
       @if (error()) { <p class="error-text" style="margin-top: 0.8rem">{{ error() }}</p> }
-      @if (ok()) { <p class="lead" style="margin-top: 0.8rem">{{ ok() }}</p> }
-      <button class="btn" style="margin-top: 1.1rem; width: 100%" type="submit" [disabled]="loading()">Guardar</button>
-      <div class="auth-links"><a routerLink="/login">Ir al ingreso</a></div>
+      @if (success()) { <p class="lead" style="margin-top: 0.8rem">{{ success() }}</p> }
+      <button class="btn" style="margin-top: 1.1rem; width: 100%" type="submit" [disabled]="loading()">{{ 'common.save' | t }}</button>
+      <div class="auth-links"><a routerLink="/login">{{ 'reset.back' | t }}</a></div>
     </form>
   </div>
 </section>

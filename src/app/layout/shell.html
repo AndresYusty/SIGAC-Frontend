@@ -2,36 +2,39 @@
   <aside class="sidebar">
     <div class="sidebar-brand">
       <span class="logo-plate">
-        <img src="/USCO_Logo.png" alt="Escudo Universidad Surcolombiana" />
+        <img src="/USCO_Logo.png" [alt]="'app.logoAlt' | t" />
       </span>
       <div>
-        <strong>Universidad Surcolombiana</strong>
-        <span>SIGAC · Actas y consejos</span>
+        <strong>{{ 'app.university' | t }}</strong>
+        <span>{{ 'app.tagline' | t }}</span>
       </div>
     </div>
     <nav class="nav">
       @for (item of nav(); track item.path) {
-        <a [routerLink]="item.path" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: item.path === '/' }">{{ item.label }}</a>
+        <a [routerLink]="item.path" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: item.path === '/' }">{{ item.labelKey | t }}</a>
       }
     </nav>
     <div class="sidebar-user">
-      <strong>{{ auth.user()?.nombre }}</strong>
-      <span>{{ auth.user()?.roles?.[0] ? etiquetaRol(auth.user()!.roles[0]) : '' }}</span>
+      <strong>{{ auth.user()?.name }}</strong>
+      @if (auth.user()?.roles?.[0]; as role) {
+        <span>{{ 'enums.role.' + role | t }}</span>
+      }
     </div>
   </aside>
 
   <div class="workspace">
     <header class="topbar">
-      <div class="uni">Vigilada Mineducación · <b>Neiva, Huila</b></div>
+      <div class="uni">{{ 'app.accreditation' | t }} · <b>{{ 'app.city' | t }}</b></div>
       <div class="row-actions">
-        <a routerLink="/perfil" class="btn btn-ghost">Mi perfil</a>
-        <button class="btn btn-secondary" type="button" (click)="logout()">Cerrar sesión</button>
+        <app-lang-switch />
+        <a routerLink="/profile" class="btn btn-ghost">{{ 'nav.profile' | t }}</a>
+        <button class="btn btn-secondary" type="button" (click)="logout()">{{ 'nav.logout' | t }}</button>
       </div>
     </header>
     <main class="page">
       <router-outlet />
     </main>
-    <p class="footer-note">Universidad Surcolombiana · SIGAC {{ year }} </p>
+    <p class="footer-note">{{ 'app.footer' | t: { year: year } }}</p>
   </div>
 </div>
 
@@ -47,7 +50,7 @@
       <h2>{{ confirm.title() }}</h2>
       <p class="lead">{{ confirm.message() }}</p>
       <div class="modal-actions">
-        <button class="btn btn-ghost" type="button" (click)="confirm.close(false)">Cancelar</button>
+        <button class="btn btn-ghost" type="button" (click)="confirm.close(false)">{{ 'common.cancel' | t }}</button>
         <button class="btn" type="button" (click)="confirm.close(true)">{{ confirm.okLabel() }}</button>
       </div>
     </div>
