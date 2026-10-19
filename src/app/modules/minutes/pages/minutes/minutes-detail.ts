@@ -51,7 +51,7 @@ export class MinutesDetailPage implements OnInit, OnDestroy {
     this.api.getMinutes(this.id()).subscribe({
       next: (m) => {
         this.minutes.set(m);
-        this.content = m.contentHtml ?? '';
+        this.content = m.htmlContent ?? '';
       },
       error: (e) => this.toast.apiError(e),
     });

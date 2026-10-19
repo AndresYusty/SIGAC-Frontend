@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 import { roleGuard } from '@core/auth/auth.guard';
-import { COUNCIL_ROLES, STAFF_ROLES } from '@core/auth/role-groups';
+import { SESSION_ROLES, STAFF_ROLES } from '@core/auth/role-groups';
 
 export const requestsRoutes: Routes = [
   {
@@ -12,13 +12,13 @@ export const requestsRoutes: Routes = [
   {
     path: 'requests/new',
     canActivate: [roleGuard],
-    data: { roles: ['ROLE_SECRETARY_2'] },
+    data: { roles: ['ROLE_FACULTY_SECRETARY'] },
     loadComponent: () => import('./pages/requests/request-form').then((m) => m.RequestFormPage),
   },
   {
     path: 'requests/:id/edit',
     canActivate: [roleGuard],
-    data: { roles: ['ROLE_SECRETARY_2'] },
+    data: { roles: ['ROLE_FACULTY_SECRETARY'] },
     loadComponent: () => import('./pages/requests/request-form').then((m) => m.RequestFormPage),
   },
   {
@@ -30,19 +30,19 @@ export const requestsRoutes: Routes = [
   {
     path: 'sessions',
     canActivate: [roleGuard],
-    data: { roles: COUNCIL_ROLES },
+    data: { roles: SESSION_ROLES },
     loadComponent: () => import('./pages/sessions/sessions').then((m) => m.SessionsPage),
   },
   {
     path: 'sessions/new',
     canActivate: [roleGuard],
-    data: { roles: ['ROLE_SECRETARY_1'] },
+    data: { roles: ['ROLE_COUNCIL_SECRETARY'] },
     loadComponent: () => import('./pages/sessions/session-new').then((m) => m.SessionNewPage),
   },
   {
     path: 'sessions/:id',
     canActivate: [roleGuard],
-    data: { roles: COUNCIL_ROLES },
+    data: { roles: SESSION_ROLES },
     loadComponent: () => import('./pages/sessions/session-detail').then((m) => m.SessionDetailPage),
   },
 ];

@@ -54,18 +54,14 @@
         <span>{{ 'templates.content' | t }}</span>
         <textarea class="editor" [(ngModel)]="content"></textarea>
       </label>
-      @if (errors().length) {
-        <ul>
-          @for (e of errors(); track e) {
-            <li class="error-text">{{ e }}</li>
-          }
-        </ul>
-      }
       <div class="row-actions" style="margin-top: 0.8rem">
-        <button class="btn btn-secondary" type="button" (click)="validate()">{{ 'templates.validate' | t }}</button>
+        <button class="btn" type="button" (click)="loadAgreementDraft()">{{ 'templates.loadAgreement' | t }}</button>
         <button class="btn btn-ochre" type="button" (click)="preview()">{{ 'templates.previewPdf' | t }}</button>
-        <button class="btn" type="button" (click)="save()">{{ 'templates.saveVersion' | t }}</button>
+        <button class="btn btn-ghost" type="button" (click)="save()">{{ 'templates.saveVersion' | t }}</button>
       </div>
+      @if (pdf) {
+        <iframe class="preview-frame" [src]="pdf" [title]="'templates.previewFrameTitle' | t"></iframe>
+      }
     </article>
   </div>
   <article class="card">

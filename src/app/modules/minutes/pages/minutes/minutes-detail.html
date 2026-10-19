@@ -1,7 +1,7 @@
 @if (minutes(); as m) {
   <div class="page-head">
     <div>
-      <p class="kicker">{{ m.number }}</p>
+      <p class="kicker">{{ m.serialNumber }}</p>
       <h1>{{ m.councilType }}</h1>
       <p class="lead">{{ m.faculty }} · {{ m.sessionDate | localDate: 'dd/MM/yyyy' }}</p>
     </div>
@@ -19,7 +19,7 @@
   <div class="split">
     <article class="card">
       <h2>{{ 'minutes.content' | t }}</h2>
-      @if (auth.has('ROLE_SECRETARY_1') && (m.status === 'DRAFT' || m.status === 'EDITING')) {
+      @if (auth.has('ROLE_COUNCIL_SECRETARY') && (m.status === 'DRAFT' || m.status === 'EDITING')) {
         <textarea class="editor" [(ngModel)]="content" [attr.aria-label]="'minutes.content' | t"></textarea>
         <div class="row-actions" style="margin-top: 0.8rem">
           <button class="btn" type="button" (click)="save()">{{ 'common.save' | t }}</button>
@@ -28,7 +28,7 @@
       } @else {
         <div [innerHTML]="html()"></div>
       }
-      @if (m.status === 'PENDING_SIGNATURE' && auth.has('ROLE_PRESIDENT', 'ROLE_SECRETARY_1')) {
+      @if (m.status === 'PENDING_SIGNATURE' && auth.has('ROLE_PRESIDENT', 'ROLE_COUNCIL_SECRETARY')) {
         <label class="field" style="margin-top: 1rem">
           <span>{{ 'minutes.returnNote' | t }}</span>
           <textarea [(ngModel)]="note"></textarea>

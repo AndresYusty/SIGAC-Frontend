@@ -7,10 +7,15 @@ export interface NodeDto {
   city: string | null;
 }
 
+export const COUNCIL_KINDS = ['ORDINARY', 'EXTRAORDINARY', 'VIRTUAL', 'EXPANDED'] as const;
+
+export type CouncilKind = (typeof COUNCIL_KINDS)[number];
+
 export interface CouncilTypeDto {
   id: number;
   code: string;
   name: string;
+  kind: CouncilKind;
 }
 
 export interface ParameterDto {

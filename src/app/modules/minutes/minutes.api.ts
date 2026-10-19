@@ -21,14 +21,14 @@ export class MinutesApi {
   generateMinutes(sessionId: number) {
     return this.http.post<MinutesDto>(`${this.base}/minutes/session/${sessionId}`, {});
   }
-  updateMinutesContent(id: number, contentHtml: string) {
-    return this.http.put<MinutesDto>(`${this.base}/minutes/${id}/content`, { contentHtml });
+  updateMinutesContent(id: number, htmlContent: string) {
+    return this.http.put<MinutesDto>(`${this.base}/minutes/${id}/content`, { htmlContent });
   }
   previewMinutes(id: number) {
     return this.http.get(`${this.base}/minutes/${id}/preview`, { responseType: 'blob' });
   }
   sendMinutesForSignature(id: number) {
-    return this.http.post<MinutesDto>(`${this.base}/minutes/${id}/send-for-signature`, {});
+    return this.http.post<MinutesDto>(`${this.base}/minutes/${id}/send-to-signature`, {});
   }
   rejectMinutes(id: number, note: string) {
     return this.http.post<MinutesDto>(`${this.base}/minutes/${id}/reject`, { note });

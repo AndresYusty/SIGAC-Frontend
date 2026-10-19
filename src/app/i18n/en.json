@@ -91,17 +91,16 @@
   "enums": {
     "role": {
       "ROLE_ADMIN": "Administrator",
-      "ROLE_DEV": "Technical profile",
-      "ROLE_SECRETARY_1": "Secretary 1",
-      "ROLE_SECRETARY_2": "Secretary 2",
-      "ROLE_PRESIDENT": "President",
-      "ROLE_COUNCILOR": "Councilor"
+      "ROLE_COUNCIL_SECRETARY": "Council Secretary",
+      "ROLE_FACULTY_SECRETARY": "Faculty Secretary",
+      "ROLE_PRESIDENT": "President (Dean)",
+      "ROLE_COUNCIL_MEMBER": "Council member"
     },
     "requestType": {
       "ACADEMIC": "Academic",
       "ADMINISTRATIVE": "Administrative",
       "STUDENT": "Student",
-      "FACULTY": "Faculty"
+      "TEACHING": "Teaching"
     },
     "requestStatus": {
       "FILED": "Filed",
@@ -124,7 +123,13 @@
       "PENDING_SIGNATURE": "Pending signature",
       "PUBLISHED": "Published"
     },
-    "decisionResult": {
+    "councilKind": {
+      "ORDINARY": "Ordinary",
+      "EXTRAORDINARY": "Extraordinary",
+      "VIRTUAL": "Virtual",
+      "EXPANDED": "Expanded"
+    },
+    "decisionOutcome": {
       "APPROVED": "Approved",
       "DENIED": "Denied",
       "POSTPONED": "Postponed",
@@ -190,7 +195,7 @@
       "newTitle": "New request",
       "editTitle": "Correct request",
       "lead": "Attachments must be PDF files of up to 10 MB.",
-      "applicant": "Applicant",
+      "requester": "Applicant",
       "noProgram": "No program",
       "attachments": "PDF attachments",
       "filed": "Request filed",
@@ -202,7 +207,7 @@
       "attachments": "Attachments",
       "noAttachments": "No attachments.",
       "reviewTitle": "Review",
-      "reviewLead": "Secretary 1 approves, rejects or returns the request with a reason.",
+      "reviewLead": "The council secretary approves, rejects or returns the request with a reason.",
       "reasonLabel": "Reason (rejection or return)",
       "approve": "Approve",
       "return": "Return",
@@ -449,8 +454,12 @@
     "newTemplate": "New template",
     "comment": "Comment",
     "content": "XHTML content",
+    "loadAgreement": "Load agreement layout",
+    "agreementDraftName": "Faculty Council agreement",
+    "agreementDraftComment": "Layout of agreements 005 of 2025 and 028 of 2026. Preview uses 028.",
     "validate": "Validate",
-    "previewPdf": "Preview PDF",
+    "previewPdf": "Preview",
+    "previewFrameTitle": "Document preview",
     "saveVersion": "Save version",
     "variables": "Variables",
     "toast": {

@@ -2,7 +2,7 @@ import { RequestStatus } from '@modules/requests';
 
 export interface RepositoryMinutesDto {
   id: number;
-  number: string;
+  serialNumber: string;
   councilType: string;
   university: string;
   campus: string;
@@ -14,14 +14,14 @@ export interface RepositoryMinutesDto {
 }
 
 export interface VerificationDto {
-  number: string;
+  serialNumber: string;
   storedHash: string;
   computedHash: string;
   intact: boolean;
 }
 
 export interface RepositorySearch {
-  number?: string;
+  serialNumber?: string;
   councilTypeId?: number | '';
   from?: string;
   to?: string;
@@ -40,7 +40,7 @@ export interface AuditLogDto {
   entity: string;
   entityId: string;
   detail: string | null;
-  date: string;
+  occurredAt: string;
 }
 
 export interface AuditSearch {
@@ -52,7 +52,7 @@ export interface AuditSearch {
 
 export interface PublishedMinutesSummary {
   id: number;
-  number: string;
+  serialNumber: string;
   sessionDate: string;
 }
 

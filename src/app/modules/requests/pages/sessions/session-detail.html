@@ -1,26 +1,26 @@
 @if (session(); as s) {
   <div class="page-head">
     <div>
-      <p class="kicker">{{ s.councilType }}</p>
+      <p class="kicker">{{ s.councilType }} · {{ 'enums.councilKind.' + s.councilKind | t }}</p>
       <h1>{{ 'sessions.detail.title' | t: { date: (s.scheduledAt | localDate: 'dd MMMM yyyy, HH:mm') } }}</h1>
-      <p class="lead">{{ s.faculty }} · {{ s.location }}</p>
+      <p class="lead">{{ s.faculty }} · {{ s.location || ('sessions.virtualLocation' | t) }}</p>
     </div>
     <div class="row-actions">
       <span class="badge" [class]="tone[s.status]">{{ 'enums.sessionStatus.' + s.status | t }}</span>
       @if (s.agendaClosed) {
-        <button class="btn btn-secondary" type="button" (click)="downloadSummons()">{{ 'sessions.detail.summonsPdf' | t }}</button>
+        <button class="btn btn-secondary" type="button" (click)="downloadNotice()">{{ 'sessions.detail.noticePdf' | t }}</button>
       }
       @if (s.status === 'CONVENED' || s.status === 'STARTED' || s.status === 'SUSPENDED') {
         <a [routerLink]="['/sessions', s.id, 'live']" class="btn">{{ 'sessions.detail.liveRoom' | t }}</a>
       }
-      @if (s.status === 'FINISHED' && auth.has('ROLE_SECRETARY_1')) {
+      @if (s.status === 'FINISHED' && auth.has('ROLE_COUNCIL_SECRETARY')) {
         <button class="btn" type="button" (click)="generateMinutes()">{{ 'sessions.detail.generateMinutes' | t }}</button>
       }
       <a routerLink="/sessions" class="btn btn-ghost">{{ 'common.back' | t }}</a>
     </div>
   </div>
 
-  @if (auth.has('ROLE_SECRETARY_1') && !s.agendaClosed) {
+  @if (auth.has('ROLE_COUNCIL_SECRETARY') && !s.agendaClosed) {
     <article class="card" style="margin-bottom: 1rem">
       <h2>{{ 'sessions.detail.buildAgenda' | t }}</h2>
       <div class="toolbar">
@@ -35,6 +35,59 @@
         </label>
         <button class="btn" type="button" (click)="addItem()">{{ 'sessions.detail.addItem' | t }}</button>
         <button class="btn btn-ochre" type="button" (click)="closeAgenda()">{{ 'sessions.detail.closeAndSummon' | t }}</button>
+      </div>
+      @if (s.councilKind === 'EXTRAORDINARY') {
+        <h3 style="margin-top: 1rem">{{ 'sessions.urgentForm.title' | t }}</h3>
+        <p class="muted">{{ 'sessions.urgentForm.hint' | t }}</p>
+        <div class="toolbar">
+          <label class="field grow"><span>{{ 'common.title' | t }}</span><input [(ngModel)]="urgentTitle" maxlength="300" /></label>
+          <label class="field grow"><span>{{ 'common.description' | t }}</span><input [(ngModel)]="urgentDescription" /></label>
+          <button class="btn btn-secondary" type="button" (click)="addUrgentItem()">{{ 'sessions.urgentForm.add' | t }}</button>
+        </div>
+      }
+    </article>
+  }
+
+  @if (s.councilKind === 'EXPANDED') {
+    <article class="card" style="margin-bottom: 1rem">
+      <h2>{{ 'sessions.guests.title' | t }}</h2>
+      <p class="muted">{{ 'sessions.guests.hint' | t }}</p>
+      @if (auth.has('ROLE_COUNCIL_SECRETARY') && !s.agendaClosed) {
+        <div class="toolbar">
+          <label class="field grow"><span>{{ 'common.name' | t }}</span><input [(ngModel)]="guest.name" maxlength="150" /></label>
+          <label class="field grow"><span>{{ 'sessions.guests.email' | t }}</span><input type="email" [(ngModel)]="guest.email" maxlength="150" /></label>
+          <label class="field grow"><span>{{ 'sessions.guests.affiliation' | t }}</span><input [(ngModel)]="guest.affiliation" maxlength="150" [placeholder]="'sessions.guests.affiliationPlaceholder' | t" /></label>
+          <button class="btn btn-secondary" type="button" (click)="addGuest()">{{ 'sessions.guests.add' | t }}</button>
+        </div>
+      }
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>{{ 'common.name' | t }}</th>
+              <th>{{ 'sessions.guests.email' | t }}</th>
+              <th>{{ 'sessions.guests.affiliation' | t }}</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (g of s.guests; track g.id) {
+              <tr>
+                <td>{{ g.name }}</td>
+                <td>{{ g.email || '—' }}</td>
+                <td>{{ g.affiliation || '—' }}</td>
+                <td class="row-actions">
+                  @if (auth.has('ROLE_COUNCIL_SECRETARY') && !s.agendaClosed) {
+                    <button class="btn btn-ghost" type="button" (click)="removeGuest(g.id)">{{ 'sessions.detail.remove' | t }}</button>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+        @if (!s.guests.length) {
+          <div class="empty"><p>{{ 'sessions.guests.empty' | t }}</p></div>
+        }
       </div>
     </article>
   }
@@ -54,12 +107,12 @@
       <tbody>
         @for (item of s.items; track item.id; let i = $index) {
           <tr>
-            <td>{{ item.order }}</td>
-            <td>{{ item.title }}@if (item.isMisc) { <span class="chip">{{ 'sessions.misc' | t }}</span> }</td>
+            <td>{{ item.position }}</td>
+            <td>{{ item.title }}@if (item.miscellaneous) { <span class="chip">{{ 'sessions.misc' | t }}</span> }@if (item.urgent) { <span class="chip">{{ 'sessions.urgent' | t }}</span> }</td>
             <td>{{ item.requestCode || '—' }}</td>
-            <td>{{ item.result ? ('enums.decisionResult.' + item.result | t) : ('sessions.detail.pending' | t) }}</td>
+            <td>{{ item.outcome ? ('enums.decisionOutcome.' + item.outcome | t) : ('sessions.detail.pending' | t) }}</td>
             <td class="row-actions">
-              @if (auth.has('ROLE_SECRETARY_1') && !s.agendaClosed) {
+              @if (auth.has('ROLE_COUNCIL_SECRETARY') && !s.agendaClosed) {
                 <button class="btn btn-ghost" type="button" [attr.aria-label]="'sessions.detail.moveUp' | t" [title]="'sessions.detail.moveUp' | t" (click)="move(i, -1)">↑</button>
                 <button class="btn btn-ghost" type="button" [attr.aria-label]="'sessions.detail.moveDown' | t" [title]="'sessions.detail.moveDown' | t" (click)="move(i, 1)">↓</button>
                 <button class="btn btn-ghost" type="button" (click)="removeItem(item.id)">{{ 'sessions.detail.remove' | t }}</button>

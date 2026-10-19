@@ -1,5 +1,5 @@
 import { RoleName } from '@core/auth/auth.models';
-import { DecisionResult, SessionStatus } from '@modules/requests';
+import { DecisionOutcome, SessionStatus } from '@modules/requests';
 
 export interface QuorumDto {
   members: number;
@@ -7,6 +7,8 @@ export interface QuorumDto {
   required: number;
   percentage: number;
   reached: boolean;
+  /** False for virtual councils, which are decided by whoever responds. */
+  applicable: boolean;
 }
 
 export interface AttendeeDto {
@@ -23,7 +25,7 @@ export interface AttendanceDto {
 }
 
 export interface DecisionPayload {
-  result: DecisionResult;
+  outcome: DecisionOutcome;
   votesFor: number;
   votesAgainst: number;
   abstentions: number;

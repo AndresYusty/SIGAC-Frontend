@@ -1,10 +1,11 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { I18nService } from '@core/i18n/i18n.service';
 import { ToastService } from '@core/ui/toast.service';
 import { CouncilTypeDto, UsersApi } from '@modules/users';
 import { TranslatePipe } from '@shared/pipes/translate.pipe';
-import { saveBlob } from '@shared/utils/files';
+import { blobUrl } from '@shared/utils/files';
 import { TemplatesApi } from '../../templates.api';
 import { TemplateDto, TemplateVariableDto } from '../../templates.models';
 
@@ -13,21 +14,23 @@ import { TemplateDto, TemplateVariableDto } from '../../templates.models';
   imports: [FormsModule, TranslatePipe],
   templateUrl: './templates.html',
 })
-export class TemplatesPage implements OnInit {
+export class TemplatesPage implements OnInit, OnDestroy {
   private readonly api = inject(TemplatesApi);
   private readonly usersApi = inject(UsersApi);
   private readonly toast = inject(ToastService);
   private readonly i18n = inject(I18nService);
+  private readonly sanitizer = inject(DomSanitizer);
   readonly councilTypes = signal<CouncilTypeDto[]>([]);
   readonly list = signal<TemplateDto[]>([]);
   readonly variables = signal<TemplateVariableDto[]>([]);
-  readonly errors = signal<string[]>([]);
   councilTypeId: number | null = null;
   facultyId: number | null = null;
   name = this.i18n.t('templates.defaultName');
   comment = '';
   content = '';
   selected?: number;
+  pdf?: SafeResourceUrl;
+  private rawPdf?: string;
 
   ngOnInit(): void {
     this.usersApi.listCouncilTypes().subscribe({
@@ -38,6 +41,23 @@ export class TemplatesPage implements OnInit {
       },
     });
     this.api.listTemplateVariables().subscribe({ next: (v) => this.variables.set(v) });
+  }
+
+  ngOnDestroy(): void {
+    if (this.rawPdf) URL.revokeObjectURL(this.rawPdf);
+  }
+
+  loadAgreementDraft(): void {
+    this.api.agreementDraft().subscribe({
+      next: (content) => {
+        this.selected = undefined;
+        this.name = this.i18n.t('templates.agreementDraftName');
+        this.comment = this.i18n.t('templates.agreementDraftComment');
+        this.content = content;
+        this.preview();
+      },
+      error: (e) => this.toast.apiError(e),
+    });
   }
 
   load(): void {
@@ -55,16 +75,6 @@ export class TemplatesPage implements OnInit {
         this.comment = d.comment ?? '';
         this.content = d.content ?? '';
         this.councilTypeId = d.councilTypeId;
-      },
-      error: (e) => this.toast.apiError(e),
-    });
-  }
-
-  validate(): void {
-    this.api.validateTemplate(this.content).subscribe({
-      next: (errors) => {
-        this.errors.set(errors);
-        if (!errors.length) this.toast.ok('templates.toast.valid');
       },
       error: (e) => this.toast.apiError(e),
     });
@@ -102,7 +112,11 @@ export class TemplatesPage implements OnInit {
 
   preview(): void {
     this.api.previewTemplate(this.content).subscribe({
-      next: (b) => saveBlob(b, 'template-preview.pdf'),
+      next: (b) => {
+        if (this.rawPdf) URL.revokeObjectURL(this.rawPdf);
+        this.rawPdf = blobUrl(b);
+        this.pdf = this.sanitizer.bypassSecurityTrustResourceUrl(this.rawPdf);
+      },
       error: (e) => this.toast.apiError(e),
     });
   }

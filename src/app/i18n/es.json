@@ -91,17 +91,16 @@
   "enums": {
     "role": {
       "ROLE_ADMIN": "Administrador",
-      "ROLE_DEV": "Perfil técnico",
-      "ROLE_SECRETARY_1": "Secretaría 1",
-      "ROLE_SECRETARY_2": "Secretaría 2",
-      "ROLE_PRESIDENT": "Presidente",
-      "ROLE_COUNCILOR": "Consejero"
+      "ROLE_COUNCIL_SECRETARY": "Secretaría del Consejo",
+      "ROLE_FACULTY_SECRETARY": "Secretaría de Facultad",
+      "ROLE_PRESIDENT": "Presidente (Decano)",
+      "ROLE_COUNCIL_MEMBER": "Consejero"
     },
     "requestType": {
       "ACADEMIC": "Académica",
       "ADMINISTRATIVE": "Administrativa",
       "STUDENT": "Estudiantil",
-      "FACULTY": "Docente"
+      "TEACHING": "Docencia"
     },
     "requestStatus": {
       "FILED": "Radicada",
@@ -124,7 +123,13 @@
       "PENDING_SIGNATURE": "Pendiente de firma",
       "PUBLISHED": "Publicada"
     },
-    "decisionResult": {
+    "councilKind": {
+      "ORDINARY": "Ordinario",
+      "EXTRAORDINARY": "Extraordinario",
+      "VIRTUAL": "Virtual",
+      "EXPANDED": "Ampliado"
+    },
+    "decisionOutcome": {
       "APPROVED": "Aprobado",
       "DENIED": "Negado",
       "POSTPONED": "Aplazado",
@@ -190,7 +195,7 @@
       "newTitle": "Nueva solicitud",
       "editTitle": "Corregir solicitud",
       "lead": "Los anexos deben ser PDF de hasta 10 MB.",
-      "applicant": "Solicitante",
+      "requester": "Solicitante",
       "noProgram": "Sin programa",
       "attachments": "Anexos PDF",
       "filed": "Solicitud radicada",
@@ -202,7 +207,7 @@
       "attachments": "Anexos",
       "noAttachments": "Sin anexos.",
       "reviewTitle": "Evaluación",
-      "reviewLead": "La Secretaría 1 aprueba, rechaza o devuelve con motivo.",
+      "reviewLead": "La Secretaría del Consejo aprueba, rechaza o devuelve con motivo.",
       "reasonLabel": "Motivo (rechazo o devolución)",
       "approve": "Aprobar",
       "return": "Devolver",
@@ -449,8 +454,12 @@
     "newTemplate": "Nueva plantilla",
     "comment": "Comentario",
     "content": "Contenido XHTML",
+    "loadAgreement": "Cargar formato de acuerdo",
+    "agreementDraftName": "Acuerdo del Consejo de Facultad",
+    "agreementDraftComment": "Formato de los acuerdos 005 de 2025 y 028 de 2026. La vista previa usa el 028.",
     "validate": "Validar",
-    "previewPdf": "Previsualizar PDF",
+    "previewPdf": "Previsualizar",
+    "previewFrameTitle": "Vista previa del documento",
     "saveVersion": "Guardar versión",
     "variables": "Variables",
     "toast": {

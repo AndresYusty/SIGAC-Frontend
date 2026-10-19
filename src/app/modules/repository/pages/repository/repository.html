@@ -6,7 +6,7 @@
   </div>
 </div>
 <div class="toolbar">
-  <label class="field"><span>{{ 'common.number' | t }}</span><input [(ngModel)]="number" /></label>
+  <label class="field"><span>{{ 'common.number' | t }}</span><input [(ngModel)]="serialNumber" /></label>
   <label class="field">
     <span>{{ 'common.type' | t }}</span>
     <select [(ngModel)]="councilTypeId">
@@ -35,13 +35,13 @@
     <tbody>
       @for (m of page()?.content ?? []; track m.id) {
         <tr>
-          <td>{{ m.number }}</td>
+          <td>{{ m.serialNumber }}</td>
           <td>{{ m.councilType }}</td>
           <td>{{ m.faculty }}</td>
           <td>{{ m.sessionDate | localDate: 'dd/MM/yyyy' }}</td>
           <td class="row-actions">
             <button class="btn btn-ghost" type="button" (click)="view(m.id)">{{ 'common.view' | t }}</button>
-            <button class="btn btn-ghost" type="button" (click)="download(m.id, m.number)">{{ 'common.download' | t }}</button>
+            <button class="btn btn-ghost" type="button" (click)="download(m.id, m.serialNumber)">{{ 'common.download' | t }}</button>
             <button class="btn btn-ghost" type="button" (click)="verify(m.id)">{{ 'repository.verify' | t }}</button>
           </td>
         </tr>

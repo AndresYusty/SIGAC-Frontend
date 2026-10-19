@@ -4,7 +4,7 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { AuthService } from '@core/auth/auth.service';
 import { ConfirmService } from '@core/ui/confirm.service';
 import { ToastService } from '@core/ui/toast.service';
-import { AgendaItemDto, DECISION_RESULTS, RequestsApi, SessionDto } from '@modules/requests';
+import { AgendaItemDto, DECISION_OUTCOMES, RequestsApi, SessionDto } from '@modules/requests';
 import { LocalDatePipe } from '@shared/pipes/local-date.pipe';
 import { TranslatePipe } from '@shared/pipes/translate.pipe';
 import { TONE } from '@shared/utils/labels';
@@ -28,7 +28,7 @@ export class SessionLivePage implements OnInit, OnDestroy {
   readonly session = signal<SessionDto | null>(null);
   readonly attendance = signal<AttendanceDto | null>(null);
   readonly tone = TONE;
-  readonly results = DECISION_RESULTS;
+  readonly outcomes = DECISION_OUTCOMES;
   notes: Record<number, string> = {};
   miscTitle = '';
   miscDescription = '';
@@ -54,7 +54,7 @@ export class SessionLivePage implements OnInit, OnDestroy {
         this.session.set(s);
         for (const item of s.items) {
           this.decisions[item.id] ??= {
-            result: item.result ?? 'APPROVED',
+            outcome: item.outcome ?? 'APPROVED',
             votesFor: item.votesFor,
             votesAgainst: item.votesAgainst,
             abstentions: item.abstentions,

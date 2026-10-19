@@ -31,7 +31,7 @@
     <tbody>
       @for (a of page()?.content ?? []; track a.id) {
         <tr>
-          <td>{{ a.date | localDate: 'dd/MM/yyyy HH:mm:ss' }}</td>
+          <td>{{ a.occurredAt | localDate: 'dd/MM/yyyy HH:mm:ss' }}</td>
           <td>{{ a.event }}</td>
           <td>{{ a.userEmail }}</td>
           <td>{{ a.entity }} {{ a.entityId }}</td>

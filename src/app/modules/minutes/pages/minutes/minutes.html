@@ -32,7 +32,7 @@
     <tbody>
       @for (m of page()?.content ?? []; track m.id) {
         <tr>
-          <td>{{ m.number }}</td>
+          <td>{{ m.serialNumber }}</td>
           <td>{{ m.councilType }}</td>
           <td>{{ m.faculty }}</td>
           <td>{{ m.sessionDate | localDate: 'dd/MM/yyyy' }}</td>

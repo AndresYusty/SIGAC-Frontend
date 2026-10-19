@@ -20,7 +20,7 @@ export class RepositoryPage implements OnInit, OnDestroy {
   private readonly usersApi = inject(UsersApi);
   private readonly toast = inject(ToastService);
   private readonly sanitizer = inject(DomSanitizer);
-  number = '';
+  serialNumber = '';
   text = '';
   councilTypeId: number | '' = '';
   from = '';
@@ -43,7 +43,7 @@ export class RepositoryPage implements OnInit, OnDestroy {
   load(n = 0): void {
     this.api
       .searchRepository({
-        number: this.number,
+        serialNumber: this.serialNumber,
         text: this.text,
         councilTypeId: this.councilTypeId,
         from: this.from,
@@ -74,9 +74,9 @@ export class RepositoryPage implements OnInit, OnDestroy {
     });
   }
 
-  download(id: number, number: string): void {
+  download(id: number, serialNumber: string): void {
     this.api.downloadMinutes(id).subscribe({
-      next: (b) => saveBlob(b, `minutes-${number}.pdf`),
+      next: (b) => saveBlob(b, `minutes-${serialNumber}.pdf`),
       error: (e) => this.toast.apiError(e),
     });
   }

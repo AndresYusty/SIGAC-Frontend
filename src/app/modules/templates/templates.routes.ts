@@ -5,7 +5,7 @@ export const templatesRoutes: Routes = [
   {
     path: 'templates',
     canActivate: [roleGuard],
-    data: { roles: ['ROLE_DEV'] },
+    data: { roles: ['ROLE_ADMIN'] },
     loadComponent: () => import('./pages/templates/templates').then((m) => m.TemplatesPage),
   },
 ];

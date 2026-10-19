@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 import { roleGuard } from '@core/auth/auth.guard';
-import { COUNCIL_ROLES } from '@core/auth/role-groups';
+import { REPOSITORY_ROLES } from '@core/auth/role-groups';
 
 export const repositoryRoutes: Routes = [
   {
@@ -10,7 +10,7 @@ export const repositoryRoutes: Routes = [
   {
     path: 'repository',
     canActivate: [roleGuard],
-    data: { roles: COUNCIL_ROLES },
+    data: { roles: REPOSITORY_ROLES },
     loadComponent: () => import('./pages/repository/repository').then((m) => m.RepositoryPage),
   },
   {

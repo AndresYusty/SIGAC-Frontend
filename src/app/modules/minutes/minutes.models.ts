@@ -4,7 +4,7 @@ export type MinutesStatus = (typeof MINUTES_STATUSES)[number];
 
 export interface MinutesDto {
   id: number;
-  number: string;
+  serialNumber: string;
   status: MinutesStatus;
   sessionId: number;
   councilType: string;
@@ -13,5 +13,5 @@ export interface MinutesDto {
   rejectionNote: string | null;
   signedBy: string | null;
   signedAt: string | null;
-  contentHtml: string | null;
+  htmlContent: string | null;
 }

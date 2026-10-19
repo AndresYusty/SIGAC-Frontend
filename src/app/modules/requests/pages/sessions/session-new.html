@@ -14,14 +14,17 @@
         <option [ngValue]="ct.id">{{ ct.code }} · {{ ct.name }}</option>
       }
     </select>
+    @if (kind(); as k) {
+      <small class="muted">{{ 'sessions.kindHint.' + k | t }}</small>
+    }
   </label>
   <label class="field">
     <span>{{ 'sessions.new.dateTime' | t }}</span>
     <input type="datetime-local" formControlName="scheduledAt" />
   </label>
   <label class="field">
-    <span>{{ 'sessions.location' | t }}</span>
-    <input formControlName="location" [placeholder]="'sessions.new.locationPlaceholder' | t" />
+    <span>{{ (kind() === 'VIRTUAL' ? 'sessions.new.locationOptional' : 'sessions.location') | t }}</span>
+    <input formControlName="location" [placeholder]="(kind() === 'VIRTUAL' ? 'sessions.new.virtualPlaceholder' : 'sessions.new.locationPlaceholder') | t" />
   </label>
   <button class="btn" type="submit" [disabled]="saving()">{{ 'sessions.new.submit' | t }}</button>
 </form>

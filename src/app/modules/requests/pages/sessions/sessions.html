@@ -4,7 +4,7 @@
     <h1>{{ 'sessions.title' | t }}</h1>
     <p class="lead">{{ 'sessions.lead' | t }}</p>
   </div>
-  @if (auth.has('ROLE_SECRETARY_1')) {
+  @if (auth.has('ROLE_COUNCIL_SECRETARY')) {
     <a routerLink="/sessions/new" class="btn">{{ 'sessions.schedule' | t }}</a>
   }
 </div>
@@ -39,7 +39,7 @@
           <td>{{ s.councilType }}</td>
           <td>{{ s.faculty }}</td>
           <td>{{ s.scheduledAt | localDate: 'dd/MM/yyyy HH:mm' }}</td>
-          <td>{{ s.location }}</td>
+          <td>{{ s.location || ('sessions.virtualLocation' | t) }}</td>
           <td><span class="badge" [class]="tone[s.status]">{{ 'enums.sessionStatus.' + s.status | t }}</span></td>
           <td>{{ s.totalItems }}</td>
           <td><a [routerLink]="['/sessions', s.id]" class="btn btn-ghost">{{ 'common.open' | t }}</a></td>

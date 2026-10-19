@@ -20,9 +20,6 @@ export class TemplatesApi {
   listTemplateVariables() {
     return this.http.get<TemplateVariableDto[]>(`${this.base}/templates/variables`);
   }
-  validateTemplate(content: string) {
-    return this.http.post<string[]>(`${this.base}/templates/validate`, { content });
-  }
   saveTemplate(body: TemplatePayload) {
     return this.http.post<TemplateDto>(`${this.base}/templates`, body);
   }
@@ -31,5 +28,8 @@ export class TemplatesApi {
   }
   previewTemplate(content: string) {
     return this.http.post(`${this.base}/templates/preview`, { content }, { responseType: 'blob' });
+  }
+  agreementDraft() {
+    return this.http.get(`${this.base}/templates/samples/agreement`, { responseType: 'text' });
   }
 }

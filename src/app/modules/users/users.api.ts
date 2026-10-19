@@ -81,11 +81,8 @@ export class UsersApi {
   listCouncilTypes() {
     return this.http.get<CouncilTypeDto[]>(`${this.base}/council-types`);
   }
-  createCouncilType(code: string, name: string) {
-    return this.http.post<CouncilTypeDto>(`${this.base}/council-types`, { code, name });
-  }
-  updateCouncilType(id: number, code: string, name: string) {
-    return this.http.put<CouncilTypeDto>(`${this.base}/council-types/${id}`, { code, name });
+  renameCouncilType(id: number, name: string) {
+    return this.http.put<CouncilTypeDto>(`${this.base}/council-types/${id}`, { name });
   }
 
   listParameters() {

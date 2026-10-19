@@ -9,7 +9,7 @@
     </div>
     <div class="row-actions">
       <span class="badge" [class]="tone[req.status]">{{ 'enums.requestStatus.' + req.status | t }}</span>
-      @if (auth.has('ROLE_SECRETARY_2') && (req.status === 'FILED' || req.status === 'RETURNED')) {
+      @if (auth.has('ROLE_FACULTY_SECRETARY') && (req.status === 'FILED' || req.status === 'RETURNED')) {
         <a [routerLink]="['/requests', req.id, 'edit']" class="btn btn-secondary">{{ 'requests.detail.edit' | t }}</a>
       }
       <a routerLink="/requests" class="btn btn-ghost">{{ 'common.back' | t }}</a>
@@ -35,7 +35,7 @@
       }
     </article>
     <div class="grid">
-      @if (auth.has('ROLE_SECRETARY_1') && req.status === 'FILED') {
+      @if (auth.has('ROLE_COUNCIL_SECRETARY') && req.status === 'FILED') {
         <article class="card">
           <h2>{{ 'requests.detail.reviewTitle' | t }}</h2>
           <p class="lead">{{ 'requests.detail.reviewLead' | t }}</p>
@@ -56,7 +56,7 @@
           @for (h of history(); track $index) {
             <div class="timeline-item">
               <strong>{{ h.newStatus ? ('enums.requestStatus.' + h.newStatus | t) : '' }}</strong>
-              <div class="muted">{{ h.user }} · {{ h.date | localDate: 'dd/MM/yyyy HH:mm' }}</div>
+              <div class="muted">{{ h.user }} · {{ h.occurredAt | localDate: 'dd/MM/yyyy HH:mm' }}</div>
               @if (h.reason) { <p>{{ h.reason }}</p> }
             </div>
           }

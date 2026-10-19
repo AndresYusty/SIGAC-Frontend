@@ -4,6 +4,7 @@ import { Page } from '@core/http/api.models';
 import { toQuery } from '@core/http/http-utils';
 import { environment } from '../../../environments/environment';
 import {
+  GuestPayload,
   RequestDto,
   RequestHistoryDto,
   RequestSearch,
@@ -57,7 +58,7 @@ export class RequestsApi {
   getSession(id: number) {
     return this.http.get<SessionDto>(`${this.base}/sessions/${id}`);
   }
-  createSession(councilTypeId: number, scheduledAt: string, location: string) {
+  createSession(councilTypeId: number, scheduledAt: string, location: string | null) {
     return this.http.post<SessionDto>(`${this.base}/sessions`, {
       councilTypeId,
       scheduledAt,
@@ -66,6 +67,18 @@ export class RequestsApi {
   }
   addAgendaItem(sessionId: number, requestId: number) {
     return this.http.post<SessionDto>(`${this.base}/sessions/${sessionId}/items`, { requestId });
+  }
+  addUrgentItem(sessionId: number, title: string, description: string) {
+    return this.http.post<SessionDto>(`${this.base}/sessions/${sessionId}/urgent-items`, {
+      title,
+      description,
+    });
+  }
+  addGuest(sessionId: number, guest: GuestPayload) {
+    return this.http.post<SessionDto>(`${this.base}/sessions/${sessionId}/guests`, guest);
+  }
+  removeGuest(sessionId: number, guestId: number) {
+    return this.http.delete<SessionDto>(`${this.base}/sessions/${sessionId}/guests/${guestId}`);
   }
   removeAgendaItem(sessionId: number, itemId: number) {
     return this.http.delete<SessionDto>(`${this.base}/sessions/${sessionId}/items/${itemId}`);
@@ -78,7 +91,7 @@ export class RequestsApi {
   closeAgenda(sessionId: number) {
     return this.http.post<SessionDto>(`${this.base}/sessions/${sessionId}/close-agenda`, {});
   }
-  downloadSummons(sessionId: number) {
-    return this.http.get(`${this.base}/sessions/${sessionId}/summons`, { responseType: 'blob' });
+  downloadNotice(sessionId: number) {
+    return this.http.get(`${this.base}/sessions/${sessionId}/notice`, { responseType: 'blob' });
   }
 }

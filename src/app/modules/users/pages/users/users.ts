@@ -8,7 +8,7 @@ import { TranslatePipe } from '@shared/pipes/translate.pipe';
 import { UsersApi } from '../../users.api';
 import { NodeDto } from '../../users.models';
 
-const DEFAULT_ROLE: RoleName = 'ROLE_COUNCILOR';
+const DEFAULT_ROLE: RoleName = 'ROLE_COUNCIL_MEMBER';
 
 @Component({
   selector: 'app-users',

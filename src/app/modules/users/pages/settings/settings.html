@@ -8,18 +8,21 @@
 <div class="grid grid-2">
   <article class="card">
     <h2>{{ 'settings.councilTypes' | t }}</h2>
+    <p class="muted">{{ 'settings.councilTypesHint' | t }}</p>
     @for (ct of councilTypes(); track ct.id) {
       <div class="toolbar">
-        <label class="field"><span>{{ 'common.code' | t }}</span><input [(ngModel)]="ct.code" /></label>
-        <label class="field grow"><span>{{ 'common.name' | t }}</span><input [(ngModel)]="ct.name" /></label>
-        <button class="btn btn-ghost" type="button" (click)="saveCouncilType(ct)">{{ 'common.save' | t }}</button>
+        <label class="field">
+          <span>{{ 'common.code' | t }}</span>
+          <input [value]="ct.code" readonly />
+        </label>
+        <label class="field grow">
+          <span>{{ 'enums.councilKind.' + ct.kind | t }}</span>
+          <input [(ngModel)]="ct.name" maxlength="100" />
+          <small class="muted">{{ 'sessions.kindHint.' + ct.kind | t }}</small>
+        </label>
+        <button class="btn btn-ghost" type="button" (click)="renameCouncilType(ct)">{{ 'common.save' | t }}</button>
       </div>
     }
-    <div class="toolbar">
-      <label class="field"><span>{{ 'common.code' | t }}</span><input [(ngModel)]="code" maxlength="10" /></label>
-      <label class="field grow"><span>{{ 'common.name' | t }}</span><input [(ngModel)]="name" /></label>
-      <button class="btn" type="button" (click)="createCouncilType()">{{ 'common.add' | t }}</button>
-    </div>
   </article>
   <article class="card">
     <h2>{{ 'settings.parameters' | t }}</h2>

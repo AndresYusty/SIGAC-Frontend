@@ -10,7 +10,7 @@ import { TranslatePipe } from '@shared/pipes/translate.pipe';
 import { saveBlob } from '@shared/utils/files';
 import { TONE } from '@shared/utils/labels';
 import { RequestsApi } from '../../requests.api';
-import { RequestDto, SessionDto } from '../../requests.models';
+import { GuestPayload, RequestDto, SessionDto } from '../../requests.models';
 
 @Component({
   selector: 'app-session-detail',
@@ -28,6 +28,9 @@ export class SessionDetailPage implements OnInit {
   readonly session = signal<SessionDto | null>(null);
   readonly approvedRequests = signal<RequestDto[]>([]);
   requestId: number | null = null;
+  urgentTitle = '';
+  urgentDescription = '';
+  guest: GuestPayload = { name: '', email: '', affiliation: '' };
   readonly tone = TONE;
 
   ngOnInit(): void {
@@ -63,6 +66,44 @@ export class SessionDetailPage implements OnInit {
     });
   }
 
+  addUrgentItem(): void {
+    if (!this.urgentTitle.trim()) {
+      this.toast.error('sessions.urgentForm.titleRequired');
+      return;
+    }
+    this.api.addUrgentItem(this.id(), this.urgentTitle.trim(), this.urgentDescription.trim()).subscribe({
+      next: (s) => {
+        this.session.set(s);
+        this.urgentTitle = '';
+        this.urgentDescription = '';
+        this.toast.ok('sessions.detail.itemAdded');
+      },
+      error: (e) => this.toast.apiError(e),
+    });
+  }
+
+  addGuest(): void {
+    if (!this.guest.name.trim()) {
+      this.toast.error('sessions.guests.nameRequired');
+      return;
+    }
+    this.api.addGuest(this.id(), this.guest).subscribe({
+      next: (s) => {
+        this.session.set(s);
+        this.guest = { name: '', email: '', affiliation: '' };
+        this.toast.ok('sessions.guests.added');
+      },
+      error: (e) => this.toast.apiError(e),
+    });
+  }
+
+  removeGuest(guestId: number): void {
+    this.api.removeGuest(this.id(), guestId).subscribe({
+      next: (s) => this.session.set(s),
+      error: (e) => this.toast.apiError(e),
+    });
+  }
+
   removeItem(itemId: number): void {
     this.api.removeAgendaItem(this.id(), itemId).subscribe({
       next: (s) => this.session.set(s),
@@ -92,9 +133,9 @@ export class SessionDetailPage implements OnInit {
     });
   }
 
-  downloadSummons(): void {
-    this.api.downloadSummons(this.id()).subscribe({
-      next: (b) => saveBlob(b, `summons-${this.id()}.pdf`),
+  downloadNotice(): void {
+    this.api.downloadNotice(this.id()).subscribe({
+      next: (b) => saveBlob(b, `notice-${this.id()}.pdf`),
       error: (e) => this.toast.apiError(e),
     });
   }

@@ -19,11 +19,10 @@ export const TONE: Record<string, string> = {
   POSTPONED: 'warn',
   CANCELLED: 'muted',
   ROLE_ADMIN: 'danger',
-  ROLE_DEV: 'info',
-  ROLE_SECRETARY_1: 'ok',
-  ROLE_SECRETARY_2: 'info',
+  ROLE_COUNCIL_SECRETARY: 'ok',
+  ROLE_FACULTY_SECRETARY: 'info',
   ROLE_PRESIDENT: 'warn',
-  ROLE_COUNCILOR: 'muted',
+  ROLE_COUNCIL_MEMBER: 'muted',
 };
 
 export function formatBytes(n: number): string {

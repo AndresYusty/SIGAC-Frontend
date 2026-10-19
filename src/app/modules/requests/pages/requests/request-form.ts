@@ -29,7 +29,7 @@ export class RequestFormPage implements OnInit {
   readonly form = this.fb.nonNullable.group({
     title: ['', [Validators.required, Validators.maxLength(200)]],
     description: ['', [Validators.required, Validators.maxLength(4000)]],
-    applicant: ['', [Validators.required, Validators.maxLength(150)]],
+    requester: ['', [Validators.required, Validators.maxLength(150)]],
     requestType: ['ACADEMIC' as RequestType, Validators.required],
     programId: ['' as string | number],
   });
@@ -59,7 +59,7 @@ export class RequestFormPage implements OnInit {
           this.form.patchValue({
             title: r.title,
             description: r.description,
-            applicant: r.applicant,
+            requester: r.requester,
             requestType: r.requestType,
             programId: r.programId ?? '',
           });
@@ -83,7 +83,7 @@ export class RequestFormPage implements OnInit {
     const fd = new FormData();
     fd.append('title', v.title);
     fd.append('description', v.description);
-    fd.append('applicant', v.applicant);
+    fd.append('requester', v.requester);
     fd.append('requestType', v.requestType);
     if (v.programId) {
       fd.append('programId', String(v.programId));

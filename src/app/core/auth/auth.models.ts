@@ -1,10 +1,9 @@
 export const ROLES = [
   'ROLE_ADMIN',
-  'ROLE_DEV',
-  'ROLE_SECRETARY_1',
-  'ROLE_SECRETARY_2',
+  'ROLE_COUNCIL_SECRETARY',
+  'ROLE_FACULTY_SECRETARY',
   'ROLE_PRESIDENT',
-  'ROLE_COUNCILOR',
+  'ROLE_COUNCIL_MEMBER',
 ] as const;
 
 export type RoleName = (typeof ROLES)[number];

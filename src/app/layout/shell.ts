@@ -2,6 +2,7 @@ import { Component, computed, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { RoleName } from '@core/auth/auth.models';
 import { AuthService } from '@core/auth/auth.service';
+import { MINUTES_ROLES, REPOSITORY_ROLES, SESSION_ROLES, STAFF_ROLES } from '@core/auth/role-groups';
 import { ConfirmService } from '@core/ui/confirm.service';
 import { ToastService } from '@core/ui/toast.service';
 import { LangSwitchComponent } from '@shared/components/lang-switch';
@@ -26,12 +27,12 @@ export class ShellComponent {
 
   private readonly items: NavItem[] = [
     { path: '/', labelKey: 'nav.home' },
-    { path: '/requests', labelKey: 'nav.requests', roles: ['ROLE_SECRETARY_1', 'ROLE_SECRETARY_2', 'ROLE_ADMIN'] },
-    { path: '/sessions', labelKey: 'nav.sessions', roles: ['ROLE_SECRETARY_1', 'ROLE_SECRETARY_2', 'ROLE_PRESIDENT', 'ROLE_COUNCILOR', 'ROLE_ADMIN'] },
-    { path: '/minutes', labelKey: 'nav.minutes', roles: ['ROLE_SECRETARY_1', 'ROLE_PRESIDENT', 'ROLE_ADMIN'] },
-    { path: '/repository', labelKey: 'nav.repository', roles: ['ROLE_SECRETARY_1', 'ROLE_SECRETARY_2', 'ROLE_PRESIDENT', 'ROLE_COUNCILOR', 'ROLE_ADMIN'] },
-    { path: '/templates', labelKey: 'nav.templates', roles: ['ROLE_DEV'] },
-    { path: '/users', labelKey: 'nav.users', roles: ['ROLE_ADMIN', 'ROLE_DEV'] },
+    { path: '/requests', labelKey: 'nav.requests', roles: STAFF_ROLES },
+    { path: '/sessions', labelKey: 'nav.sessions', roles: SESSION_ROLES },
+    { path: '/minutes', labelKey: 'nav.minutes', roles: MINUTES_ROLES },
+    { path: '/repository', labelKey: 'nav.repository', roles: REPOSITORY_ROLES },
+    { path: '/templates', labelKey: 'nav.templates', roles: ['ROLE_ADMIN'] },
+    { path: '/users', labelKey: 'nav.users', roles: ['ROLE_ADMIN'] },
     { path: '/hierarchy', labelKey: 'nav.hierarchy', roles: ['ROLE_ADMIN'] },
     { path: '/settings', labelKey: 'nav.settings', roles: ['ROLE_ADMIN'] },
     { path: '/audit', labelKey: 'nav.audit', roles: ['ROLE_ADMIN'] },

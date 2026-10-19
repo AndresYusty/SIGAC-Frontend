@@ -4,7 +4,7 @@
     <h1>{{ 'requests.list.title' | t }}</h1>
     <p class="lead">{{ 'requests.list.lead' | t }}</p>
   </div>
-  @if (auth.has('ROLE_SECRETARY_2')) {
+  @if (auth.has('ROLE_FACULTY_SECRETARY')) {
     <a routerLink="/requests/new" class="btn">{{ 'requests.list.file' | t }}</a>
   }
 </div>

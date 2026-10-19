@@ -47,7 +47,7 @@
         <tbody>
           @for (m of latestMinutes(); track m.id) {
             <tr>
-              <td>{{ m.number }}</td>
+              <td>{{ m.serialNumber }}</td>
               <td>{{ m.sessionDate | localDate: 'dd/MM/yyyy' }}</td>
             </tr>
           }
