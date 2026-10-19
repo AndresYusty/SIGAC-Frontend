@@ -332,7 +332,9 @@
       "dateTime": "Date and time",
       "locationPlaceholder": "Boardroom / virtual meeting link",
       "submit": "Create session",
-      "scheduled": "Session scheduled"
+      "scheduled": "Session scheduled",
+      "locationOptional": "Location (optional for a virtual session)",
+      "virtualPlaceholder": "Held by email"
     },
     "detail": {
       "title": "Session of {{date}}",
@@ -359,7 +361,8 @@
       "emptyTitle": "No items",
       "emptyHint": "Add approved requests to the agenda.",
       "selectRequest": "Select an approved request",
-      "itemAdded": "Item added"
+      "itemAdded": "Item added",
+      "noticePdf": "Notice PDF"
     },
     "live": {
       "start": "Start",
@@ -388,7 +391,35 @@
       "quorum": "Quorum",
       "noQuorum": "No quorum",
       "saveAttendance": "Save attendance",
-      "attendanceSaved": "Attendance saved"
+      "attendanceSaved": "Attendance saved",
+      "outcome": "Decision",
+      "responded": "responded",
+      "quorumNotRequired": "No quorum required"
+    },
+    "kindHint": {
+      "ORDINARY": "Routine session.",
+      "EXTRAORDINARY": "For what cannot wait: urgent items may be added.",
+      "VIRTUAL": "Consultation by email: no location and no deliberative quorum.",
+      "EXPANDED": "With guests who have a voice but no vote and do not count for the quorum."
+    },
+    "virtualLocation": "Virtual session",
+    "urgent": "Urgent",
+    "urgentForm": {
+      "title": "Urgent item",
+      "hint": "In an extraordinary council, items that do not come from a request can be added.",
+      "add": "Add urgent item",
+      "titleRequired": "Enter the title of the urgent item"
+    },
+    "guests": {
+      "title": "Guests",
+      "hint": "They have a voice but no vote and do not count for the quorum.",
+      "email": "Email",
+      "affiliation": "Position or department",
+      "affiliationPlaceholder": "Civil Engineering professor",
+      "add": "Add guest",
+      "empty": "No guests.",
+      "nameRequired": "Enter the name of the guest",
+      "added": "Guest added"
     }
   },
   "minutes": {
@@ -491,7 +522,8 @@
     "logo": "Header logo",
     "logoDefault": "Using the logo of the sheet.",
     "logoCustom": "Using a custom logo.",
-    "logoReset": "Remove custom logo"
+    "logoReset": "Remove custom logo",
+    "councilTypesHint": "The four types are fixed; only their display name can be changed."
   },
   "agreements": {
     "kicker": "Faculty Council",

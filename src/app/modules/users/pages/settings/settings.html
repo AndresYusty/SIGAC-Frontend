@@ -13,7 +13,7 @@
       <div class="toolbar">
         <label class="field">
           <span>{{ 'common.code' | t }}</span>
-          <input [value]="ct.code" readonly />
+          <input [value]="ct.code" readonly style="width: 5.5rem" />
         </label>
         <label class="field grow">
           <span>{{ 'enums.councilKind.' + ct.kind | t }}</span>
@@ -37,31 +37,31 @@
       </div>
     }
   </article>
-  <article class="card">
-    <h2>{{ 'settings.letterhead' | t }}</h2>
-    <p class="muted">{{ 'settings.letterheadHint' | t }}</p>
-    <div class="toolbar" style="align-items: start">
-      @if (sheetUrl(); as url) {
-        <img class="sheet-preview" [src]="url" [alt]="'settings.letterhead' | t" />
-      }
-      <div class="grid grow">
-        <label class="field">
-          <span>{{ 'settings.sheet' | t }}</span>
-          <input type="file" accept="image/png,image/jpeg" (change)="uploadLetterhead('sheet', $event)" />
-          <small class="muted">{{ (letterhead()?.customSheet ? 'settings.sheetCustom' : 'settings.sheetDefault') | t }}</small>
-        </label>
-        @if (letterhead()?.customSheet) {
-          <button class="btn btn-ghost" type="button" (click)="resetLetterhead('sheet')">{{ 'settings.sheetReset' | t }}</button>
-        }
-        <label class="field">
-          <span>{{ 'settings.logo' | t }}</span>
-          <input type="file" accept="image/png,image/jpeg" (change)="uploadLetterhead('logo', $event)" />
-          <small class="muted">{{ (letterhead()?.logo ? 'settings.logoCustom' : 'settings.logoDefault') | t }}</small>
-        </label>
-        @if (letterhead()?.logo) {
-          <button class="btn btn-ghost" type="button" (click)="resetLetterhead('logo')">{{ 'settings.logoReset' | t }}</button>
-        }
-      </div>
-    </div>
-  </article>
 </div>
+<article class="card" style="margin-top: 1rem">
+  <h2>{{ 'settings.letterhead' | t }}</h2>
+  <p class="muted">{{ 'settings.letterheadHint' | t }}</p>
+  <div class="toolbar" style="align-items: start">
+    @if (sheetUrl(); as url) {
+      <img class="sheet-preview" [src]="url" [alt]="'settings.letterhead' | t" />
+    }
+    <div class="grid grow">
+      <label class="field">
+        <span>{{ 'settings.sheet' | t }}</span>
+        <input type="file" accept="image/png,image/jpeg" (change)="uploadLetterhead('sheet', $event)" />
+        <small class="muted">{{ (letterhead()?.customSheet ? 'settings.sheetCustom' : 'settings.sheetDefault') | t }}</small>
+      </label>
+      @if (letterhead()?.customSheet) {
+        <button class="btn btn-ghost" type="button" (click)="resetLetterhead('sheet')">{{ 'settings.sheetReset' | t }}</button>
+      }
+      <label class="field">
+        <span>{{ 'settings.logo' | t }}</span>
+        <input type="file" accept="image/png,image/jpeg" (change)="uploadLetterhead('logo', $event)" />
+        <small class="muted">{{ (letterhead()?.logo ? 'settings.logoCustom' : 'settings.logoDefault') | t }}</small>
+      </label>
+      @if (letterhead()?.logo) {
+        <button class="btn btn-ghost" type="button" (click)="resetLetterhead('logo')">{{ 'settings.logoReset' | t }}</button>
+      }
+    </div>
+  </div>
+</article>

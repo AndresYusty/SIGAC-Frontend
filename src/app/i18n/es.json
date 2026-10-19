@@ -332,7 +332,9 @@
       "dateTime": "Fecha y hora",
       "locationPlaceholder": "Sala de juntas / enlace virtual",
       "submit": "Crear sesión",
-      "scheduled": "Sesión programada"
+      "scheduled": "Sesión programada",
+      "locationOptional": "Lugar (opcional en sesión virtual)",
+      "virtualPlaceholder": "Se realiza por correo electrónico"
     },
     "detail": {
       "title": "Sesión del {{date}}",
@@ -359,7 +361,8 @@
       "emptyTitle": "Sin puntos",
       "emptyHint": "Agregue solicitudes aprobadas al orden del día.",
       "selectRequest": "Seleccione una solicitud aprobada",
-      "itemAdded": "Punto agregado"
+      "itemAdded": "Punto agregado",
+      "noticePdf": "Citación PDF"
     },
     "live": {
       "start": "Iniciar",
@@ -388,7 +391,35 @@
       "quorum": "Quórum",
       "noQuorum": "Sin quórum",
       "saveAttendance": "Guardar asistencia",
-      "attendanceSaved": "Asistencia registrada"
+      "attendanceSaved": "Asistencia registrada",
+      "outcome": "Decisión",
+      "responded": "respondieron",
+      "quorumNotRequired": "No requiere quórum"
+    },
+    "kindHint": {
+      "ORDINARY": "Sesión de rutina.",
+      "EXTRAORDINARY": "Para lo que no da espera: permite agregar puntos urgentes.",
+      "VIRTUAL": "Consulta por correo: sin lugar y sin quórum deliberatorio.",
+      "EXPANDED": "Con invitados con voz y sin voto, que no cuentan para el quórum."
+    },
+    "virtualLocation": "Sesión virtual",
+    "urgent": "Urgente",
+    "urgentForm": {
+      "title": "Punto urgente",
+      "hint": "En el consejo extraordinario se pueden agregar puntos que no vienen de una solicitud.",
+      "add": "Agregar punto urgente",
+      "titleRequired": "Escriba el título del punto urgente"
+    },
+    "guests": {
+      "title": "Invitados",
+      "hint": "Tienen voz pero no voto y no cuentan para el quórum.",
+      "email": "Correo",
+      "affiliation": "Cargo o dependencia",
+      "affiliationPlaceholder": "Docente de Ingeniería Civil",
+      "add": "Agregar invitado",
+      "empty": "No hay invitados.",
+      "nameRequired": "Escriba el nombre del invitado",
+      "added": "Invitado agregado"
     }
   },
   "minutes": {
@@ -491,7 +522,8 @@
     "logo": "Logo del encabezado",
     "logoDefault": "Usando el logo de la hoja.",
     "logoCustom": "Usando un logo propio.",
-    "logoReset": "Quitar logo propio"
+    "logoReset": "Quitar logo propio",
+    "councilTypesHint": "Los cuatro tipos son fijos; solo se puede cambiar el nombre con el que aparecen."
   },
   "agreements": {
     "kicker": "Consejo de Facultad",
