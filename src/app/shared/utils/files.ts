@@ -15,6 +15,10 @@ export function filenameFromDisposition(header: string | null, fallback: string)
   if (!header) {
     return fallback;
   }
-  const match = /filename\*?=(?:UTF-8''|")?([^\";]+)/i.exec(header);
-  return match ? decodeURIComponent(match[1].replace(/"/g, '')) : fallback;
+  const encoded = /filename\*=UTF-8''([^;]+)/i.exec(header);
+  if (encoded) {
+    return decodeURIComponent(encoded[1]);
+  }
+  const match = /filename="?([^";]+)/i.exec(header);
+  return match ? match[1] : fallback;
 }
