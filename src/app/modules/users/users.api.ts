@@ -4,7 +4,15 @@ import { UserDto } from '@core/auth/auth.models';
 import { Page } from '@core/http/api.models';
 import { toQuery } from '@core/http/http-utils';
 import { environment } from '../../../environments/environment';
-import { CouncilTypeDto, NewUserPayload, NodeDto, ParameterDto, UserPayload } from './users.models';
+import {
+  CouncilTypeDto,
+  LetterheadPart,
+  LetterheadStatus,
+  NewUserPayload,
+  NodeDto,
+  ParameterDto,
+  UserPayload,
+} from './users.models';
 
 @Injectable({ providedIn: 'root' })
 export class UsersApi {
@@ -90,5 +98,20 @@ export class UsersApi {
   }
   updateParameter(key: string, value: string) {
     return this.http.put<ParameterDto>(`${this.base}/parameters/${key}`, { value });
+  }
+
+  letterheadStatus() {
+    return this.http.get<LetterheadStatus>(`${this.base}/letterhead`);
+  }
+  letterheadSheet() {
+    return this.http.get(`${this.base}/letterhead/sheet`, { responseType: 'blob' });
+  }
+  uploadLetterhead(part: LetterheadPart, file: File) {
+    const body = new FormData();
+    body.append('file', file);
+    return this.http.put<LetterheadStatus>(`${this.base}/letterhead/${part}`, body);
+  }
+  resetLetterhead(part: LetterheadPart) {
+    return this.http.delete<LetterheadStatus>(`${this.base}/letterhead/${part}`);
   }
 }

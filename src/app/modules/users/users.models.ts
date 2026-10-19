@@ -24,6 +24,13 @@ export interface ParameterDto {
   description: string;
 }
 
+export type LetterheadPart = 'sheet' | 'logo';
+
+export interface LetterheadStatus {
+  customSheet: boolean;
+  logo: boolean;
+}
+
 export interface UserPayload {
   name: string;
   roles: RoleName[];
