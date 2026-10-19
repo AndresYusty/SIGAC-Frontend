@@ -26,7 +26,8 @@
     "settings": "Settings",
     "audit": "Audit",
     "profile": "My profile",
-    "logout": "Sign out"
+    "logout": "Sign out",
+    "agreements": "Agreements"
   },
   "errors": {
     "unexpected": "An unexpected error occurred.",
@@ -477,7 +478,65 @@
     "toast": {
       "councilTypeCreated": "Council type created",
       "councilTypeUpdated": "Council type updated",
-      "parameterUpdated": "Parameter updated"
-    }
+      "parameterUpdated": "Parameter updated",
+      "letterheadUpdated": "Letterhead updated",
+      "letterheadReset": "Letterhead reset"
+    },
+    "letterhead": "Document letterhead",
+    "letterheadHint": "Sheet printed behind agreements and minutes. Use a letter-size image (PNG or JPG). An uploaded logo replaces the header logo.",
+    "sheet": "Letterhead sheet",
+    "sheetDefault": "Using the USCO institutional sheet.",
+    "sheetCustom": "Using a custom sheet.",
+    "sheetReset": "Back to the institutional sheet",
+    "logo": "Header logo",
+    "logoDefault": "Using the logo of the sheet.",
+    "logoCustom": "Using a custom logo.",
+    "logoReset": "Remove custom logo"
+  },
+  "agreements": {
+    "kicker": "Faculty Council",
+    "title": "Agreements",
+    "lead": "Council agreements on the institutional letterhead, ready to sign.",
+    "new": "New agreement",
+    "year": "Year",
+    "searchHint": "Student, code or subject",
+    "agreement": "Agreement",
+    "subject": "Subject",
+    "emptyTitle": "No agreements yet",
+    "emptyHint": "Create the first one with the New agreement button.",
+    "editorLead": "Choose the type, fill in the case data and check the PDF on the right.",
+    "downloadPdf": "Download PDF",
+    "data": "Agreement data",
+    "type": "Agreement type",
+    "number": "Number",
+    "numberAuto": "Automatic ({{next}})",
+    "issueDate": "Issue date",
+    "councilTitle": "Issuing council",
+    "legalBasis": "Legal basis",
+    "president": "President",
+    "secretary": "Secretary",
+    "closing": "Closing",
+    "fields": "Case data",
+    "fillExamples": "Use sample data",
+    "fieldsHint": "Each value replaces its {{field}} in the text. Missing ones are highlighted in yellow in the PDF.",
+    "recitals": "Whereas",
+    "articles": "Resolves",
+    "block": {
+      "paragraph": "Paragraph",
+      "article": "Article",
+      "table": "Table"
+    },
+    "moveUp": "Move up",
+    "moveDown": "Move down",
+    "remove": "Remove",
+    "addRow": "+ Row",
+    "refresh": "Refresh",
+    "previewHint": "It refreshes as you type. Use **text** for bold.",
+    "changeTypeTitle": "Change the agreement type",
+    "changeTypeMessage": "The texts will be replaced with those of the new type. Case data with the same name is kept.",
+    "toast": {
+      "saved": "{{label}} saved"
+    },
+    "texts": "Heading and signatures"
   }
 }

@@ -12,6 +12,7 @@ const ALLOWED = {
   requests: ['users', 'minutes'],
   session: ['requests'],
   repository: ['users', 'requests'],
+  agreements: [],
 };
 
 // Layers outside modules/ and the layers they may import.

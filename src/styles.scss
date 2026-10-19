@@ -891,3 +891,81 @@ tr:hover td {
     flex-wrap: wrap;
   }
 }
+
+.agreement-editor {
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  align-items: start;
+}
+
+.preview-card {
+  position: sticky;
+  top: 1rem;
+}
+
+.preview-card .preview-frame {
+  min-height: 82vh;
+}
+
+.block {
+  border: 1px solid var(--gray-light);
+  border-radius: 10px;
+  padding: 0.6rem;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.block-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.block-head .btn {
+  padding: 0.25rem 0.55rem;
+}
+
+.block-table {
+  min-height: 0;
+}
+
+.block-table table {
+  margin-top: 0;
+}
+
+.block-table th,
+.block-table td {
+  padding: 0.25rem;
+  white-space: nowrap;
+}
+
+.block-table input {
+  width: 100%;
+  min-width: 8rem;
+  padding: 0.35rem 0.45rem;
+}
+
+.link {
+  border: 0;
+  background: none;
+  color: var(--gray-mid);
+  cursor: pointer;
+  padding: 0 0.3rem;
+}
+
+.sheet-preview {
+  width: 100%;
+  max-width: 220px;
+  border: 1px solid var(--gray-light);
+  border-radius: 6px;
+  background: #fff;
+}
+
+@media (max-width: 1100px) {
+  .agreement-editor {
+    grid-template-columns: 1fr;
+  }
+
+  .preview-card {
+    position: static;
+  }
+}

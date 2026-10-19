@@ -28,11 +28,12 @@ src/app/
 │   └── utils/       file download helpers, status tones
 ├── layout/          ShellComponent (top bar, navigation)
 ├── modules/
-│   ├── users/       login, profile, users, hierarchy, settings
+│   ├── users/       login, profile, users, hierarchy, settings (letterhead)
 │   ├── templates/   minutes templates
 │   ├── requests/    council requests, sessions and agenda
 │   ├── session/     live session (attendance, quorum, decisions)
 │   ├── minutes/     minutes drafting and signature
+│   ├── agreements/  council agreements with live PDF preview
 │   └── repository/  public repository, audit, dashboard
 ├── i18n/            en.json, es.json
 ├── app.routes.ts    composes the routes of every module
@@ -66,6 +67,7 @@ modules/<module>/
 | `requests`   | `users`, `minutes`  |
 | `session`    | `requests`          |
 | `repository` | `users`, `requests` |
+| `agreements` | -                   |
 
 These rules are enforced by `scripts/check-architecture.mjs` (`npm run lint:architecture`).
 

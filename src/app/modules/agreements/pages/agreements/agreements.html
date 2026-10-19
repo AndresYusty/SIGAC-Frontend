@@ -1,0 +1,74 @@
+<div class="page-head">
+  <div>
+    <p class="kicker">{{ 'agreements.kicker' | t }}</p>
+    <h1>{{ 'agreements.title' | t }}</h1>
+    <p class="lead">{{ 'agreements.lead' | t }}</p>
+  </div>
+  @if (canWrite) {
+    <a routerLink="/agreements/new" class="btn">{{ 'agreements.new' | t }}</a>
+  }
+</div>
+<div class="toolbar">
+  <label class="field">
+    <span>{{ 'agreements.year' | t }}</span>
+    <input type="number" [(ngModel)]="year" style="width: 7rem" />
+  </label>
+  <label class="field">
+    <span>{{ 'common.type' | t }}</span>
+    <select [(ngModel)]="typeCode">
+      <option value="">{{ 'common.all' | t }}</option>
+      @for (t of types(); track t.code) {
+        <option [value]="t.code">{{ typeName(t) }}</option>
+      }
+    </select>
+  </label>
+  <label class="field grow">
+    <span>{{ 'common.search' | t }}</span>
+    <input [(ngModel)]="text" [placeholder]="'agreements.searchHint' | t" (keyup.enter)="load()" />
+  </label>
+  <button class="btn" type="button" (click)="load()">{{ 'common.filter' | t }}</button>
+</div>
+<article class="card table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>{{ 'agreements.agreement' | t }}</th>
+        <th>{{ 'common.type' | t }}</th>
+        <th>{{ 'agreements.subject' | t }}</th>
+        <th>{{ 'common.date' | t }}</th>
+        <th>{{ 'common.actions' | t }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (a of page()?.content ?? []; track a.id) {
+        <tr>
+          <td><strong>{{ a.label }}</strong></td>
+          <td>{{ a.typeName }}</td>
+          <td>{{ a.subject }}</td>
+          <td>{{ a.issueDate | localDate: 'dd/MM/yyyy' }}</td>
+          <td class="row-actions">
+            @if (canWrite) {
+              <a [routerLink]="['/agreements', a.id]" class="btn btn-ghost">{{ 'common.edit' | t }}</a>
+            }
+            <button class="btn btn-secondary" type="button" (click)="download(a)">PDF</button>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+  @if (!page()?.content?.length) {
+    <div class="empty">
+      <h3>{{ 'agreements.emptyTitle' | t }}</h3>
+      <p>{{ 'agreements.emptyHint' | t }}</p>
+    </div>
+  }
+</article>
+<div class="pager">
+  <button class="btn btn-ghost" type="button" [disabled]="page()?.first" (click)="load((page()?.number ?? 1) - 1)">
+    {{ 'common.previous' | t }}
+  </button>
+  <span>{{ 'common.pageOf' | t: { page: (page()?.number ?? 0) + 1, total: page()?.totalPages || 1 } }}</span>
+  <button class="btn btn-ghost" type="button" [disabled]="page()?.last" (click)="load((page()?.number ?? -1) + 1)">
+    {{ 'common.next' | t }}
+  </button>
+</div>

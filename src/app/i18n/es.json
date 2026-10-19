@@ -26,7 +26,8 @@
     "settings": "Configuración",
     "audit": "Auditoría",
     "profile": "Mi perfil",
-    "logout": "Cerrar sesión"
+    "logout": "Cerrar sesión",
+    "agreements": "Acuerdos"
   },
   "errors": {
     "unexpected": "Ocurrió un error inesperado.",
@@ -477,7 +478,65 @@
     "toast": {
       "councilTypeCreated": "Tipo de consejo creado",
       "councilTypeUpdated": "Tipo actualizado",
-      "parameterUpdated": "Parámetro actualizado"
-    }
+      "parameterUpdated": "Parámetro actualizado",
+      "letterheadUpdated": "Membrete actualizado",
+      "letterheadReset": "Membrete restablecido"
+    },
+    "letterhead": "Membrete de los documentos",
+    "letterheadHint": "Hoja que va de fondo en acuerdos y actas. Use una imagen tamaño carta (PNG o JPG). Si sube un logo, reemplaza el logo del encabezado.",
+    "sheet": "Hoja membreteada",
+    "sheetDefault": "Usando la hoja institucional de la USCO.",
+    "sheetCustom": "Usando una hoja propia.",
+    "sheetReset": "Volver a la hoja institucional",
+    "logo": "Logo del encabezado",
+    "logoDefault": "Usando el logo de la hoja.",
+    "logoCustom": "Usando un logo propio.",
+    "logoReset": "Quitar logo propio"
+  },
+  "agreements": {
+    "kicker": "Consejo de Facultad",
+    "title": "Acuerdos",
+    "lead": "Acuerdos del Consejo con el membrete institucional, listos para firmar.",
+    "new": "Nuevo acuerdo",
+    "year": "Año",
+    "searchHint": "Estudiante, código o asunto",
+    "agreement": "Acuerdo",
+    "subject": "Epígrafe",
+    "emptyTitle": "Aún no hay acuerdos",
+    "emptyHint": "Cree el primero con el botón Nuevo acuerdo.",
+    "editorLead": "Elija el tipo, llene los datos del caso y revise el PDF a la derecha.",
+    "downloadPdf": "Descargar PDF",
+    "data": "Datos del acuerdo",
+    "type": "Tipo de acuerdo",
+    "number": "Número",
+    "numberAuto": "Automático ({{next}})",
+    "issueDate": "Fecha de expedición",
+    "councilTitle": "Consejo que expide",
+    "legalBasis": "Fundamento legal",
+    "president": "Presidente",
+    "secretary": "Secretaria",
+    "closing": "Cierre",
+    "fields": "Datos del caso",
+    "fillExamples": "Usar datos de ejemplo",
+    "fieldsHint": "Cada dato reemplaza su {{campo}} en el texto. Los que falten se ven resaltados en amarillo en el PDF.",
+    "recitals": "Considerando",
+    "articles": "Acuerda",
+    "block": {
+      "paragraph": "Párrafo",
+      "article": "Artículo",
+      "table": "Tabla"
+    },
+    "moveUp": "Subir",
+    "moveDown": "Bajar",
+    "remove": "Quitar",
+    "addRow": "+ Fila",
+    "refresh": "Actualizar",
+    "previewHint": "Se actualiza solo al escribir. Use **texto** para negrilla.",
+    "changeTypeTitle": "Cambiar el tipo de acuerdo",
+    "changeTypeMessage": "Se reemplazarán los textos por los del nuevo tipo. Los datos del caso con el mismo nombre se conservan.",
+    "toast": {
+      "saved": "{{label}} guardado"
+    },
+    "texts": "Encabezado y firmas"
   }
 }

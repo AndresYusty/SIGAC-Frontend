@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { authGuard } from '@core/auth/auth.guard';
 import { ShellComponent } from '@layout/shell';
+import { agreementsRoutes } from '@modules/agreements/agreements.routes';
 import { minutesRoutes } from '@modules/minutes/minutes.routes';
 import { repositoryRoutes } from '@modules/repository/repository.routes';
 import { requestsRoutes } from '@modules/requests/requests.routes';
@@ -19,6 +20,7 @@ export const routes: Routes = [
       ...requestsRoutes,
       ...sessionRoutes,
       ...minutesRoutes,
+      ...agreementsRoutes,
       ...templatesRoutes,
       ...usersRoutes,
     ],

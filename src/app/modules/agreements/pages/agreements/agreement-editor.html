@@ -1,0 +1,155 @@
+<div class="page-head">
+  <div>
+    <p class="kicker">{{ 'agreements.kicker' | t }}</p>
+    <h1>{{ id() ? label() : ('agreements.new' | t) }}</h1>
+    <p class="lead">{{ 'agreements.editorLead' | t }}</p>
+  </div>
+  <div class="row-actions">
+    <a routerLink="/agreements" class="btn btn-ghost">{{ 'common.back' | t }}</a>
+    @if (id()) {
+      <button class="btn btn-secondary" type="button" (click)="download()">{{ 'agreements.downloadPdf' | t }}</button>
+    }
+    <button class="btn" type="button" [disabled]="saving()" (click)="save()">
+      {{ (saving() ? 'common.saving' : 'common.save') | t }}
+    </button>
+  </div>
+</div>
+
+<div class="split agreement-editor">
+  <div class="grid" (input)="refresh()" (change)="refresh()">
+    <article class="card grid">
+      <h2>{{ 'agreements.data' | t }}</h2>
+      <label class="field">
+        <span>{{ 'agreements.type' | t }}</span>
+        <select [ngModel]="typeCode()" (ngModelChange)="changeType($event)">
+          @for (t of types(); track t.code) {
+            <option [value]="t.code">{{ typeName(t) }}</option>
+          }
+        </select>
+      </label>
+      <div class="grid grid-2">
+        <label class="field">
+          <span>{{ 'agreements.number' | t }}</span>
+          <input type="number" min="1" [(ngModel)]="model.number"
+                 [placeholder]="'agreements.numberAuto' | t: { next: defaults()?.nextNumber ?? '' }" />
+        </label>
+        <label class="field">
+          <span>{{ 'agreements.issueDate' | t }}</span>
+          <input type="date" [(ngModel)]="model.issueDate" />
+        </label>
+      </div>
+    </article>
+
+    <article class="card grid">
+      <div class="toolbar" style="margin: 0; justify-content: space-between">
+        <h2>{{ 'agreements.fields' | t }}</h2>
+        <button class="btn btn-ghost" type="button" (click)="fillExamples()">{{ 'agreements.fillExamples' | t }}</button>
+      </div>
+      <p class="muted">{{ 'agreements.fieldsHint' | t }}</p>
+      <div class="grid grid-2">
+        @for (f of type()?.fields ?? []; track f.key) {
+          <label class="field">
+            <span>{{ fieldLabel(f) }}</span>
+            <input [(ngModel)]="model.values[f.key]" [placeholder]="f.example" />
+          </label>
+        }
+      </div>
+    </article>
+
+    <article class="card grid">
+      <h2>{{ 'agreements.texts' | t }}</h2>
+      <label class="field">
+        <span>{{ 'agreements.subject' | t }}</span>
+        <textarea rows="2" [(ngModel)]="model.subject"></textarea>
+      </label>
+      <label class="field">
+        <span>{{ 'agreements.councilTitle' | t }}</span>
+        <input [(ngModel)]="model.councilTitle" />
+      </label>
+      <label class="field">
+        <span>{{ 'agreements.legalBasis' | t }}</span>
+        <input [(ngModel)]="model.legalBasis" />
+      </label>
+      <div class="grid grid-2">
+        <label class="field">
+          <span>{{ 'agreements.president' | t }}</span>
+          <input [(ngModel)]="model.presidentName" />
+        </label>
+        <label class="field">
+          <span>{{ 'agreements.secretary' | t }}</span>
+          <input [(ngModel)]="model.secretaryName" />
+        </label>
+      </div>
+      <label class="field">
+        <span>{{ 'agreements.closing' | t }}</span>
+        <input [(ngModel)]="model.closing" />
+      </label>
+    </article>
+
+    @for (section of sections; track section) {
+      <article class="card grid">
+        <h2>{{ 'agreements.' + section | t }}</h2>
+        @for (b of model[section]; track trackIndex($index); let i = $index) {
+          <div class="block">
+            <div class="block-head">
+              <span class="chip">{{ 'agreements.block.' + b.type | t }}</span>
+              <div class="row-actions">
+                <button class="btn btn-ghost" type="button" [title]="'agreements.moveUp' | t" (click)="moveBlock(section, i, -1)">↑</button>
+                <button class="btn btn-ghost" type="button" [title]="'agreements.moveDown' | t" (click)="moveBlock(section, i, 1)">↓</button>
+                <button class="btn btn-ghost" type="button" [title]="'agreements.remove' | t" (click)="removeBlock(section, i)">✕</button>
+              </div>
+            </div>
+            @if (b.type === 'table') {
+              <div class="table-wrap block-table">
+                <table>
+                  <thead>
+                    <tr>
+                      @for (c of b.columns; track trackIndex($index); let ci = $index) {
+                        <th>
+                          <input [(ngModel)]="b.columns![ci]" />
+                          <button class="link" type="button" (click)="removeColumn(b, ci)">✕</button>
+                        </th>
+                      }
+                      <th><button class="btn btn-ghost" type="button" (click)="addColumn(b)">+</button></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (row of b.rows; track trackIndex($index); let ri = $index) {
+                      <tr>
+                        @for (cell of row; track trackIndex($index); let ci = $index) {
+                          <td><input [(ngModel)]="row[ci]" /></td>
+                        }
+                        <td><button class="link" type="button" (click)="removeRow(b, ri)">✕</button></td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+              <button class="btn btn-ghost" type="button" (click)="addRow(b)">{{ 'agreements.addRow' | t }}</button>
+            } @else {
+              <textarea rows="4" [(ngModel)]="b.text"></textarea>
+            }
+          </div>
+        }
+        <div class="row-actions">
+          @if (section === 'articles') {
+            <button class="btn btn-ghost" type="button" (click)="addBlock('articles', 'article')">+ {{ 'agreements.block.article' | t }}</button>
+          }
+          <button class="btn btn-ghost" type="button" (click)="addBlock(section, 'paragraph')">+ {{ 'agreements.block.paragraph' | t }}</button>
+          <button class="btn btn-ghost" type="button" (click)="addBlock(section, 'table')">+ {{ 'agreements.block.table' | t }}</button>
+        </div>
+      </article>
+    }
+  </div>
+
+  <article class="card preview-card">
+    <div class="toolbar" style="margin: 0 0 0.6rem; justify-content: space-between">
+      <h2>{{ 'common.preview' | t }}</h2>
+      <button class="btn btn-ochre" type="button" (click)="preview()">{{ 'agreements.refresh' | t }}</button>
+    </div>
+    <p class="muted">{{ 'agreements.previewHint' | t }}</p>
+    @if (pdf(); as src) {
+      <iframe class="preview-frame" [src]="src" [title]="'common.preview' | t"></iframe>
+    }
+  </article>
+</div>

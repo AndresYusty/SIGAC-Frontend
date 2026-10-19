@@ -2,7 +2,7 @@ import { Component, computed, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { RoleName } from '@core/auth/auth.models';
 import { AuthService } from '@core/auth/auth.service';
-import { MINUTES_ROLES, REPOSITORY_ROLES, SESSION_ROLES, STAFF_ROLES } from '@core/auth/role-groups';
+import { AGREEMENT_ROLES, MINUTES_ROLES, REPOSITORY_ROLES, SESSION_ROLES, STAFF_ROLES } from '@core/auth/role-groups';
 import { ConfirmService } from '@core/ui/confirm.service';
 import { ToastService } from '@core/ui/toast.service';
 import { LangSwitchComponent } from '@shared/components/lang-switch';
@@ -30,6 +30,7 @@ export class ShellComponent {
     { path: '/requests', labelKey: 'nav.requests', roles: STAFF_ROLES },
     { path: '/sessions', labelKey: 'nav.sessions', roles: SESSION_ROLES },
     { path: '/minutes', labelKey: 'nav.minutes', roles: MINUTES_ROLES },
+    { path: '/agreements', labelKey: 'nav.agreements', roles: AGREEMENT_ROLES },
     { path: '/repository', labelKey: 'nav.repository', roles: REPOSITORY_ROLES },
     { path: '/templates', labelKey: 'nav.templates', roles: ['ROLE_ADMIN'] },
     { path: '/users', labelKey: 'nav.users', roles: ['ROLE_ADMIN'] },
