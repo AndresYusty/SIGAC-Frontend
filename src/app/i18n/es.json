@@ -165,12 +165,27 @@
   "dashboard": {
     "kicker": "Panel",
     "welcome": "Bienvenido, {{name}}",
+    "council": "Consejo de Facultad",
+    "office": "Despacho de SIGAC",
+    "pending": "Pendiente del despacho",
+    "clear": "No hay trámites pendientes. El consejo está al día.",
+    "record": "Registro",
+    "hints": {
+      "requestsPendingReview": "Solicitudes que esperan evaluación de la secretaría.",
+      "approvedRequestsWithoutAgenda": "Asuntos aprobados que aún no entran a una sesión.",
+      "upcomingSessions": "Sesiones convocadas que están por realizarse.",
+      "minutesInProgress": "Actas abiertas, todavía sin cerrar.",
+      "minutesPendingSignature": "Actas que esperan la firma del presidente.",
+      "finishedSessions": "Sesiones ya celebradas.",
+      "activeUsers": "Cuentas habilitadas en el sistema.",
+      "publishedMinutesTotal": "Actas publicadas en el repositorio."
+    },
     "stats": {
-      "requestsPendingReview": "Por evaluar",
-      "approvedRequestsWithoutAgenda": "Sin agenda",
+      "requestsPendingReview": "Solicitudes por evaluar",
+      "approvedRequestsWithoutAgenda": "Asuntos sin agenda",
       "upcomingSessions": "Sesiones próximas",
       "minutesInProgress": "Actas en elaboración",
-      "minutesPendingSignature": "Pendientes de firma",
+      "minutesPendingSignature": "Actas por firmar",
       "finishedSessions": "Sesiones finalizadas",
       "activeUsers": "Usuarios activos",
       "publishedMinutesTotal": "Actas publicadas"

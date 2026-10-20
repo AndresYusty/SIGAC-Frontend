@@ -1,6 +1,6 @@
 import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { DomSanitizer, SafeHtml, SafeResourceUrl } from '@angular/platform-browser';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { AuthService } from '@core/auth/auth.service';
 import { ConfirmService } from '@core/ui/confirm.service';
@@ -39,8 +39,8 @@ export class MinutesDetailPage implements OnInit, OnDestroy {
     if (this.rawPdf) URL.revokeObjectURL(this.rawPdf);
   }
 
-  html(): SafeHtml {
-    return this.sanitizer.bypassSecurityTrustHtml(this.content || '');
+  canEdit(m: MinutesDto): boolean {
+    return this.auth.has('ROLE_COUNCIL_SECRETARY') && (m.status === 'DRAFT' || m.status === 'EDITING');
   }
 
   private id(): number {
@@ -49,18 +49,23 @@ export class MinutesDetailPage implements OnInit, OnDestroy {
 
   reload(): void {
     this.api.getMinutes(this.id()).subscribe({
-      next: (m) => {
-        this.minutes.set(m);
-        this.content = m.htmlContent ?? '';
-      },
+      next: (m) => this.show(m),
       error: (e) => this.toast.apiError(e),
     });
+  }
+
+  private show(m: MinutesDto): void {
+    this.minutes.set(m);
+    this.content = m.htmlContent ?? '';
+    if (m.status !== 'PUBLISHED') {
+      this.preview();
+    }
   }
 
   save(): void {
     this.api.updateMinutesContent(this.id(), this.content).subscribe({
       next: (m) => {
-        this.minutes.set(m);
+        this.show(m);
         this.toast.ok('minutes.toast.contentSaved');
       },
       error: (e) => this.toast.apiError(e),
@@ -87,7 +92,7 @@ export class MinutesDetailPage implements OnInit, OnDestroy {
     if (!ok) return;
     this.api.sendMinutesForSignature(this.id()).subscribe({
       next: (m) => {
-        this.minutes.set(m);
+        this.show(m);
         this.toast.ok('minutes.toast.sentForSignature');
       },
       error: (e) => this.toast.apiError(e),
@@ -117,7 +122,8 @@ export class MinutesDetailPage implements OnInit, OnDestroy {
     }
     this.api.rejectMinutes(this.id(), this.note).subscribe({
       next: (m) => {
-        this.minutes.set(m);
+        this.show(m);
+        this.note = '';
         this.toast.ok('minutes.toast.returned');
       },
       error: (e) => this.toast.apiError(e),

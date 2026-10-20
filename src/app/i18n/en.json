@@ -165,6 +165,21 @@
   "dashboard": {
     "kicker": "Dashboard",
     "welcome": "Welcome, {{name}}",
+    "council": "Faculty Council",
+    "office": "SIGAC office",
+    "pending": "Waiting at the office",
+    "clear": "Nothing is waiting. The council is up to date.",
+    "record": "Record",
+    "hints": {
+      "requestsPendingReview": "Requests waiting for the secretary's review.",
+      "approvedRequestsWithoutAgenda": "Approved matters not yet placed on a session.",
+      "upcomingSessions": "Convened sessions still to be held.",
+      "minutesInProgress": "Minutes opened and not yet closed.",
+      "minutesPendingSignature": "Minutes waiting for the president's signature.",
+      "finishedSessions": "Sessions already held.",
+      "activeUsers": "Accounts enabled in the system.",
+      "publishedMinutesTotal": "Minutes published in the repository."
+    },
     "stats": {
       "requestsPendingReview": "To review",
       "approvedRequestsWithoutAgenda": "Not on agenda",

@@ -1,59 +1,98 @@
-<div class="page-head">
+<header class="desk-mast">
   <div>
-    <p class="kicker">{{ 'dashboard.kicker' | t }}</p>
-    <h1>{{ 'dashboard.welcome' | t: { name: data()?.user || auth.user()?.name } }}</h1>
-    <p class="lead">
-      {{ auth.user()?.facultyName || ('app.university' | t) }}
+    <p class="desk-uni">{{ 'app.university' | t }}</p>
+    <h1>{{ auth.user()?.facultyName || ('dashboard.office' | t) }}</h1>
+    <p class="desk-who">
+      @if (auth.user()?.facultyName) {
+        {{ 'dashboard.council' | t }}
+      }
       @if (auth.user()?.roles?.[0]; as role) {
-        · {{ 'enums.role.' + role | t }}
+        @if (auth.user()?.facultyName) {
+          ·
+        }
+        {{ 'enums.role.' + role | t }}
+      }
+      @if (data()?.user || auth.user()?.name; as name) {
+        · {{ name }}
       }
     </p>
   </div>
+  <p class="desk-date">
+    <span>{{ today().weekday }}</span>
+    <strong>{{ today().day }}</strong>
+    <span>{{ today().rest }}</span>
+  </p>
+</header>
+
+<div class="desk-body">
+  <section>
+    <h2>{{ 'dashboard.pending' | t }}</h2>
+    @if (pending().length) {
+      <ul class="desk-queue">
+        @for (item of pending(); track item.key) {
+          <li>
+            <a [routerLink]="item.path">
+              <span class="desk-count">{{ item.value }}</span>
+              <span>
+                <strong>{{ 'dashboard.stats.' + item.key | t }}</strong>
+                <small>{{ 'dashboard.hints.' + item.key | t }}</small>
+              </span>
+            </a>
+          </li>
+        }
+      </ul>
+    } @else {
+      <p class="desk-clear">{{ 'dashboard.clear' | t }}</p>
+    }
+  </section>
+
+  <aside>
+    <h2>{{ 'dashboard.record' | t }}</h2>
+    @if (record().length) {
+      <ul class="desk-record">
+        @for (item of record(); track item.key) {
+          <li>
+            <a [routerLink]="item.path">
+              <span>{{ 'dashboard.stats.' + item.key | t }}</span>
+              <strong>{{ item.value }}</strong>
+            </a>
+          </li>
+        }
+      </ul>
+    }
+
+    @if (latestMinutes().length) {
+      <h3>{{ 'dashboard.latestMinutes' | t }}</h3>
+      <ul class="desk-record">
+        @for (m of latestMinutes(); track m.id) {
+          <li>
+            <a [routerLink]="['/minutes', m.id]">
+              <span>{{ m.serialNumber }}</span>
+              <strong>{{ m.sessionDate | localDate: 'd MMM yyyy' }}</strong>
+            </a>
+          </li>
+        }
+      </ul>
+      <a routerLink="/repository" class="desk-more">{{ 'dashboard.goToRepository' | t }}</a>
+    }
+  </aside>
 </div>
 
-<div class="grid grid-4">
-  @for (s of stats(); track s.key) {
-    <article class="card stat">
-      <div class="label">{{ 'dashboard.stats.' + s.key | t }}</div>
-      <div class="value">{{ s.value }}</div>
-    </article>
-  }
-</div>
-
-<div class="grid" style="margin-top: 1rem">
-  @if (byStatus(); as byStatus) {
-    <article class="card table-wrap">
+@if (byStatus(); as byStatus) {
+  <section class="desk-ledger">
+    <div class="desk-ledger-head">
       <h2>{{ 'dashboard.myRequests' | t }}</h2>
-      <table>
-        <tbody>
-          @for (e of byStatus | keyvalue; track e.key) {
-            <tr>
-              <td>{{ 'enums.requestStatus.' + e.key | t }}</td>
-              <td>{{ e.value }}</td>
-            </tr>
-          }
-        </tbody>
-      </table>
-      <a routerLink="/requests" class="btn btn-secondary" style="margin-top: 0.8rem">{{ 'dashboard.viewRequests' | t }}</a>
-    </article>
-  }
-  @if (latestMinutes().length) {
-    <article class="card table-wrap">
-      <h2>{{ 'dashboard.latestMinutes' | t }}</h2>
-      <table>
-        <thead>
-          <tr><th>{{ 'common.number' | t }}</th><th>{{ 'common.date' | t }}</th></tr>
-        </thead>
-        <tbody>
-          @for (m of latestMinutes(); track m.id) {
-            <tr>
-              <td>{{ m.serialNumber }}</td>
-              <td>{{ m.sessionDate | localDate: 'dd/MM/yyyy' }}</td>
-            </tr>
-          }
-        </tbody>
-      </table>
-      <a routerLink="/repository" class="btn btn-secondary" style="margin-top: 0.8rem">{{ 'dashboard.goToRepository' | t }}</a>
-    </article>
-  }
-</div>
+      <a routerLink="/requests">{{ 'dashboard.viewRequests' | t }}</a>
+    </div>
+    <table>
+      <tbody>
+        @for (e of byStatus | keyvalue; track e.key) {
+          <tr>
+            <td>{{ 'enums.requestStatus.' + e.key | t }}</td>
+            <td>{{ e.value }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </section>
+}
