@@ -42,7 +42,6 @@
           <td class="row-actions">
             <button class="btn btn-ghost" type="button" (click)="view(m.id)">{{ 'common.view' | t }}</button>
             <button class="btn btn-ghost" type="button" (click)="download(m.id, m.serialNumber)">{{ 'common.download' | t }}</button>
-            <button class="btn btn-ghost" type="button" (click)="verify(m.id)">{{ 'repository.verify' | t }}</button>
           </td>
         </tr>
       }
@@ -52,23 +51,9 @@
     <div class="empty"><h3>{{ 'repository.emptyTitle' | t }}</h3></div>
   }
 </article>
-@if (verification() || pdf) {
-  <div class="grid grid-2" style="margin-top: 1rem">
-    @if (verification(); as v) {
-      <article class="card">
-        <h2>{{ 'repository.integrity' | t }}</h2>
-        <p>
-          <span class="badge" [class]="v.intact ? 'ok' : 'danger'">{{ (v.intact ? 'repository.intact' : 'repository.altered') | t }}</span>
-        </p>
-        <p class="muted">{{ 'repository.storedHash' | t: { hash: v.storedHash } }}</p>
-        <p class="muted">{{ 'repository.computedHash' | t: { hash: v.computedHash } }}</p>
-      </article>
-    }
-    @if (pdf) {
-      <article class="card">
-        <h2>{{ 'repository.viewer' | t }}</h2>
-        <iframe class="preview-frame" [src]="pdf" [title]="'repository.viewerFrameTitle' | t"></iframe>
-      </article>
-    }
-  </div>
+@if (pdf) {
+  <article class="card" style="margin-top: 1rem">
+    <h2>{{ 'repository.viewer' | t }}</h2>
+    <iframe class="preview-frame" [src]="pdf" [title]="'repository.viewerFrameTitle' | t"></iframe>
+  </article>
 }

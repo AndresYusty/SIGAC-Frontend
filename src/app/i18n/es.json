@@ -474,7 +474,7 @@
   "repository": {
     "kicker": "Consulta",
     "title": "Repositorio digital",
-    "lead": "Actas publicadas con verificación SHA-256.",
+    "lead": "Actas publicadas del consejo.",
     "text": "Texto",
     "council": "Consejo",
     "verify": "Verificar",

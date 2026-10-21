@@ -474,7 +474,7 @@
   "repository": {
     "kicker": "Search",
     "title": "Digital repository",
-    "lead": "Published minutes with SHA-256 verification.",
+    "lead": "Published council minutes.",
     "text": "Text",
     "council": "Council",
     "verify": "Verify",

@@ -8,7 +8,7 @@ import { LocalDatePipe } from '@shared/pipes/local-date.pipe';
 import { TranslatePipe } from '@shared/pipes/translate.pipe';
 import { blobUrl, saveBlob } from '@shared/utils/files';
 import { RepositoryApi } from '../../repository.api';
-import { RepositoryMinutesDto, VerificationDto } from '../../repository.models';
+import { RepositoryMinutesDto } from '../../repository.models';
 
 @Component({
   selector: 'app-repository',
@@ -27,7 +27,6 @@ export class RepositoryPage implements OnInit, OnDestroy {
   to = '';
   readonly councilTypes = signal<CouncilTypeDto[]>([]);
   readonly page = signal<Page<RepositoryMinutesDto> | null>(null);
-  readonly verification = signal<VerificationDto | null>(null);
   pdf?: SafeResourceUrl;
   private rawPdf?: string;
 
@@ -54,13 +53,6 @@ export class RepositoryPage implements OnInit, OnDestroy {
         next: (p) => this.page.set(p),
         error: (e) => this.toast.apiError(e),
       });
-  }
-
-  verify(id: number): void {
-    this.api.verifyMinutes(id).subscribe({
-      next: (v) => this.verification.set(v),
-      error: (e) => this.toast.apiError(e),
-    });
   }
 
   view(id: number): void {
