@@ -455,6 +455,7 @@
     "pdf": "PDF",
     "previewFrameTitle": "Minutes preview",
     "previewHint": "Generate the preview to review the PDF/A.",
+    "loadingPdf": "Loading the signed minutes.",
     "confirm": {
       "sendTitle": "Send for signature",
       "sendMessage": "The minutes will move to pending signature.",
@@ -477,13 +478,7 @@
     "lead": "Published council minutes.",
     "text": "Text",
     "council": "Council",
-    "verify": "Verify",
     "emptyTitle": "No results",
-    "integrity": "Integrity",
-    "intact": "Intact",
-    "altered": "Altered",
-    "storedHash": "Stored: {{hash}}",
-    "computedHash": "Computed: {{hash}}",
     "viewer": "Viewer",
     "viewerFrameTitle": "Minutes"
   },
@@ -501,16 +496,11 @@
     "newTemplate": "New template",
     "comment": "Comment",
     "content": "XHTML content",
-    "loadAgreement": "Load agreement layout",
-    "agreementDraftName": "Faculty Council agreement",
-    "agreementDraftComment": "Layout of agreements 005 of 2025 and 028 of 2026. Preview uses 028.",
-    "validate": "Validate",
     "previewPdf": "Preview",
     "previewFrameTitle": "Document preview",
     "saveVersion": "Save version",
     "variables": "Variables",
     "toast": {
-      "valid": "Template is valid",
       "saved": "Template saved (v{{version}})",
       "activated": "Template activated"
     }

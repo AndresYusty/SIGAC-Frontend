@@ -455,6 +455,7 @@
     "pdf": "PDF",
     "previewFrameTitle": "Vista previa del acta",
     "previewHint": "Genere la vista previa para revisar el PDF/A.",
+    "loadingPdf": "Cargando el acta firmada.",
     "confirm": {
       "sendTitle": "Enviar a firma",
       "sendMessage": "El acta pasará a pendiente de firma.",
@@ -477,13 +478,7 @@
     "lead": "Actas publicadas del consejo.",
     "text": "Texto",
     "council": "Consejo",
-    "verify": "Verificar",
     "emptyTitle": "Sin resultados",
-    "integrity": "Integridad",
-    "intact": "Íntegro",
-    "altered": "Alterado",
-    "storedHash": "Almacenado: {{hash}}",
-    "computedHash": "Calculado: {{hash}}",
     "viewer": "Visor",
     "viewerFrameTitle": "Acta"
   },
@@ -501,16 +496,11 @@
     "newTemplate": "Nueva plantilla",
     "comment": "Comentario",
     "content": "Contenido XHTML",
-    "loadAgreement": "Cargar formato de acuerdo",
-    "agreementDraftName": "Acuerdo del Consejo de Facultad",
-    "agreementDraftComment": "Formato de los acuerdos 005 de 2025 y 028 de 2026. La vista previa usa el 028.",
-    "validate": "Validar",
     "previewPdf": "Previsualizar",
     "previewFrameTitle": "Vista previa del documento",
     "saveVersion": "Guardar versión",
     "variables": "Variables",
     "toast": {
-      "valid": "Plantilla válida",
       "saved": "Plantilla guardada (v{{version}})",
       "activated": "Plantilla activada"
     }

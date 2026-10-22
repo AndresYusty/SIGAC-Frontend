@@ -7,6 +7,7 @@ import { CouncilTypeDto, UsersApi } from '@modules/users';
 import { LocalDatePipe } from '@shared/pipes/local-date.pipe';
 import { TranslatePipe } from '@shared/pipes/translate.pipe';
 import { blobUrl, saveBlob } from '@shared/utils/files';
+import { LiveQuery } from '@shared/utils/live-query';
 import { RepositoryApi } from '../../repository.api';
 import { RepositoryMinutesDto } from '../../repository.models';
 
@@ -29,6 +30,7 @@ export class RepositoryPage implements OnInit, OnDestroy {
   readonly page = signal<Page<RepositoryMinutesDto> | null>(null);
   pdf?: SafeResourceUrl;
   private rawPdf?: string;
+  private readonly query = new LiveQuery();
 
   ngOnInit(): void {
     this.usersApi.listCouncilTypes().subscribe({ next: (t) => this.councilTypes.set(t) });
@@ -36,10 +38,20 @@ export class RepositoryPage implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.query.cancel();
     if (this.rawPdf) URL.revokeObjectURL(this.rawPdf);
   }
 
+  apply(): void {
+    this.query.immediate(() => this.load());
+  }
+
+  applyText(): void {
+    this.query.typed(() => this.load());
+  }
+
   load(n = 0): void {
+    const id = this.query.begin();
     this.api
       .searchRepository({
         serialNumber: this.serialNumber,
@@ -50,7 +62,9 @@ export class RepositoryPage implements OnInit, OnDestroy {
         page: n,
       })
       .subscribe({
-        next: (p) => this.page.set(p),
+        next: (p) => {
+          if (this.query.isCurrent(id)) this.page.set(p);
+        },
         error: (e) => this.toast.apiError(e),
       });
   }

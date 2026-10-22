@@ -8,13 +8,12 @@
 <div class="toolbar">
   <label class="field">
     <span>{{ 'audit.event' | t }}</span>
-    <input [(ngModel)]="event" [placeholder]="'audit.eventPlaceholder' | t" />
+    <input [(ngModel)]="event" [placeholder]="'audit.eventPlaceholder' | t" (ngModelChange)="applyText()" />
   </label>
   <label class="field">
     <span>{{ 'common.user' | t }}</span>
-    <input [(ngModel)]="user" />
+    <input [(ngModel)]="user" (ngModelChange)="applyText()" />
   </label>
-  <button class="btn" type="button" (click)="load()">{{ 'common.filter' | t }}</button>
 </div>
 <article class="card table-wrap">
   <table>

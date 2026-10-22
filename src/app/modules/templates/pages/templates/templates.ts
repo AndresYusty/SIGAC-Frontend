@@ -47,19 +47,6 @@ export class TemplatesPage implements OnInit, OnDestroy {
     if (this.rawPdf) URL.revokeObjectURL(this.rawPdf);
   }
 
-  loadAgreementDraft(): void {
-    this.api.agreementDraft().subscribe({
-      next: (content) => {
-        this.selected = undefined;
-        this.name = this.i18n.t('templates.agreementDraftName');
-        this.comment = this.i18n.t('templates.agreementDraftComment');
-        this.content = content;
-        this.preview();
-      },
-      error: (e) => this.toast.apiError(e),
-    });
-  }
-
   load(): void {
     this.api.listTemplates(this.councilTypeId ?? undefined).subscribe({
       next: (l) => this.list.set(l),

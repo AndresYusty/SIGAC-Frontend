@@ -8,14 +8,13 @@
 <div class="toolbar">
   <label class="field">
     <span>{{ 'common.status' | t }}</span>
-    <select [(ngModel)]="status">
+    <select [(ngModel)]="status" (ngModelChange)="apply()">
       <option value="">{{ 'common.all' | t }}</option>
       @for (s of statuses; track s) {
         <option [value]="s">{{ 'enums.minutesStatus.' + s | t }}</option>
       }
     </select>
   </label>
-  <button class="btn" type="button" (click)="load()">{{ 'common.filter' | t }}</button>
 </div>
 <article class="card table-wrap">
   <table>

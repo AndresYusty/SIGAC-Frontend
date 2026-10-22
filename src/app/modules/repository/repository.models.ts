@@ -13,13 +13,6 @@ export interface RepositoryMinutesDto {
   sha256Hash: string;
 }
 
-export interface VerificationDto {
-  serialNumber: string;
-  storedHash: string;
-  computedHash: string;
-  intact: boolean;
-}
-
 export interface RepositorySearch {
   serialNumber?: string;
   councilTypeId?: number | '';

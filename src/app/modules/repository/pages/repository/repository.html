@@ -6,20 +6,19 @@
   </div>
 </div>
 <div class="toolbar">
-  <label class="field"><span>{{ 'common.number' | t }}</span><input [(ngModel)]="serialNumber" /></label>
+  <label class="field"><span>{{ 'common.number' | t }}</span><input [(ngModel)]="serialNumber" (ngModelChange)="applyText()" /></label>
   <label class="field">
     <span>{{ 'common.type' | t }}</span>
-    <select [(ngModel)]="councilTypeId">
+    <select [(ngModel)]="councilTypeId" (ngModelChange)="apply()">
       <option value="">{{ 'common.all' | t }}</option>
       @for (ct of councilTypes(); track ct.id) {
         <option [value]="ct.id">{{ ct.name }}</option>
       }
     </select>
   </label>
-  <label class="field grow"><span>{{ 'repository.text' | t }}</span><input [(ngModel)]="text" /></label>
-  <label class="field"><span>{{ 'common.from' | t }}</span><input type="date" [(ngModel)]="from" /></label>
-  <label class="field"><span>{{ 'common.to' | t }}</span><input type="date" [(ngModel)]="to" /></label>
-  <button class="btn" type="button" (click)="load()">{{ 'common.search' | t }}</button>
+  <label class="field grow"><span>{{ 'repository.text' | t }}</span><input [(ngModel)]="text" (ngModelChange)="applyText()" /></label>
+  <label class="field"><span>{{ 'common.from' | t }}</span><input type="date" [(ngModel)]="from" (ngModelChange)="apply()" /></label>
+  <label class="field"><span>{{ 'common.to' | t }}</span><input type="date" [(ngModel)]="to" (ngModelChange)="apply()" /></label>
 </div>
 <article class="card table-wrap">
   <table>

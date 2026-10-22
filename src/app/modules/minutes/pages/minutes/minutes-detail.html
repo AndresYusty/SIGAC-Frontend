@@ -30,8 +30,8 @@
       </article>
       <article class="card">
         <h2>{{ 'minutes.pdf' | t }}</h2>
-        @if (pdf) {
-          <iframe class="preview-frame" [src]="pdf" [title]="'minutes.previewFrameTitle' | t"></iframe>
+        @if (pdf()) {
+          <iframe class="preview-frame" [src]="pdf()" [title]="'minutes.previewFrameTitle' | t"></iframe>
         } @else {
           <p class="muted">{{ 'minutes.previewHint' | t }}</p>
         }
@@ -39,10 +39,10 @@
     </div>
   } @else {
     <article class="card">
-      @if (pdf) {
-        <iframe class="preview-frame" [src]="pdf" [title]="'minutes.previewFrameTitle' | t"></iframe>
+      @if (pdf()) {
+        <iframe class="preview-frame" [src]="pdf()" [title]="'minutes.previewFrameTitle' | t"></iframe>
       } @else {
-        <p class="muted">{{ 'minutes.previewHint' | t }}</p>
+        <p class="muted">{{ (m.status === 'PUBLISHED' ? 'minutes.loadingPdf' : 'minutes.previewHint') | t }}</p>
       }
       @if (m.status === 'PENDING_SIGNATURE' && auth.has('ROLE_PRESIDENT', 'ROLE_COUNCIL_SECRETARY')) {
         <label class="field" style="margin-top: 1rem">

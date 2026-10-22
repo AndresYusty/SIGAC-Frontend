@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '@core/auth/auth.service';
@@ -7,6 +7,7 @@ import { ToastService } from '@core/ui/toast.service';
 import { LocalDatePipe } from '@shared/pipes/local-date.pipe';
 import { TranslatePipe } from '@shared/pipes/translate.pipe';
 import { TONE } from '@shared/utils/labels';
+import { LiveQuery } from '@shared/utils/live-query';
 import { RequestsApi } from '../../requests.api';
 import { REQUEST_STATUSES, RequestDto, RequestStatus } from '../../requests.models';
 
@@ -15,7 +16,7 @@ import { REQUEST_STATUSES, RequestDto, RequestStatus } from '../../requests.mode
   imports: [RouterLink, FormsModule, LocalDatePipe, TranslatePipe],
   templateUrl: './requests.html',
 })
-export class RequestsPage implements OnInit {
+export class RequestsPage implements OnInit, OnDestroy {
   private readonly api = inject(RequestsApi);
   readonly auth = inject(AuthService);
   private readonly toast = inject(ToastService);
@@ -26,14 +27,30 @@ export class RequestsPage implements OnInit {
   from = '';
   to = '';
   readonly page = signal<Page<RequestDto> | null>(null);
+  private readonly query = new LiveQuery();
 
   ngOnInit(): void {
     this.load();
   }
 
+  ngOnDestroy(): void {
+    this.query.cancel();
+  }
+
+  apply(): void {
+    this.query.immediate(() => this.load());
+  }
+
+  applyText(): void {
+    this.query.typed(() => this.load());
+  }
+
   load(n = 0): void {
+    const id = this.query.begin();
     this.api.searchRequests({ status: this.status, code: this.code, from: this.from, to: this.to, page: n, size: 20 }).subscribe({
-      next: (p) => this.page.set(p),
+      next: (p) => {
+        if (this.query.isCurrent(id)) this.page.set(p);
+      },
       error: (e) => this.toast.apiError(e),
     });
   }

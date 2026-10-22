@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '@core/auth/auth.service';
@@ -9,6 +9,7 @@ import { ToastService } from '@core/ui/toast.service';
 import { LocalDatePipe } from '@shared/pipes/local-date.pipe';
 import { TranslatePipe } from '@shared/pipes/translate.pipe';
 import { filenameFromDisposition, saveBlob } from '@shared/utils/files';
+import { LiveQuery } from '@shared/utils/live-query';
 import { AgreementsApi } from '../../agreements.api';
 import { AgreementSummaryDto, AgreementTypeDto } from '../../agreements.models';
 
@@ -17,7 +18,7 @@ import { AgreementSummaryDto, AgreementTypeDto } from '../../agreements.models';
   imports: [RouterLink, FormsModule, LocalDatePipe, TranslatePipe],
   templateUrl: './agreements.html',
 })
-export class AgreementsPage implements OnInit {
+export class AgreementsPage implements OnInit, OnDestroy {
   private readonly api = inject(AgreementsApi);
   private readonly toast = inject(ToastService);
   readonly i18n = inject(I18nService);
@@ -27,15 +28,31 @@ export class AgreementsPage implements OnInit {
   year: number | null = new Date().getFullYear();
   typeCode = '';
   text = '';
+  private readonly query = new LiveQuery();
 
   ngOnInit(): void {
     this.api.listTypes().subscribe({ next: (t) => this.types.set(t) });
     this.load();
   }
 
+  ngOnDestroy(): void {
+    this.query.cancel();
+  }
+
+  apply(): void {
+    this.query.immediate(() => this.load());
+  }
+
+  applyText(): void {
+    this.query.typed(() => this.load());
+  }
+
   load(n = 0): void {
+    const id = this.query.begin();
     this.api.list({ year: this.year, typeCode: this.typeCode, text: this.text }, n).subscribe({
-      next: (p) => this.page.set(p),
+      next: (p) => {
+        if (this.query.isCurrent(id)) this.page.set(p);
+      },
       error: (e) => this.toast.apiError(e),
     });
   }

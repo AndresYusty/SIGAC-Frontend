@@ -6,6 +6,7 @@ import { ToastService } from '@core/ui/toast.service';
 import { LocalDatePipe } from '@shared/pipes/local-date.pipe';
 import { TranslatePipe } from '@shared/pipes/translate.pipe';
 import { TONE } from '@shared/utils/labels';
+import { LiveQuery } from '@shared/utils/live-query';
 import { MinutesApi } from '../../minutes.api';
 import { MINUTES_STATUSES, MinutesDto, MinutesStatus } from '../../minutes.models';
 
@@ -21,14 +22,22 @@ export class MinutesPage implements OnInit {
   readonly tone = TONE;
   status: MinutesStatus | '' = '';
   readonly page = signal<Page<MinutesDto> | null>(null);
+  private readonly query = new LiveQuery();
 
   ngOnInit(): void {
     this.load();
   }
 
+  apply(): void {
+    this.query.immediate(() => this.load());
+  }
+
   load(n = 0): void {
+    const id = this.query.begin();
     this.api.listMinutes(this.status, n).subscribe({
-      next: (p) => this.page.set(p),
+      next: (p) => {
+        if (this.query.isCurrent(id)) this.page.set(p);
+      },
       error: (e) => this.toast.apiError(e),
     });
   }

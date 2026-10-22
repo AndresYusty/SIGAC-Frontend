@@ -11,11 +11,11 @@
 <div class="toolbar">
   <label class="field">
     <span>{{ 'agreements.year' | t }}</span>
-    <input type="number" [(ngModel)]="year" style="width: 7rem" />
+    <input type="number" [(ngModel)]="year" style="width: 7rem" (ngModelChange)="applyText()" />
   </label>
   <label class="field">
     <span>{{ 'common.type' | t }}</span>
-    <select [(ngModel)]="typeCode">
+    <select [(ngModel)]="typeCode" (ngModelChange)="apply()">
       <option value="">{{ 'common.all' | t }}</option>
       @for (t of types(); track t.code) {
         <option [value]="t.code">{{ typeName(t) }}</option>
@@ -24,9 +24,8 @@
   </label>
   <label class="field grow">
     <span>{{ 'common.search' | t }}</span>
-    <input [(ngModel)]="text" [placeholder]="'agreements.searchHint' | t" (keyup.enter)="load()" />
+    <input [(ngModel)]="text" [placeholder]="'agreements.searchHint' | t" (ngModelChange)="applyText()" />
   </label>
-  <button class="btn" type="button" (click)="load()">{{ 'common.filter' | t }}</button>
 </div>
 <article class="card table-wrap">
   <table>

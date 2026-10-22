@@ -7,6 +7,7 @@ import { ToastService } from '@core/ui/toast.service';
 import { LocalDatePipe } from '@shared/pipes/local-date.pipe';
 import { TranslatePipe } from '@shared/pipes/translate.pipe';
 import { TONE } from '@shared/utils/labels';
+import { LiveQuery } from '@shared/utils/live-query';
 import { RequestsApi } from '../../requests.api';
 import { SESSION_STATUSES, SessionStatus, SessionSummaryDto } from '../../requests.models';
 
@@ -23,14 +24,22 @@ export class SessionsPage implements OnInit {
   readonly tone = TONE;
   status: SessionStatus | '' = '';
   readonly page = signal<Page<SessionSummaryDto> | null>(null);
+  private readonly query = new LiveQuery();
 
   ngOnInit(): void {
     this.load();
   }
 
+  apply(): void {
+    this.query.immediate(() => this.load());
+  }
+
   load(n = 0): void {
+    const id = this.query.begin();
     this.api.listSessions(this.status, n).subscribe({
-      next: (p) => this.page.set(p),
+      next: (p) => {
+        if (this.query.isCurrent(id)) this.page.set(p);
+      },
       error: (e) => this.toast.apiError(e),
     });
   }

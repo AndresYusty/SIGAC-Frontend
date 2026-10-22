@@ -9,7 +9,6 @@ import {
   DashboardDto,
   RepositoryMinutesDto,
   RepositorySearch,
-  VerificationDto,
 } from './repository.models';
 
 @Injectable({ providedIn: 'root' })
@@ -21,9 +20,6 @@ export class RepositoryApi {
     return this.http.get<Page<RepositoryMinutesDto>>(`${this.base}/repository/minutes`, {
       params: toQuery({ ...params, sort: 'sessionDate,desc' }),
     });
-  }
-  verifyMinutes(id: number) {
-    return this.http.get<VerificationDto>(`${this.base}/repository/minutes/${id}/verify`);
   }
   viewMinutes(id: number) {
     return this.http.get(`${this.base}/repository/minutes/${id}/viewer`, { responseType: 'blob' });

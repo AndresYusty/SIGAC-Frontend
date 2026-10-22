@@ -9,6 +9,7 @@ import { LocalDatePipe } from '@shared/pipes/local-date.pipe';
 import { TranslatePipe } from '@shared/pipes/translate.pipe';
 import { blobUrl } from '@shared/utils/files';
 import { TONE } from '@shared/utils/labels';
+import { RepositoryApi } from '@modules/repository';
 import { MinutesApi } from '../../minutes.api';
 import { MinutesDto } from '../../minutes.models';
 
@@ -19,6 +20,7 @@ import { MinutesDto } from '../../minutes.models';
 })
 export class MinutesDetailPage implements OnInit, OnDestroy {
   private readonly api = inject(MinutesApi);
+  private readonly repository = inject(RepositoryApi);
   private readonly route = inject(ActivatedRoute);
   readonly auth = inject(AuthService);
   private readonly toast = inject(ToastService);
@@ -27,7 +29,7 @@ export class MinutesDetailPage implements OnInit, OnDestroy {
   readonly minutes = signal<MinutesDto | null>(null);
   content = '';
   note = '';
-  pdf?: SafeResourceUrl;
+  readonly pdf = signal<SafeResourceUrl | undefined>(undefined);
   private rawPdf?: string;
   readonly tone = TONE;
 
@@ -57,9 +59,18 @@ export class MinutesDetailPage implements OnInit, OnDestroy {
   private show(m: MinutesDto): void {
     this.minutes.set(m);
     this.content = m.htmlContent ?? '';
-    if (m.status !== 'PUBLISHED') {
+    if (m.status === 'PUBLISHED') {
+      this.openPublished();
+    } else {
       this.preview();
     }
+  }
+
+  private openPublished(): void {
+    this.repository.viewMinutes(this.id()).subscribe({
+      next: (b) => this.setPdf(b),
+      error: (e) => this.toast.apiError(e),
+    });
   }
 
   save(): void {
@@ -74,13 +85,15 @@ export class MinutesDetailPage implements OnInit, OnDestroy {
 
   preview(): void {
     this.api.previewMinutes(this.id()).subscribe({
-      next: (b) => {
-        if (this.rawPdf) URL.revokeObjectURL(this.rawPdf);
-        this.rawPdf = blobUrl(b);
-        this.pdf = this.sanitizer.bypassSecurityTrustResourceUrl(this.rawPdf);
-      },
+      next: (b) => this.setPdf(b),
       error: (e) => this.toast.apiError(e),
     });
+  }
+
+  private setPdf(b: Blob): void {
+    if (this.rawPdf) URL.revokeObjectURL(this.rawPdf);
+    this.rawPdf = blobUrl(b);
+    this.pdf.set(this.sanitizer.bypassSecurityTrustResourceUrl(this.rawPdf));
   }
 
   async sendForSignature(): Promise<void> {
@@ -108,7 +121,7 @@ export class MinutesDetailPage implements OnInit, OnDestroy {
     if (!ok) return;
     this.api.signMinutes(this.id()).subscribe({
       next: (m) => {
-        this.minutes.set(m);
+        this.show(m);
         this.toast.ok('minutes.toast.signed');
       },
       error: (e) => this.toast.apiError(e),

@@ -29,7 +29,4 @@ export class TemplatesApi {
   previewTemplate(content: string) {
     return this.http.post(`${this.base}/templates/preview`, { content }, { responseType: 'blob' });
   }
-  agreementDraft() {
-    return this.http.get(`${this.base}/templates/samples/agreement`, { responseType: 'text' });
-  }
 }

@@ -12,7 +12,7 @@
 <div class="toolbar">
   <label class="field">
     <span>{{ 'common.status' | t }}</span>
-    <select [(ngModel)]="status">
+    <select [(ngModel)]="status" (ngModelChange)="apply()">
       <option value="">{{ 'common.all' | t }}</option>
       @for (s of statuses; track s) {
         <option [value]="s">{{ 'enums.requestStatus.' + s | t }}</option>
@@ -21,17 +21,16 @@
   </label>
   <label class="field">
     <span>{{ 'common.code' | t }}</span>
-    <input [(ngModel)]="code" [placeholder]="'requests.list.codePlaceholder' | t" />
+    <input [(ngModel)]="code" [placeholder]="'requests.list.codePlaceholder' | t" (ngModelChange)="applyText()" />
   </label>
   <label class="field">
     <span>{{ 'common.from' | t }}</span>
-    <input type="date" [(ngModel)]="from" />
+    <input type="date" [(ngModel)]="from" (ngModelChange)="apply()" />
   </label>
   <label class="field">
     <span>{{ 'common.to' | t }}</span>
-    <input type="date" [(ngModel)]="to" />
+    <input type="date" [(ngModel)]="to" (ngModelChange)="apply()" />
   </label>
-  <button class="btn" type="button" (click)="load()">{{ 'common.filter' | t }}</button>
 </div>
 
 <article class="card table-wrap">
