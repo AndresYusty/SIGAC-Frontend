@@ -11,6 +11,8 @@ import { LiveQuery } from '@shared/utils/live-query';
 import { RequestsApi } from '../../requests.api';
 import { SESSION_STATUSES, SessionStatus, SessionSummaryDto } from '../../requests.models';
 
+type SessionSort = 'type' | 'faculty' | 'date' | 'location' | 'status' | 'items';
+
 @Component({
   selector: 'app-sessions',
   imports: [RouterLink, FormsModule, LocalDatePipe, TranslatePipe],
@@ -23,6 +25,8 @@ export class SessionsPage implements OnInit {
   readonly statuses = SESSION_STATUSES;
   readonly tone = TONE;
   status: SessionStatus | '' = '';
+  readonly sortKey = signal<SessionSort | null>(null);
+  readonly sortDir = signal<'asc' | 'desc'>('asc');
   readonly page = signal<Page<SessionSummaryDto> | null>(null);
   private readonly query = new LiveQuery();
 
@@ -34,9 +38,30 @@ export class SessionsPage implements OnInit {
     this.query.immediate(() => this.load());
   }
 
+  mark(key: SessionSort): string {
+    return this.sortKey() === key && this.sortDir() === 'desc' ? '↓' : '↑';
+  }
+
+  aria(key: SessionSort): 'ascending' | 'descending' | 'none' {
+    if (this.sortKey() !== key) return 'none';
+    return this.sortDir() === 'asc' ? 'ascending' : 'descending';
+  }
+
+  sortBy(key: SessionSort): void {
+    if (this.sortKey() === key) {
+      this.sortDir.set(this.sortDir() === 'asc' ? 'desc' : 'asc');
+    } else {
+      this.sortKey.set(key);
+      this.sortDir.set('asc');
+    }
+    this.apply();
+  }
+
   load(n = 0): void {
     const id = this.query.begin();
-    this.api.listSessions(this.status, n).subscribe({
+    const key = this.sortKey();
+    const sort = key ? `${key},${this.sortDir()}` : undefined;
+    this.api.listSessions(this.status, n, 20, sort).subscribe({
       next: (p) => {
         if (this.query.isCurrent(id)) this.page.set(p);
       },

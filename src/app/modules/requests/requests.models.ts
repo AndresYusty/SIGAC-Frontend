@@ -1,3 +1,4 @@
+import { RoleName } from '@core/auth/auth.models';
 import { CouncilKind } from '@modules/users';
 
 export const REQUEST_TYPES = ['ACADEMIC', 'ADMINISTRATIVE', 'STUDENT', 'TEACHING'] as const;
@@ -106,6 +107,13 @@ export interface GuestPayload {
   affiliation: string;
 }
 
+/** Counselor or participant summoned when the session is scheduled. */
+export interface SummonedDto {
+  userId: number;
+  name: string;
+  role: RoleName;
+}
+
 export interface SessionDto {
   id: number;
   councilTypeId: number;
@@ -121,4 +129,5 @@ export interface SessionDto {
   actualEnd: string | null;
   items: AgendaItemDto[];
   guests: GuestDto[];
+  summoned: SummonedDto[];
 }

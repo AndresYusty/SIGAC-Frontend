@@ -2,7 +2,15 @@
   <div>
     <p class="kicker">{{ 'requests.list.kicker' | t }}</p>
     <h1>{{ 'requests.list.title' | t }}</h1>
-    <p class="lead">{{ 'requests.list.lead' | t }}</p>
+    <p class="lead">
+      @if (auth.has('ROLE_COUNCIL_SECRETARY')) {
+        {{ 'requests.list.leadCouncil' | t }}
+      } @else if (auth.has('ROLE_FACULTY_SECRETARY')) {
+        {{ 'requests.list.leadFaculty' | t }}
+      } @else {
+        {{ 'requests.list.lead' | t }}
+      }
+    </p>
   </div>
   @if (auth.has('ROLE_FACULTY_SECRETARY')) {
     <a routerLink="/requests/new" class="btn">{{ 'requests.list.file' | t }}</a>

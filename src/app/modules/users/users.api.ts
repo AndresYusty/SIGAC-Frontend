@@ -48,6 +48,9 @@ export class UsersApi {
   updateUniversity(id: number, name: string) {
     return this.http.put<NodeDto>(`${this.base}/hierarchy/universities/${id}`, { name });
   }
+  deleteUniversity(id: number) {
+    return this.http.delete<void>(`${this.base}/hierarchy/universities/${id}`);
+  }
   listCampuses(universityId: number) {
     return this.http.get<NodeDto[]>(`${this.base}/hierarchy/campuses`, {
       params: { universityId },
@@ -67,6 +70,9 @@ export class UsersApi {
       universityId,
     });
   }
+  deleteCampus(id: number) {
+    return this.http.delete<void>(`${this.base}/hierarchy/campuses/${id}`);
+  }
   listFaculties(campusId: number) {
     return this.http.get<NodeDto[]>(`${this.base}/hierarchy/faculties`, { params: { campusId } });
   }
@@ -76,6 +82,9 @@ export class UsersApi {
   updateFaculty(id: number, name: string, campusId: number) {
     return this.http.put<NodeDto>(`${this.base}/hierarchy/faculties/${id}`, { name, campusId });
   }
+  deleteFaculty(id: number) {
+    return this.http.delete<void>(`${this.base}/hierarchy/faculties/${id}`);
+  }
   listPrograms(facultyId: number) {
     return this.http.get<NodeDto[]>(`${this.base}/hierarchy/programs`, { params: { facultyId } });
   }
@@ -84,6 +93,9 @@ export class UsersApi {
   }
   updateProgram(id: number, name: string, facultyId: number) {
     return this.http.put<NodeDto>(`${this.base}/hierarchy/programs/${id}`, { name, facultyId });
+  }
+  deleteProgram(id: number) {
+    return this.http.delete<void>(`${this.base}/hierarchy/programs/${id}`);
   }
 
   listCouncilTypes() {
@@ -105,6 +117,9 @@ export class UsersApi {
   }
   letterheadSheet() {
     return this.http.get(`${this.base}/letterhead/sheet`, { responseType: 'blob' });
+  }
+  letterheadLogo() {
+    return this.http.get(`${this.base}/letterhead/logo`, { responseType: 'blob' });
   }
   uploadLetterhead(part: LetterheadPart, file: File) {
     const body = new FormData();

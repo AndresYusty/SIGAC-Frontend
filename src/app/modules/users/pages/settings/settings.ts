@@ -3,7 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { ToastService } from '@core/ui/toast.service';
 import { TranslatePipe } from '@shared/pipes/translate.pipe';
 import { UsersApi } from '../../users.api';
-import { blobUrl } from '@shared/utils/files';
+import { blobUrl, saveBlob } from '@shared/utils/files';
 import { CouncilTypeDto, LetterheadPart, LetterheadStatus, ParameterDto } from '../../users.models';
 
 @Component({
@@ -18,6 +18,7 @@ export class SettingsPage implements OnInit, OnDestroy {
   readonly parameters = signal<ParameterDto[]>([]);
   readonly letterhead = signal<LetterheadStatus | null>(null);
   readonly sheetUrl = signal<string | null>(null);
+  private sheetBlob: Blob | null = null;
 
   ngOnInit(): void {
     this.api.listCouncilTypes().subscribe({ next: (t) => this.councilTypes.set(t) });
@@ -55,11 +56,25 @@ export class SettingsPage implements OnInit, OnDestroy {
     this.loadSheet();
   }
 
+  downloadSheet(): void {
+    const file = this.sheetBlob;
+    if (!file) return;
+    saveBlob(file, `Membrete.${file.type.includes('jpeg') ? 'jpg' : 'png'}`);
+  }
+
+  downloadLogo(): void {
+    this.api.letterheadLogo().subscribe({
+      next: (file) => saveBlob(file, `Logo.${file.type.includes('jpeg') ? 'jpg' : 'png'}`),
+      error: (e) => this.toast.apiError(e),
+    });
+  }
+
   private loadSheet(): void {
     this.api.letterheadSheet().subscribe({
       next: (b) => {
         const old = this.sheetUrl();
         if (old) URL.revokeObjectURL(old);
+        this.sheetBlob = b;
         this.sheetUrl.set(blobUrl(b));
       },
     });

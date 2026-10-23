@@ -6,25 +6,56 @@
   </div>
   <a routerLink="/sessions" class="btn btn-ghost">{{ 'common.back' | t }}</a>
 </div>
-<form class="card grid" style="max-width: 640px" [formGroup]="form" (ngSubmit)="submit()">
-  <label class="field">
-    <span>{{ 'sessions.councilType' | t }}</span>
-    <select formControlName="councilTypeId">
-      @for (ct of councilTypes(); track ct.id) {
-        <option [ngValue]="ct.id">{{ ct.code }} · {{ ct.name }}</option>
+<form class="schedule-desk" [formGroup]="form" (ngSubmit)="submit()">
+  <article class="card schedule-data">
+    <h2>{{ 'sessions.new.data' | t }}</h2>
+    <label class="field">
+      <span>{{ 'sessions.councilType' | t }}</span>
+      <select formControlName="councilTypeId">
+        @for (ct of councilTypes(); track ct.id) {
+          <option [ngValue]="ct.id">{{ ct.code }} · {{ ct.name }}</option>
+        }
+      </select>
+      @if (kind(); as k) {
+        <small class="muted">{{ 'sessions.kindHint.' + k | t }}</small>
       }
-    </select>
-    @if (kind(); as k) {
-      <small class="muted">{{ 'sessions.kindHint.' + k | t }}</small>
-    }
-  </label>
-  <label class="field">
-    <span>{{ 'sessions.new.dateTime' | t }}</span>
-    <input type="datetime-local" formControlName="scheduledAt" />
-  </label>
-  <label class="field">
-    <span>{{ (kind() === 'VIRTUAL' ? 'sessions.new.locationOptional' : 'sessions.location') | t }}</span>
-    <input formControlName="location" [placeholder]="(kind() === 'VIRTUAL' ? 'sessions.new.virtualPlaceholder' : 'sessions.new.locationPlaceholder') | t" />
-  </label>
-  <button class="btn" type="submit" [disabled]="saving()">{{ 'sessions.new.submit' | t }}</button>
+    </label>
+    <label class="field">
+      <span>{{ 'sessions.new.dateTime' | t }}</span>
+      <input type="datetime-local" formControlName="scheduledAt" />
+    </label>
+    <label class="field">
+      <span>{{ (kind() === 'VIRTUAL' ? 'sessions.new.locationOptional' : 'sessions.location') | t }}</span>
+      <input formControlName="location" [placeholder]="(kind() === 'VIRTUAL' ? 'sessions.new.virtualPlaceholder' : 'sessions.new.locationPlaceholder') | t" />
+    </label>
+    <button class="btn" type="submit" [disabled]="saving()">{{ 'sessions.new.submit' | t }}</button>
+  </article>
+
+  <article class="card">
+    <div class="agenda-head">
+      <h2>{{ 'sessions.new.cite' | t }}</h2>
+      <span class="chip">{{ selectedIds().length }}</span>
+    </div>
+    <p class="muted">{{ 'sessions.new.citeHint' | t }}</p>
+    <label class="field">
+      <span>{{ 'common.search' | t }}</span>
+      <input [ngModel]="personQuery()" (ngModelChange)="personQuery.set($event)" [ngModelOptions]="{ standalone: true }" [placeholder]="'sessions.new.searchPeople' | t" />
+    </label>
+    <ul class="member-list">
+      @for (p of visiblePeople(); track p.userId) {
+        <li>
+          <label class="member-row" [class.on]="isSelected(p.userId)">
+            <input type="checkbox" [ngModel]="isSelected(p.userId)" (ngModelChange)="setSelected(p.userId, $event)" [ngModelOptions]="{ standalone: true }" />
+            <span>
+              <strong>{{ p.name }}</strong>
+              <span class="muted">{{ 'enums.role.' + p.role | t }}</span>
+            </span>
+            <span class="member-state">{{ (isSelected(p.userId) ? 'sessions.new.cited' : 'sessions.new.notCited') | t }}</span>
+          </label>
+        </li>
+      } @empty {
+        <li class="pick-empty">{{ (personQuery() ? 'sessions.new.noneMatch' : 'sessions.new.nonePeople') | t }}</li>
+      }
+    </ul>
+  </article>
 </form>

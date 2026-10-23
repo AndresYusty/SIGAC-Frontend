@@ -34,6 +34,8 @@ export class SessionLivePage implements OnInit, OnDestroy {
   miscDescription = '';
   decisions: Record<number, DecisionPayload> = {};
   private timer?: number;
+  private attendanceSave = 0;
+  private attendanceApplied = 0;
 
   ngOnInit(): void {
     this.reload();
@@ -67,19 +69,33 @@ export class SessionLivePage implements OnInit, OnDestroy {
       },
     });
     this.api.getAttendance(this.id()).subscribe({
-      next: (a) => this.attendance.set(a),
+      next: (a) => {
+        if (silent && this.attendanceSave !== this.attendanceApplied) return;
+        this.attendance.set(a);
+      },
       error: () => undefined,
     });
   }
 
-  saveAttendance(): void {
+  setPresent(attendee: AttendanceDto['attendees'][number], present: boolean): void {
+    attendee.present = present;
+    this.saveAttendance(true);
+  }
+
+  saveAttendance(quiet = false): void {
+    const saveId = ++this.attendanceSave;
     const items = (this.attendance()?.attendees ?? []).map((a) => ({ userId: a.userId, present: a.present }));
     this.api.saveAttendance(this.id(), items).subscribe({
       next: (a) => {
+        if (saveId !== this.attendanceSave) return;
+        this.attendanceApplied = saveId;
         this.attendance.set(a);
-        this.toast.ok('sessions.live.attendanceSaved');
+        if (!quiet) this.toast.ok('sessions.live.attendanceSaved');
       },
-      error: (e) => this.toast.apiError(e),
+      error: (e) => {
+        if (saveId === this.attendanceSave) this.attendanceApplied = saveId;
+        this.toast.apiError(e);
+      },
     });
   }
 

@@ -51,7 +51,7 @@
 
       @if (creating()) {
         <form class="wz-form" (ngSubmit)="save()">
-          <h3>{{ 'hierarchy.form.title' | t: { entity: (current().key + '.title' | t) } }}</h3>
+          <h3>{{ (editingId() ? 'hierarchy.form.editTitle' : 'hierarchy.form.title') | t: { entity: (current().key + '.title' | t) } }}</h3>
           @if (step() > 0) {
             <p class="wz-form-parent">
               {{ 'hierarchy.form.parent' | t }} <strong>{{ selection[step() - 1]()?.name }}</strong>
@@ -93,23 +93,25 @@
           <p class="wz-empty">{{ 'common.loading' | t }}</p>
         } @else {
           @for (n of items(); track n.id) {
-            @if (step() < 3) {
-              <button type="button" class="wz-option" role="option" [class.selected]="selected()?.id === n.id"
-                [attr.aria-selected]="selected()?.id === n.id" (click)="select(n)">
+            <div class="wz-option" role="option" [class.static]="step() === 3" [class.selected]="selected()?.id === n.id"
+              [attr.aria-selected]="step() < 3 ? selected()?.id === n.id : null" [attr.tabindex]="step() < 3 ? 0 : null"
+              (click)="step() < 3 && select(n)" (keydown.enter)="step() < 3 && select(n)">
+              @if (step() < 3) {
                 <span class="wz-radio"></span>
-                <span class="wz-option-text">
-                  <strong>{{ n.name }}</strong>
-                  @if (n.city) {
-                    <small>{{ n.city }}</small>
-                  }
-                </span>
-              </button>
-            } @else {
-              <div class="wz-option static">
+              } @else {
                 <svg viewBox="0 0 24 24"><path d="M4 19.5V5a2 2 0 0 1 2-2h12v16H6a2 2 0 0 0-2 2zM18 19v2H6" /></svg>
-                <span class="wz-option-text"><strong>{{ n.name }}</strong></span>
-              </div>
-            }
+              }
+              <span class="wz-option-text">
+                <strong>{{ n.name }}</strong>
+                @if (n.city) {
+                  <small>{{ n.city }}</small>
+                }
+              </span>
+              <span class="wz-actions" (click)="$event.stopPropagation()">
+                <button class="btn btn-ghost" type="button" (click)="openEdit(n)">{{ 'hierarchy.edit' | t }}</button>
+                <button class="btn btn-ghost" type="button" (click)="remove(n)">{{ 'hierarchy.remove' | t }}</button>
+              </span>
+            </div>
           } @empty {
             <p class="wz-empty">
               @if (filter()) {
@@ -146,16 +148,28 @@
         <div [class.empty]="!selection[i]()">
           <dt>{{ s.key + '.title' | t }}</dt>
           <dd>
-            {{ selection[i]()?.name ?? ('hierarchy.summary.notSelected' | t) }}
-            @if (selection[i]()?.city) {
-              <small>{{ selection[i]()?.city }}</small>
+            @if (selection[i](); as node) {
+              {{ node.name }}
+              @if (node.city) {
+                <small>{{ node.city }}</small>
+              }
+            } @else if (i > 0 && selection[i - 1]()) {
+              {{ (lists[i]().length ? 'hierarchy.summary.linked' : 'hierarchy.summary.noneLinked') | t: { count: lists[i]().length } }}
+            } @else {
+              {{ 'hierarchy.summary.notSelected' | t }}
             }
           </dd>
         </div>
       }
-      <div [class.empty]="step() < 3">
+      <div [class.empty]="!selection[2]()">
         <dt>{{ 'hierarchy.summary.programs' | t }}</dt>
-        <dd>{{ step() === 3 ? ('hierarchy.summary.registered' | t: { count: lists[3]().length }) : '—' }}</dd>
+        <dd>
+          @if (selection[2]()) {
+            {{ (lists[3]().length ? 'hierarchy.summary.linked' : 'hierarchy.summary.noneLinked') | t: { count: lists[3]().length } }}
+          } @else {
+            —
+          }
+        </dd>
       </div>
     </dl>
   </aside>

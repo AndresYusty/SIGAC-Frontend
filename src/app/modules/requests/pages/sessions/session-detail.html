@@ -10,42 +10,118 @@
       @if (s.agendaClosed) {
         <button class="btn btn-secondary" type="button" (click)="downloadNotice()">{{ 'sessions.detail.noticePdf' | t }}</button>
       }
-      @if (s.status === 'CONVENED' || s.status === 'STARTED' || s.status === 'SUSPENDED') {
+      @if ((s.status === 'CONVENED' || s.status === 'STARTED' || s.status === 'SUSPENDED') && !auth.has('ROLE_COUNCIL_SECRETARY')) {
         <a [routerLink]="['/sessions', s.id, 'live']" class="btn">{{ 'sessions.detail.liveRoom' | t }}</a>
-      }
-      @if (s.status === 'FINISHED' && auth.has('ROLE_COUNCIL_SECRETARY')) {
-        <button class="btn" type="button" (click)="generateMinutes()">{{ 'sessions.detail.generateMinutes' | t }}</button>
       }
       <a routerLink="/sessions" class="btn btn-ghost">{{ 'common.back' | t }}</a>
     </div>
   </div>
 
-  @if (auth.has('ROLE_COUNCIL_SECRETARY') && !s.agendaClosed) {
-    <article class="card" style="margin-bottom: 1rem">
-      <h2>{{ 'sessions.detail.buildAgenda' | t }}</h2>
-      <div class="toolbar">
-        <label class="field grow">
-          <span>{{ 'sessions.detail.approvedRequest' | t }}</span>
-          <select [(ngModel)]="requestId">
-            <option [ngValue]="null">{{ 'common.select' | t }}</option>
-            @for (r of approvedRequests(); track r.id) {
-              <option [ngValue]="r.id">{{ r.code }} · {{ r.title }}</option>
-            }
-          </select>
-        </label>
-        <button class="btn" type="button" (click)="addItem()">{{ 'sessions.detail.addItem' | t }}</button>
+  @if (auth.has('ROLE_COUNCIL_SECRETARY')) {
+    <article class="card flow-card">
+      <ol class="flow">
+        @for (step of flowOrder; track step) {
+          <li [class]="flowClass(step)">{{ 'sessions.flow.' + step | t }}</li>
+        }
+      </ol>
+      <p class="flow-now">{{ flowHint() | t }}</p>
+      @if (flowStep() === 'cite') {
         <button class="btn btn-ochre" type="button" (click)="closeAgenda()">{{ 'sessions.detail.closeAndSummon' | t }}</button>
-      </div>
-      @if (s.councilKind === 'EXTRAORDINARY') {
-        <h3 style="margin-top: 1rem">{{ 'sessions.urgentForm.title' | t }}</h3>
-        <p class="muted">{{ 'sessions.urgentForm.hint' | t }}</p>
-        <div class="toolbar">
-          <label class="field grow"><span>{{ 'common.title' | t }}</span><input [(ngModel)]="urgentTitle" maxlength="300" /></label>
-          <label class="field grow"><span>{{ 'common.description' | t }}</span><input [(ngModel)]="urgentDescription" /></label>
-          <button class="btn btn-secondary" type="button" (click)="addUrgentItem()">{{ 'sessions.urgentForm.add' | t }}</button>
-        </div>
+      }
+      @if (flowStep() === 'live') {
+        <a [routerLink]="['/sessions', s.id, 'live']" class="btn">{{ 'sessions.detail.liveRoom' | t }}</a>
+      }
+      @if (flowStep() === 'minutes') {
+        <button class="btn" type="button" (click)="generateMinutes()">{{ 'sessions.detail.generateMinutes' | t }}</button>
       }
     </article>
+  }
+
+  @if (s.summoned?.length) {
+    <article class="card cited-card">
+      <div class="agenda-head">
+        <h2>{{ 'sessions.detail.cited' | t }}</h2>
+        <span class="chip">{{ s.summoned.length }}</span>
+      </div>
+      <p class="muted">{{ 'sessions.detail.citedHint' | t }}</p>
+      <ul class="member-list">
+        @for (p of s.summoned; track p.userId) {
+          <li class="member-row guest">
+            <span>
+              <strong>{{ p.name }}</strong>
+              <span class="muted">{{ 'enums.role.' + p.role | t }}</span>
+            </span>
+          </li>
+        }
+      </ul>
+    </article>
+  }
+
+  @if (auth.has('ROLE_COUNCIL_SECRETARY') && !s.agendaClosed) {
+    <div class="agenda-desk">
+      <article class="card">
+        <div class="agenda-head">
+          <h2>{{ 'sessions.detail.waiting' | t }}</h2>
+          <span class="chip">{{ availableRequests().length }}</span>
+        </div>
+        <p class="muted">{{ 'sessions.detail.waitingHint' | t }}</p>
+
+        <label class="field" style="margin-top: 0.8rem">
+          <span>{{ 'common.search' | t }}</span>
+          <input [ngModel]="query()" (ngModelChange)="query.set($event)" [placeholder]="'sessions.detail.searchRequests' | t" />
+        </label>
+        <ul class="pick-list">
+          @for (r of availableRequests(); track r.id) {
+            <li>
+              <div>
+                <div class="pick-code">{{ r.code }}</div>
+                <div>{{ r.title }}</div>
+                <div class="muted">{{ 'enums.requestType.' + r.requestType | t }} · {{ r.requester }}</div>
+              </div>
+              <button class="btn" type="button" (click)="addItem(r.id)">{{ 'sessions.detail.addItem' | t }}</button>
+            </li>
+          } @empty {
+            <li class="pick-empty">{{ (query() ? 'sessions.detail.noneMatch' : 'sessions.detail.noneWaiting') | t }}</li>
+          }
+        </ul>
+      </article>
+      <article class="card">
+        <div class="agenda-head">
+          <h2>{{ 'sessions.detail.agenda' | t }}</h2>
+          <span class="chip">{{ s.items.length }}</span>
+        </div>
+        <ol class="agenda-order">
+          @for (item of s.items; track item.id; let i = $index) {
+            <li>
+              <span class="agenda-pos">{{ item.position }}</span>
+              <div>
+                <div>{{ item.title }}
+                  @if (item.miscellaneous) { <span class="chip">{{ 'sessions.misc' | t }}</span> }
+                  @if (item.urgent) { <span class="chip">{{ 'sessions.urgent' | t }}</span> }
+                </div>
+                <div class="muted">{{ item.requestCode || '—' }}</div>
+              </div>
+              <div class="row-actions">
+                <button class="btn btn-ghost" type="button" [attr.aria-label]="'sessions.detail.moveUp' | t" (click)="move(i, -1)">↑</button>
+                <button class="btn btn-ghost" type="button" [attr.aria-label]="'sessions.detail.moveDown' | t" (click)="move(i, 1)">↓</button>
+                <button class="btn btn-ghost" type="button" (click)="removeItem(item.id)">{{ 'sessions.detail.remove' | t }}</button>
+              </div>
+            </li>
+          } @empty {
+            <li class="pick-empty">{{ 'sessions.detail.emptyHint' | t }}</li>
+          }
+        </ol>
+        @if (s.councilKind === 'EXTRAORDINARY') {
+          <h3 style="margin-top: 1rem">{{ 'sessions.urgentForm.title' | t }}</h3>
+          <p class="muted">{{ 'sessions.urgentForm.hint' | t }}</p>
+          <div class="toolbar">
+            <label class="field grow"><span>{{ 'common.title' | t }}</span><input [(ngModel)]="urgentTitle" maxlength="300" /></label>
+            <label class="field grow"><span>{{ 'common.description' | t }}</span><input [(ngModel)]="urgentDescription" /></label>
+            <button class="btn btn-secondary" type="button" (click)="addUrgentItem()">{{ 'sessions.urgentForm.add' | t }}</button>
+          </div>
+        }
+      </article>
+    </div>
   }
 
   @if (s.councilKind === 'EXPANDED') {
@@ -92,6 +168,7 @@
     </article>
   }
 
+  @if (s.agendaClosed) {
   <article class="card table-wrap">
     <h2>{{ 'sessions.detail.agenda' | t }}</h2>
     <table>
@@ -125,8 +202,11 @@
     @if (!s.items.length) {
       <div class="empty">
         <h3>{{ 'sessions.detail.emptyTitle' | t }}</h3>
-        <p>{{ 'sessions.detail.emptyHint' | t }}</p>
+        @if (!s.agendaClosed) {
+          <p>{{ 'sessions.detail.emptyHint' | t }}</p>
+        }
       </div>
     }
   </article>
+  }
 }

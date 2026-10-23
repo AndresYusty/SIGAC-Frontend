@@ -15,116 +15,132 @@
     </div>
   </div>
 
-  <div class="split">
-    <div class="grid">
-      @for (item of s.items; track item.id) {
-        <article class="card">
-          <h2>{{ item.position }}. {{ item.title }}</h2>
-          @if (item.urgent) { <span class="chip">{{ 'sessions.urgent' | t }}</span> }
-          @if (item.miscellaneous) { <span class="chip">{{ 'sessions.misc' | t }}</span> }
-          <p class="lead">{{ item.description }}</p>
-          @if (item.debateNotes) {
-            <p class="muted" style="margin-top: 0.6rem"><b>{{ 'sessions.live.notes' | t }}</b> {{ item.debateNotes }}</p>
-          }
-          @if (auth.has('ROLE_COUNCIL_SECRETARY') && s.status === 'STARTED' && decisions[item.id]) {
-            <div class="grid grid-2" style="margin-top: 0.8rem">
-              <label class="field">
-                <span>{{ 'sessions.live.outcome' | t }}</span>
-                <select [(ngModel)]="decisions[item.id].outcome">
-                  @for (r of outcomes; track r) {
-                    <option [value]="r">{{ 'enums.decisionOutcome.' + r | t }}</option>
-                  }
-                </select>
-              </label>
-              <label class="field"><span>{{ 'sessions.live.votesFor' | t }}</span><input type="number" min="0" [(ngModel)]="decisions[item.id].votesFor" /></label>
-              <label class="field"><span>{{ 'sessions.live.votesAgainst' | t }}</span><input type="number" min="0" [(ngModel)]="decisions[item.id].votesAgainst" /></label>
-              <label class="field"><span>{{ 'sessions.live.abstentions' | t }}</span><input type="number" min="0" [(ngModel)]="decisions[item.id].abstentions" /></label>
+  @if (auth.has('ROLE_COUNCIL_SECRETARY') && (s.status === 'CONVENED' || s.status === 'STARTED' || s.status === 'SUSPENDED')) {
+    <p class="card flow-card flow-now">{{ 'sessions.flow.liveHint.' + s.status | t }}</p>
+  }
+
+  <div class="live-room">
+    <section class="card">
+      <div class="agenda-head">
+        <h2>{{ 'sessions.detail.agenda' | t }}</h2>
+        <span class="chip">{{ s.items.length }}</span>
+      </div>
+      <div class="live-points">
+        @for (item of s.items; track item.id) {
+          <article class="live-point">
+            <div class="live-point-title">
+              <span class="agenda-pos">{{ item.position }}</span>
+              <div>
+                <h3>{{ item.title }}</h3>
+                @if (item.description) { <p class="muted">{{ item.description }}</p> }
+                <div class="row-actions">
+                  @if (item.urgent) { <span class="chip">{{ 'sessions.urgent' | t }}</span> }
+                  @if (item.miscellaneous) { <span class="chip">{{ 'sessions.misc' | t }}</span> }
+                </div>
+              </div>
             </div>
-            @if (item.outcome) {
-              <label class="field" style="margin-top: 0.8rem">
-                <span>{{ 'sessions.live.changeReason' | t }}</span>
-                <input [(ngModel)]="decisions[item.id].changeReason" [placeholder]="'sessions.live.changeReasonPlaceholder' | t" />
-              </label>
+            @if (item.debateNotes) {
+              <p class="muted"><b>{{ 'sessions.live.notes' | t }}</b> {{ item.debateNotes }}</p>
             }
-            <div class="row-actions" style="margin-top: 0.8rem">
-              <button class="btn" type="button" (click)="recordDecision(item)">{{ 'sessions.live.recordDecision' | t }}</button>
-            </div>
-            <label class="field" style="margin-top: 0.8rem">
-              <span>{{ 'sessions.live.debateNote' | t }}</span>
-              <textarea [(ngModel)]="notes[item.id]"></textarea>
-            </label>
-            <button class="btn btn-secondary" type="button" (click)="addNote(item)">{{ 'sessions.live.addNote' | t }}</button>
-          } @else {
-            <p style="margin-top: 0.6rem">
+            @if (auth.has('ROLE_COUNCIL_SECRETARY') && s.status === 'STARTED' && decisions[item.id]) {
+              <p class="muted">{{ 'sessions.live.decideHint' | t }}</p>
+              <div class="grid grid-2">
+                <label class="field">
+                  <span>{{ 'sessions.live.outcome' | t }}</span>
+                  <select [(ngModel)]="decisions[item.id].outcome">
+                    @for (r of outcomes; track r) {
+                      <option [value]="r">{{ 'enums.decisionOutcome.' + r | t }}</option>
+                    }
+                  </select>
+                </label>
+                <label class="field"><span>{{ 'sessions.live.votesFor' | t }}</span><input type="number" min="0" [(ngModel)]="decisions[item.id].votesFor" /></label>
+                <label class="field"><span>{{ 'sessions.live.votesAgainst' | t }}</span><input type="number" min="0" [(ngModel)]="decisions[item.id].votesAgainst" /></label>
+                <label class="field"><span>{{ 'sessions.live.abstentions' | t }}</span><input type="number" min="0" [(ngModel)]="decisions[item.id].abstentions" /></label>
+              </div>
               @if (item.outcome) {
+                <label class="field">
+                  <span>{{ 'sessions.live.changeReason' | t }}</span>
+                  <input [(ngModel)]="decisions[item.id].changeReason" [placeholder]="'sessions.live.changeReasonPlaceholder' | t" />
+                </label>
+              }
+              <div class="row-actions">
+                <button class="btn" type="button" (click)="recordDecision(item)">{{ 'sessions.live.recordDecision' | t }}</button>
+              </div>
+              <label class="field">
+                <span>{{ 'sessions.live.debateNote' | t }}</span>
+                <textarea [(ngModel)]="notes[item.id]"></textarea>
+              </label>
+              <button class="btn btn-secondary" type="button" (click)="addNote(item)">{{ 'sessions.live.addNote' | t }}</button>
+            } @else if (item.outcome) {
+              <p>
                 <span class="badge" [class]="tone[item.outcome]">{{ 'enums.decisionOutcome.' + item.outcome | t }}</span>
                 · {{ 'sessions.live.voteSummary' | t: { votesFor: item.votesFor, votesAgainst: item.votesAgainst, abstentions: item.abstentions } }}
-              } @else {
-                {{ 'sessions.live.noDecision' | t }}
-              }
-            </p>
-          }
-        </article>
-      }
+              </p>
+            } @else {
+              <p class="muted">{{ 'sessions.live.noDecision' | t }}</p>
+            }
+          </article>
+        }
+      </div>
       @if (auth.has('ROLE_COUNCIL_SECRETARY') && s.status === 'STARTED') {
-        <article class="card">
-          <h2>{{ 'sessions.live.miscItem' | t }}</h2>
+        <div class="live-misc">
+          <h3>{{ 'sessions.live.miscItem' | t }}</h3>
           <label class="field"><span>{{ 'common.title' | t }}</span><input [(ngModel)]="miscTitle" /></label>
           <label class="field"><span>{{ 'common.description' | t }}</span><textarea [(ngModel)]="miscDescription"></textarea></label>
           <button class="btn" type="button" (click)="addMiscItem()">{{ 'common.add' | t }}</button>
-        </article>
+        </div>
       }
-    </div>
-    <article class="card">
-      <h2>{{ 'sessions.live.attendanceAndQuorum' | t }}</h2>
+    </section>
+
+    <section class="card">
+      <div class="agenda-head">
+        <h2>{{ 'sessions.live.whoSits' | t }}</h2>
+        @if (attendance(); as a) {
+          <span class="chip">{{ a.quorum.present }}/{{ a.quorum.members }}</span>
+        }
+      </div>
+      <p class="muted">{{ 'sessions.live.whoSitsHint' | t }}</p>
       @if (attendance(); as a) {
         @if (a.quorum.applicable) {
           <div class="quorum">
-            <div>
-              <strong>{{ a.quorum.present }}/{{ a.quorum.members }}</strong>
-              <div class="muted">{{ 'sessions.live.required' | t: { count: a.quorum.required } }}</div>
-            </div>
             <div class="quorum-bar"><span [style.width.%]="a.quorum.members ? (100 * a.quorum.present / a.quorum.members) : 0"></span></div>
-            <span class="badge" [class]="a.quorum.reached ? 'ok' : 'warn'">{{ (a.quorum.reached ? 'sessions.live.quorum' : 'sessions.live.noQuorum') | t }}</span>
+            <span class="badge" [class]="a.quorum.reached ? 'ok' : 'warn'">
+              {{ (a.quorum.reached ? 'sessions.live.quorum' : 'sessions.live.noQuorum') | t }}
+            </span>
           </div>
+          <p class="muted">{{ 'sessions.live.required' | t: { count: a.quorum.required, members: a.quorum.members } }}</p>
         } @else {
-          <div class="quorum">
-            <div>
-              <strong>{{ a.quorum.present }}/{{ a.quorum.members }}</strong>
-              <div class="muted">{{ 'sessions.live.responded' | t }}</div>
-            </div>
-            <span class="badge info">{{ 'sessions.live.quorumNotRequired' | t }}</span>
-          </div>
+          <p class="muted">{{ 'sessions.live.quorumNotRequired' | t }} · {{ a.quorum.present }}/{{ a.quorum.members }} {{ 'sessions.live.responded' | t }}</p>
         }
-        <div class="check-list" style="margin-top: 1rem">
+        <ul class="member-list">
           @for (attendee of a.attendees; track attendee.userId) {
-            <label class="check-row">
-              <input type="checkbox" [(ngModel)]="attendee.present" [disabled]="!auth.has('ROLE_COUNCIL_SECRETARY')" />
-              <div>
-                <strong>{{ attendee.name }}</strong>
-                <div class="muted">{{ 'enums.role.' + attendee.role | t }}</div>
-              </div>
-            </label>
+            <li>
+              <label class="member-row" [class.on]="attendee.present">
+                <input type="checkbox" [ngModel]="attendee.present" (ngModelChange)="setPresent(attendee, $event)" [disabled]="!auth.has('ROLE_COUNCIL_SECRETARY')" />
+                <span>
+                  <strong>{{ attendee.name }}</strong>
+                  <span class="muted">{{ 'enums.role.' + attendee.role | t }}</span>
+                </span>
+                <span class="member-state">{{ (attendee.present ? 'sessions.live.sits' : 'sessions.live.notSitting') | t }}</span>
+              </label>
+            </li>
           }
-        </div>
-        @if (auth.has('ROLE_COUNCIL_SECRETARY')) {
-          <button class="btn" style="margin-top: 0.8rem" type="button" (click)="saveAttendance()">{{ 'sessions.live.saveAttendance' | t }}</button>
-        }
+        </ul>
       }
       @if (s.guests.length) {
-        <h3 style="margin-top: 1.2rem">{{ 'sessions.guests.title' | t }}</h3>
+        <h3 class="live-guests-title">{{ 'sessions.guests.title' | t }}</h3>
         <p class="muted">{{ 'sessions.guests.hint' | t }}</p>
-        <div class="check-list">
+        <ul class="member-list">
           @for (g of s.guests; track g.id) {
-            <div class="check-row">
-              <div>
+            <li class="member-row guest">
+              <span>
                 <strong>{{ g.name }}</strong>
-                <div class="muted">{{ g.affiliation || '—' }}</div>
-              </div>
-            </div>
+                <span class="muted">{{ g.affiliation || '—' }}</span>
+              </span>
+            </li>
           }
-        </div>
+        </ul>
       }
-    </article>
+    </section>
   </div>
 }

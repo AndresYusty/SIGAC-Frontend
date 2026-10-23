@@ -9,6 +9,7 @@ import {
   RequestHistoryDto,
   RequestSearch,
   SessionDto,
+  SummonedDto,
   SessionStatus,
   SessionSummaryDto,
 } from './requests.models';
@@ -50,19 +51,23 @@ export class RequestsApi {
     });
   }
 
-  listSessions(status?: SessionStatus | '', page = 0, size = 20) {
+  listSessions(status?: SessionStatus | '', page = 0, size = 20, sort?: string) {
     return this.http.get<Page<SessionSummaryDto>>(`${this.base}/sessions`, {
-      params: toQuery({ status, page, size, sort: 'scheduledAt,desc' }),
+      params: toQuery({ status, page, size, sort }),
     });
   }
   getSession(id: number) {
     return this.http.get<SessionDto>(`${this.base}/sessions/${id}`);
   }
-  createSession(councilTypeId: number, scheduledAt: string, location: string | null) {
+  summonable() {
+    return this.http.get<SummonedDto[]>(`${this.base}/sessions/summonable`);
+  }
+  createSession(councilTypeId: number, scheduledAt: string, location: string | null, memberIds: number[]) {
     return this.http.post<SessionDto>(`${this.base}/sessions`, {
       councilTypeId,
       scheduledAt,
       location,
+      memberIds,
     });
   }
   addAgendaItem(sessionId: number, requestId: number) {
@@ -92,6 +97,6 @@ export class RequestsApi {
     return this.http.post<SessionDto>(`${this.base}/sessions/${sessionId}/close-agenda`, {});
   }
   downloadNotice(sessionId: number) {
-    return this.http.get(`${this.base}/sessions/${sessionId}/notice`, { responseType: 'blob' });
+    return this.http.get(`${this.base}/sessions/${sessionId}/citacion`, { responseType: 'blob' });
   }
 }

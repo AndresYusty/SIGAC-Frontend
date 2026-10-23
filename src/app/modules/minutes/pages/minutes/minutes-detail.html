@@ -13,6 +13,9 @@
       <a routerLink="/minutes" class="btn btn-ghost">{{ 'common.back' | t }}</a>
     </div>
   </div>
+  @if (auth.has('ROLE_COUNCIL_SECRETARY')) {
+    <p class="card flow-card flow-now">{{ 'minutes.flow.' + m.status | t }}</p>
+  }
   @if (m.rejectionNote) {
     <p class="card" style="margin-bottom: 1rem; border-left: 5px solid var(--wine)">
       {{ 'minutes.rejectionNote' | t: { note: m.rejectionNote } }}

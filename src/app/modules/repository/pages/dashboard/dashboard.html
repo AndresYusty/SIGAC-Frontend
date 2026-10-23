@@ -24,6 +24,10 @@
   </p>
 </header>
 
+@if (auth.has('ROLE_COUNCIL_SECRETARY')) {
+  <p class="desk-path">{{ 'dashboard.path' | t }}</p>
+}
+
 <div class="desk-body">
   <section>
     <h2>{{ 'dashboard.pending' | t }}</h2>

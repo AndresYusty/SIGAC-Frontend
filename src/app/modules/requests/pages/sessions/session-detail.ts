@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthService } from '@core/auth/auth.service';
@@ -27,15 +27,37 @@ export class SessionDetailPage implements OnInit {
   private readonly confirm = inject(ConfirmService);
   readonly session = signal<SessionDto | null>(null);
   readonly approvedRequests = signal<RequestDto[]>([]);
-  requestId: number | null = null;
+  readonly query = signal('');
+  readonly availableRequests = computed(() => {
+    const taken = new Set(
+      (this.session()?.items ?? []).map((item) => item.requestCode).filter((code): code is string => !!code),
+    );
+    const text = this.query().trim().toLowerCase();
+    return this.approvedRequests().filter((request) => {
+      if (taken.has(request.code)) return false;
+      if (!text) return true;
+      return [request.code, request.title, request.requester, request.program ?? ''].join(' ').toLowerCase().includes(text);
+    });
+  });
   urgentTitle = '';
   urgentDescription = '';
   guest: GuestPayload = { name: '', email: '', affiliation: '' };
   readonly tone = TONE;
+  readonly flowOrder = ['agenda', 'cite', 'live', 'minutes'] as const;
+  readonly flowStep = computed(() => {
+    const s = this.session();
+    if (!s || !s.agendaClosed) return s?.items.length ? 'cite' : 'agenda';
+    if (s.status === 'FINISHED') return 'minutes';
+    return 'live';
+  });
 
   ngOnInit(): void {
     this.reload();
-    this.api.searchRequests({ status: 'APPROVED', size: 50 }).subscribe({
+    this.loadApproved();
+  }
+
+  private loadApproved(): void {
+    this.api.searchRequests({ status: 'APPROVED', size: 200 }).subscribe({
       next: (p) => this.approvedRequests.set(p.content),
       error: () => undefined,
     });
@@ -52,12 +74,8 @@ export class SessionDetailPage implements OnInit {
     });
   }
 
-  addItem(): void {
-    if (!this.requestId) {
-      this.toast.error('sessions.detail.selectRequest');
-      return;
-    }
-    this.api.addAgendaItem(this.id(), this.requestId).subscribe({
+  addItem(requestId: number): void {
+    this.api.addAgendaItem(this.id(), requestId).subscribe({
       next: (s) => {
         this.session.set(s);
         this.toast.ok('sessions.detail.itemAdded');
@@ -122,6 +140,22 @@ export class SessionDetailPage implements OnInit {
     });
   }
 
+  flowClass(step: (typeof this.flowOrder)[number]): string {
+    const current = this.flowOrder.indexOf(this.flowStep());
+    const index = this.flowOrder.indexOf(step);
+    if (index < current) return 'done';
+    if (index === current) return 'now';
+    return '';
+  }
+
+  flowHint(): string {
+    const s = this.session();
+    if (this.flowStep() === 'live' && s && (s.status === 'STARTED' || s.status === 'SUSPENDED')) {
+      return 'sessions.flow.now.liveOpen';
+    }
+    return 'sessions.flow.now.' + this.flowStep();
+  }
+
   async closeAgenda(): Promise<void> {
     if (!(await this.confirm.ask('sessions.detail.closeAgendaTitle', 'sessions.detail.closeAgendaMessage', 'sessions.detail.closeAgendaTitle'))) return;
     this.api.closeAgenda(this.id()).subscribe({
@@ -135,7 +169,7 @@ export class SessionDetailPage implements OnInit {
 
   downloadNotice(): void {
     this.api.downloadNotice(this.id()).subscribe({
-      next: (b) => saveBlob(b, `notice-${this.id()}.pdf`),
+      next: (b) => saveBlob(b, 'Citación.pdf'),
       error: (e) => this.toast.apiError(e),
     });
   }

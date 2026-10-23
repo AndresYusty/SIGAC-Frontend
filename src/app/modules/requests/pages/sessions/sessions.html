@@ -2,7 +2,7 @@
   <div>
     <p class="kicker">{{ 'sessions.kicker' | t }}</p>
     <h1>{{ 'sessions.title' | t }}</h1>
-    <p class="lead">{{ 'sessions.lead' | t }}</p>
+    <p class="lead">{{ (auth.has('ROLE_COUNCIL_SECRETARY') ? 'sessions.path' : 'sessions.lead') | t }}</p>
   </div>
   @if (auth.has('ROLE_COUNCIL_SECRETARY')) {
     <a routerLink="/sessions/new" class="btn">{{ 'sessions.schedule' | t }}</a>
@@ -23,12 +23,12 @@
   <table>
     <thead>
       <tr>
-        <th>{{ 'common.type' | t }}</th>
-        <th>{{ 'common.faculty' | t }}</th>
-        <th>{{ 'common.date' | t }}</th>
-        <th>{{ 'sessions.location' | t }}</th>
-        <th>{{ 'common.status' | t }}</th>
-        <th>{{ 'sessions.items' | t }}</th>
+        <th [attr.aria-sort]="aria('type')"><button class="th-sort" type="button" (click)="sortBy('type')">{{ 'common.type' | t }} <span class="th-arrow" [class.on]="sortKey() === 'type'">{{ mark('type') }}</span></button></th>
+        <th [attr.aria-sort]="aria('faculty')"><button class="th-sort" type="button" (click)="sortBy('faculty')">{{ 'common.faculty' | t }} <span class="th-arrow" [class.on]="sortKey() === 'faculty'">{{ mark('faculty') }}</span></button></th>
+        <th [attr.aria-sort]="aria('date')"><button class="th-sort" type="button" (click)="sortBy('date')">{{ 'common.date' | t }} <span class="th-arrow" [class.on]="sortKey() === 'date'">{{ mark('date') }}</span></button></th>
+        <th [attr.aria-sort]="aria('location')"><button class="th-sort" type="button" (click)="sortBy('location')">{{ 'sessions.location' | t }} <span class="th-arrow" [class.on]="sortKey() === 'location'">{{ mark('location') }}</span></button></th>
+        <th [attr.aria-sort]="aria('status')"><button class="th-sort" type="button" (click)="sortBy('status')">{{ 'common.status' | t }} <span class="th-arrow" [class.on]="sortKey() === 'status'">{{ mark('status') }}</span></button></th>
+        <th [attr.aria-sort]="aria('items')"><button class="th-sort" type="button" (click)="sortBy('items')">{{ 'sessions.items' | t }} <span class="th-arrow" [class.on]="sortKey() === 'items'">{{ mark('items') }}</span></button></th>
         <th></th>
       </tr>
     </thead>

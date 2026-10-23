@@ -251,6 +251,18 @@ svg {
   }
 }
 
+.wz-actions {
+  margin-left: auto;
+  display: flex;
+  gap: 0.35rem;
+  flex-shrink: 0;
+
+  .btn {
+    padding: 0.28rem 0.6rem;
+    font-size: 0.78rem;
+  }
+}
+
 .wz-option-text {
   min-width: 0;
 
