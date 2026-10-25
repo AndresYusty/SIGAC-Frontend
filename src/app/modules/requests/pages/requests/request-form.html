@@ -27,12 +27,16 @@
     </label>
     <label class="field">
       <span>{{ 'common.program' | t }}</span>
-      <select formControlName="programId">
-        <option value="">{{ 'requests.form.noProgram' | t }}</option>
-        @for (p of programs(); track p.id) {
-          <option [value]="p.id">{{ p.name }}</option>
-        }
-      </select>
+      @if (ownProgram) {
+        <input [value]="ownProgram" readonly />
+      } @else {
+        <select formControlName="programId">
+          <option value="">{{ 'requests.form.noProgram' | t }}</option>
+          @for (p of programs(); track p.id) {
+            <option [value]="p.id">{{ p.name }}</option>
+          }
+        </select>
+      }
     </label>
   </div>
   <label class="field">

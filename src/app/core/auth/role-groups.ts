@@ -3,7 +3,6 @@ import { RoleName } from './auth.models';
 export const STAFF_ROLES: RoleName[] = ['ROLE_COUNCIL_SECRETARY', 'ROLE_FACULTY_SECRETARY', 'ROLE_ADMIN'];
 export const SESSION_ROLES: RoleName[] = [
   'ROLE_COUNCIL_SECRETARY',
-  'ROLE_FACULTY_SECRETARY',
   'ROLE_PRESIDENT',
   'ROLE_ADMIN',
 ];

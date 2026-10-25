@@ -48,6 +48,9 @@
         <th>{{ 'common.code' | t }}</th>
         <th>{{ 'common.title' | t }}</th>
         <th>{{ 'common.type' | t }}</th>
+        @if (auth.has('ROLE_FACULTY_SECRETARY')) {
+          <th>{{ 'common.program' | t }}</th>
+        }
         <th>{{ 'common.status' | t }}</th>
         <th>{{ 'requests.list.filedAt' | t }}</th>
         <th></th>
@@ -59,6 +62,9 @@
           <td>{{ r.code }}</td>
           <td>{{ r.title }}</td>
           <td>{{ 'enums.requestType.' + r.requestType | t }}</td>
+          @if (auth.has('ROLE_FACULTY_SECRETARY')) {
+            <td>{{ r.program || ('requests.form.noProgram' | t) }}</td>
+          }
           <td><span class="badge" [class]="tone[r.status]">{{ 'enums.requestStatus.' + r.status | t }}</span></td>
           <td>{{ r.filedAt | localDate: 'dd/MM/yyyy HH:mm' }}</td>
           <td><a [routerLink]="['/requests', r.id]" class="btn btn-ghost">{{ 'common.open' | t }}</a></td>
@@ -68,8 +74,8 @@
   </table>
   @if (!page()?.content?.length) {
     <div class="empty">
-      <h3>{{ 'requests.list.emptyTitle' | t }}</h3>
-      <p>{{ 'requests.list.emptyText' | t }}</p>
+      <h3>{{ (auth.has('ROLE_FACULTY_SECRETARY') ? 'requests.list.emptyMine' : 'requests.list.emptyTitle') | t }}</h3>
+      <p>{{ (auth.has('ROLE_FACULTY_SECRETARY') ? 'requests.list.emptyMineText' : 'requests.list.emptyText') | t }}</p>
     </div>
   }
 </article>

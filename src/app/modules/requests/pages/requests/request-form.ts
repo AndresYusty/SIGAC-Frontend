@@ -1,6 +1,7 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { AuthService } from '@core/auth/auth.service';
 import { ToastService } from '@core/ui/toast.service';
 import { NodeDto, UsersApi } from '@modules/users';
 import { TranslatePipe } from '@shared/pipes/translate.pipe';
@@ -19,9 +20,11 @@ export class RequestFormPage implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly toast = inject(ToastService);
+  readonly auth = inject(AuthService);
 
   readonly id = signal<number | null>(null);
   readonly programs = signal<NodeDto[]>([]);
+  readonly ownProgram = this.auth.user()?.programName ?? null;
   readonly files = signal<File[]>([]);
   readonly saving = signal(false);
   readonly types = REQUEST_TYPES;
@@ -35,21 +38,26 @@ export class RequestFormPage implements OnInit {
   });
 
   ngOnInit(): void {
-    this.usersApi.listUniversities().subscribe({
-      next: (universities) => {
-        const university = universities[0];
-        if (!university) return;
-        this.usersApi.listCampuses(university.id).subscribe((campuses) => {
-          const campus = campuses[0];
-          if (!campus) return;
-          this.usersApi.listFaculties(campus.id).subscribe((faculties) => {
-            const faculty = faculties[0];
-            if (!faculty) return;
-            this.usersApi.listPrograms(faculty.id).subscribe((p) => this.programs.set(p));
+    const mine = this.auth.user()?.programId;
+    if (mine) {
+      this.form.controls.programId.setValue(mine);
+    } else {
+      this.usersApi.listUniversities().subscribe({
+        next: (universities) => {
+          const university = universities[0];
+          if (!university) return;
+          this.usersApi.listCampuses(university.id).subscribe((campuses) => {
+            const campus = campuses[0];
+            if (!campus) return;
+            this.usersApi.listFaculties(campus.id).subscribe((faculties) => {
+              const faculty = faculties[0];
+              if (!faculty) return;
+              this.usersApi.listPrograms(faculty.id).subscribe((p) => this.programs.set(p));
+            });
           });
-        });
-      },
-    });
+        },
+      });
+    }
     const raw = this.route.snapshot.paramMap.get('id');
     if (raw) {
       const id = Number(raw);
