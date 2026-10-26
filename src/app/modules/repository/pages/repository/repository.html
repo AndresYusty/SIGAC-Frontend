@@ -5,54 +5,131 @@
     <p class="lead">{{ 'repository.lead' | t }}</p>
   </div>
 </div>
-<div class="toolbar">
-  <label class="field"><span>{{ 'common.number' | t }}</span><input [(ngModel)]="serialNumber" (ngModelChange)="applyText()" /></label>
-  <label class="field">
-    <span>{{ 'common.type' | t }}</span>
-    <select [(ngModel)]="councilTypeId" (ngModelChange)="apply()">
-      <option value="">{{ 'common.all' | t }}</option>
-      @for (ct of councilTypes(); track ct.id) {
-        <option [value]="ct.id">{{ ct.name }}</option>
-      }
-    </select>
-  </label>
-  <label class="field grow"><span>{{ 'repository.text' | t }}</span><input [(ngModel)]="text" (ngModelChange)="applyText()" /></label>
-  <label class="field"><span>{{ 'common.from' | t }}</span><input type="date" [(ngModel)]="from" (ngModelChange)="apply()" /></label>
-  <label class="field"><span>{{ 'common.to' | t }}</span><input type="date" [(ngModel)]="to" (ngModelChange)="apply()" /></label>
+
+<div class="repo-switch">
+  <button type="button" [class.on]="section() === 'minutes'" (click)="show('minutes')">
+    <strong>{{ 'repository.minutes' | t }}</strong>
+    <span>{{ 'repository.minutesHint' | t }}</span>
+  </button>
+  <button type="button" [class.on]="section() === 'agreements'" (click)="show('agreements')">
+    <strong>{{ 'repository.agreements' | t }}</strong>
+    <span>{{ 'repository.agreementsHint' | t }}</span>
+  </button>
 </div>
-<article class="card table-wrap">
-  <table>
-    <thead>
-      <tr>
-        <th>{{ 'common.number' | t }}</th>
-        <th>{{ 'repository.council' | t }}</th>
-        <th>{{ 'common.faculty' | t }}</th>
-        <th>{{ 'common.date' | t }}</th>
-        <th>{{ 'common.actions' | t }}</th>
-      </tr>
-    </thead>
-    <tbody>
-      @for (m of page()?.content ?? []; track m.id) {
+
+@if (section() === 'minutes') {
+  <div class="toolbar">
+    <label class="field"><span>{{ 'common.number' | t }}</span><input [(ngModel)]="serialNumber" (ngModelChange)="applyText()" /></label>
+    <label class="field">
+      <span>{{ 'common.type' | t }}</span>
+      <select [(ngModel)]="councilTypeId" (ngModelChange)="apply()">
+        <option value="">{{ 'common.all' | t }}</option>
+        @for (ct of councilTypes(); track ct.id) {
+          <option [value]="ct.id">{{ ct.name }}</option>
+        }
+      </select>
+    </label>
+    <label class="field grow"><span>{{ 'repository.text' | t }}</span><input [(ngModel)]="text" (ngModelChange)="applyText()" /></label>
+    <label class="field"><span>{{ 'common.from' | t }}</span><input type="date" [(ngModel)]="from" (ngModelChange)="apply()" /></label>
+    <label class="field"><span>{{ 'common.to' | t }}</span><input type="date" [(ngModel)]="to" (ngModelChange)="apply()" /></label>
+  </div>
+  <article class="card table-wrap">
+    <table>
+      <thead>
         <tr>
-          <td>{{ m.serialNumber }}</td>
-          <td>{{ m.councilType }}</td>
-          <td>{{ m.faculty }}</td>
-          <td>{{ m.sessionDate | localDate: 'dd/MM/yyyy' }}</td>
-          <td class="row-actions">
-            <button class="btn btn-ghost" type="button" (click)="view(m.id)">{{ 'common.view' | t }}</button>
-            <button class="btn btn-ghost" type="button" (click)="download(m.id, m.serialNumber)">{{ 'common.download' | t }}</button>
-          </td>
+          <th>{{ 'common.number' | t }}</th>
+          <th>{{ 'repository.council' | t }}</th>
+          <th>{{ 'common.faculty' | t }}</th>
+          <th>{{ 'common.date' | t }}</th>
+          <th>{{ 'common.actions' | t }}</th>
         </tr>
-      }
-    </tbody>
-  </table>
-  @if (!page()?.content?.length) {
-    <div class="empty"><h3>{{ 'repository.emptyTitle' | t }}</h3></div>
-  }
-</article>
-@if (pdf) {
-  <article class="card" style="margin-top: 1rem">
-    <h2>{{ 'repository.viewer' | t }}</h2>
-    <iframe class="preview-frame" [src]="pdf" [title]="'repository.viewerFrameTitle' | t"></iframe>
+      </thead>
+      <tbody>
+        @for (m of minutesPage()?.content ?? []; track m.id) {
+          <tr>
+            <td>{{ m.serialNumber }}</td>
+            <td>{{ m.councilType }}</td>
+            <td>{{ m.faculty }}</td>
+            <td>{{ m.sessionDate | localDate: 'dd/MM/yyyy' }}</td>
+            <td class="row-actions">
+              <button class="btn btn-ghost" type="button" (click)="viewMinutes(m)">{{ 'common.view' | t }}</button>
+              <button class="btn btn-ghost" type="button" (click)="downloadMinutes(m)">{{ 'common.download' | t }}</button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+    @if (minutesPage() && !minutesPage()?.content?.length) {
+      <div class="empty"><h3>{{ 'repository.emptyMinutes' | t }}</h3></div>
+    }
+  </article>
+  <div class="pager">
+    <button class="btn btn-ghost" type="button" [disabled]="minutesPage()?.first" (click)="load((minutesPage()?.number ?? 1) - 1)">{{ 'common.previous' | t }}</button>
+    <span>{{ 'common.pageOf' | t: { page: (minutesPage()?.number ?? 0) + 1, total: minutesPage()?.totalPages || 1 } }}</span>
+    <button class="btn btn-ghost" type="button" [disabled]="minutesPage()?.last" (click)="load((minutesPage()?.number ?? -1) + 1)">{{ 'common.next' | t }}</button>
+  </div>
+} @else {
+  <div class="toolbar">
+    <label class="field">
+      <span>{{ 'agreements.year' | t }}</span>
+      <input type="number" [(ngModel)]="year" style="width: 7rem" (ngModelChange)="applyText()" />
+    </label>
+    <label class="field">
+      <span>{{ 'common.type' | t }}</span>
+      <select [(ngModel)]="typeCode" (ngModelChange)="apply()">
+        <option value="">{{ 'common.all' | t }}</option>
+        @for (t of agreementTypes(); track t.code) {
+          <option [value]="t.code">{{ typeName(t) }}</option>
+        }
+      </select>
+    </label>
+    <label class="field grow">
+      <span>{{ 'common.search' | t }}</span>
+      <input [(ngModel)]="agreementText" [placeholder]="'repository.agreementSearch' | t" (ngModelChange)="applyText()" />
+    </label>
+  </div>
+  <article class="card table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>{{ 'agreements.agreement' | t }}</th>
+          <th>{{ 'common.type' | t }}</th>
+          <th>{{ 'agreements.subject' | t }}</th>
+          <th>{{ 'common.faculty' | t }}</th>
+          <th>{{ 'common.date' | t }}</th>
+          <th>{{ 'common.actions' | t }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (a of agreementsPage()?.content ?? []; track a.id) {
+          <tr>
+            <td><strong>{{ a.label }}</strong></td>
+            <td>{{ a.typeName }}</td>
+            <td>{{ a.subject }}</td>
+            <td>{{ a.faculty }}</td>
+            <td>{{ a.issueDate | localDate: 'dd/MM/yyyy' }}</td>
+            <td class="row-actions">
+              <button class="btn btn-ghost" type="button" (click)="viewAgreement(a)">{{ 'common.view' | t }}</button>
+              <button class="btn btn-ghost" type="button" (click)="downloadAgreement(a)">{{ 'common.download' | t }}</button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+    @if (agreementsPage() && !agreementsPage()?.content?.length) {
+      <div class="empty"><h3>{{ 'repository.emptyAgreements' | t }}</h3></div>
+    }
+  </article>
+  <div class="pager">
+    <button class="btn btn-ghost" type="button" [disabled]="agreementsPage()?.first" (click)="load((agreementsPage()?.number ?? 1) - 1)">{{ 'common.previous' | t }}</button>
+    <span>{{ 'common.pageOf' | t: { page: (agreementsPage()?.number ?? 0) + 1, total: agreementsPage()?.totalPages || 1 } }}</span>
+    <button class="btn btn-ghost" type="button" [disabled]="agreementsPage()?.last" (click)="load((agreementsPage()?.number ?? -1) + 1)">{{ 'common.next' | t }}</button>
+  </div>
+}
+
+@if (pdf()) {
+  <article class="card preview-card">
+    <h2>{{ viewerTitle() }}</h2>
+    <iframe class="preview-frame" [src]="pdf()" [title]="viewerTitle()"></iframe>
   </article>
 }

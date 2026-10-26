@@ -580,12 +580,19 @@
   "repository": {
     "kicker": "Search",
     "title": "Digital repository",
-    "lead": "Published council minutes.",
+    "lead": "Council documents ready to consult: session minutes and agreements.",
+    "minutes": "Minutes",
+    "minutesHint": "What was decided in each session.",
+    "agreements": "Agreements",
+    "agreementsHint": "The acts issued by the council.",
+    "agreementSearch": "Number, subject or text",
     "text": "Text",
     "council": "Council",
     "emptyTitle": "No results",
+    "emptyMinutes": "No minutes match this search.",
+    "emptyAgreements": "No agreements match this search.",
     "viewer": "Viewer",
-    "viewerFrameTitle": "Minutes"
+    "viewerFrameTitle": "Document"
   },
   "templates": {
     "defaultName": "SIGAC template",

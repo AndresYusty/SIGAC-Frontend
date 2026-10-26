@@ -580,12 +580,19 @@
   "repository": {
     "kicker": "Consulta",
     "title": "Repositorio digital",
-    "lead": "Actas publicadas del consejo.",
+    "lead": "Documentos del consejo listos para consultar: actas de sesión y acuerdos.",
+    "minutes": "Actas",
+    "minutesHint": "Lo decidido en cada sesión.",
+    "agreements": "Acuerdos",
+    "agreementsHint": "Los actos que expide el consejo.",
+    "agreementSearch": "Número, asunto o texto",
     "text": "Texto",
     "council": "Consejo",
     "emptyTitle": "Sin resultados",
+    "emptyMinutes": "No hay actas para esta consulta.",
+    "emptyAgreements": "No hay acuerdos para esta consulta.",
     "viewer": "Visor",
-    "viewerFrameTitle": "Acta"
+    "viewerFrameTitle": "Documento"
   },
   "templates": {
     "defaultName": "Plantilla SIGAC",
