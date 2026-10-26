@@ -6,10 +6,6 @@
       <p class="lead">{{ m.faculty }} · {{ m.sessionDate | localDate: 'dd/MM/yyyy' }}</p>
     </div>
     <div class="row-actions">
-      <span class="badge" [class]="tone[m.status]">{{ 'enums.minutesStatus.' + m.status | t }}</span>
-      @if (m.status !== 'PUBLISHED') {
-        <button class="btn btn-secondary" type="button" (click)="preview()">{{ 'minutes.previewPdf' | t }}</button>
-      }
       @if (auth.has('ROLE_ADMIN')) {
         <button class="btn btn-danger" type="button" (click)="remove()">{{ 'records.remove' | t }}</button>
       }
@@ -17,7 +13,7 @@
     </div>
   </div>
   @if (auth.has('ROLE_COUNCIL_SECRETARY')) {
-    <p class="card flow-card flow-now">{{ 'minutes.flow.' + m.status | t }}</p>
+    <p class="card flow-card flow-now">{{ 'minutes.sent' | t }}</p>
   }
   @if (m.rejectionNote) {
     <p class="card" style="margin-bottom: 1rem; border-left: 5px solid var(--wine)">
@@ -31,9 +27,6 @@
         <textarea class="editor" [(ngModel)]="content" [attr.aria-label]="'minutes.content' | t"></textarea>
         <div class="row-actions" style="margin-top: 0.8rem">
           <button class="btn" type="button" (click)="save()">{{ 'common.save' | t }}</button>
-          @if (m.status === 'DRAFT' || m.status === 'EDITING') {
-            <button class="btn btn-ochre" type="button" (click)="sendForSignature()">{{ 'minutes.sendForSignature' | t }}</button>
-          }
         </div>
       </article>
       <article class="card">
@@ -51,16 +44,6 @@
         <iframe class="preview-frame" [src]="pdf()" [title]="'minutes.previewFrameTitle' | t"></iframe>
       } @else {
         <p class="muted">{{ (m.status === 'PUBLISHED' ? 'minutes.loadingPdf' : 'minutes.previewHint') | t }}</p>
-      }
-      @if (m.status === 'PENDING_SIGNATURE' && auth.has('ROLE_PRESIDENT', 'ROLE_COUNCIL_SECRETARY')) {
-        <label class="field" style="margin-top: 1rem">
-          <span>{{ 'minutes.returnNote' | t }}</span>
-          <textarea [(ngModel)]="note"></textarea>
-        </label>
-        <div class="row-actions">
-          <button class="btn" type="button" (click)="sign()">{{ 'minutes.approveAndSign' | t }}</button>
-          <button class="btn btn-danger" type="button" (click)="reject()">{{ 'minutes.return' | t }}</button>
-        </div>
       }
       @if (m.signedBy) {
         <p class="muted" style="margin-top: 1rem">

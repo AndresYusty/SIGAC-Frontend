@@ -215,7 +215,7 @@ export class AgreementEditorPage implements OnInit, OnDestroy {
     request.subscribe({
       next: (a) => {
         this.saving.set(false);
-        this.toast.ok('agreements.toast.saved', { label: a.label });
+        this.confirm.tell(this.i18n.t('agreements.toast.saved', { label: a.label }), true);
         if (!id) {
           this.router.navigate(['/agreements', a.id], { replaceUrl: true });
           this.id.set(a.id);
@@ -225,7 +225,7 @@ export class AgreementEditorPage implements OnInit, OnDestroy {
       },
       error: (e) => {
         this.saving.set(false);
-        this.toast.apiError(e);
+        this.confirm.tell(this.toast.apiErrorText(e));
       },
     });
   }

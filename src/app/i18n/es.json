@@ -35,7 +35,8 @@
     "unauthorized": "Sesión no válida o expirada. Inicie sesión nuevamente.",
     "forbidden": "No tiene permisos para realizar esta operación.",
     "status": "Error {{status}} al comunicarse con el servidor.",
-    "network": "Error de red."
+    "network": "Error de red.",
+    "attendanceClosed": "No se puede cambiar la asistencia porque la sesión está {{status}}."
   },
   "common": {
     "actions": "Acciones",
@@ -368,7 +369,7 @@
     "kicker": "Consejos",
     "title": "Sesiones",
     "lead": "Programación, orden del día y conducción en vivo.",
-    "path": "Programe la sesión, arme el orden del día, cite, condúzcala y genere el acta.",
+    "path": "Sesiones agendadas desde una solicitud. Ábralas para citar, conducir y generar el acta.",
     "place": {
       "hint": "Elija una sesión programada. Incluir la agrega al orden del día.",
       "include": "Incluir",
@@ -384,7 +385,7 @@
         "cite": "El orden ya tiene puntos. Ciérrelo para enviar la citación a las personas citadas.",
         "live": "La citación ya se envió. Entre a la sala, marque quién está presente y registre la decisión de cada punto.",
         "liveOpen": "Siga en la sala. Marque la asistencia, registre cada punto y, cuando terminen, finalice la sesión.",
-        "minutes": "La sesión ya terminó. Genere el acta, revise el texto y envíela a la firma del presidente."
+        "minutes": "La sesión ya terminó. Genere el acta: queda lista y se envía por correo a quienes participaron."
       },
       "liveHint": {
         "CONVENED": "Pulse Iniciar. Después marque los presentes y registre cada punto.",
@@ -434,9 +435,9 @@
       "summonsPdf": "Citación PDF",
       "liveRoom": "Sala en vivo",
       "generateMinutes": "Generar acta",
-      "generateMinutesMessage": "Se compilará el acta a partir de la sesión finalizada.",
+      "generateMinutesMessage": "Se genera el acta de la sesión y se envía por correo a quienes participaron.",
       "generate": "Generar",
-      "minutesGenerated": "Acta generada",
+      "minutesGenerated": "Acta generada y enviada por correo",
       "cited": "Citados",
       "citedHint": "Estas personas fueron elegidas al programar la sesión y reciben la citación.",
       "buildAgenda": "Armar orden del día",
@@ -491,6 +492,7 @@
       "attendanceAndQuorum": "Asistencia y quórum",
       "whoSits": "Asistencia",
       "whoSitsHint": "Solo están las personas citadas al programar la sesión. Marque quiénes se presentan.",
+      "attendanceLocked": "La sesión está finalizada. La asistencia no se puede cambiar.",
       "sits": "Presente",
       "notSitting": "Ausente",
       "required": "Se necesitan {{count}} de {{members}}",
@@ -500,6 +502,10 @@
       "attendanceSaved": "Asistencia registrada",
       "outcome": "Decisión",
       "decideHint": "Elija la decisión, anote los votos y pulse Registrar.",
+      "voteSeats": "Pueden votar {{count}} presentes. A favor, en contra y abstenciones no pueden sumar más.",
+      "tooManyVotes": "Hay {{count}} presentes con voto. Los votos no pueden sumar más.",
+      "approveNeedsMajority": "Para aprobar, los votos a favor tienen que ser más que los en contra.",
+      "denyNeedsMajority": "Para negar, los votos en contra tienen que ser más que los a favor.",
       "responded": "respondieron",
       "quorumNotRequired": "No requiere quórum"
     },
@@ -532,12 +538,13 @@
   "minutes": {
     "kicker": "Documentos",
     "title": "Actas",
-    "lead": "Elaboración, revisión y firma antes de la publicación.",
+    "lead": "Actas de las sesiones. Al generarlas se envían por correo a quienes participaron.",
+    "sent": "Esta es el acta de la sesión. Ya se envió por correo a quienes participaron.",
     "flow": {
-      "DRAFT": "El acta ya viene armada con lo de la sesión. Cambie el texto solo si hace falta, guarde y envíe a firma.",
-      "EDITING": "Guarde los cambios y, cuando el texto quede listo, envíe a firma.",
+      "DRAFT": "Revise el acta en PDF y envíela a firma. Al firmarse, se envía por correo a quienes participaron en la sesión.",
+      "EDITING": "El acta volvió para revisión. Revise el PDF y envíela de nuevo a firma.",
       "PENDING_SIGNATURE": "El acta espera la firma. El presidente la aprueba o la devuelve con una observación.",
-      "PUBLISHED": "El acta ya está firmada y publicada. No se vuelve a editar."
+      "PUBLISHED": "El acta está firmada. Se envió por correo a quienes participaron en la sesión."
     },
     "council": "Consejo",
     "emptyTitle": "No hay actas",

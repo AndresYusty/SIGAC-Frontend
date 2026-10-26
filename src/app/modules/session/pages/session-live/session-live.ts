@@ -27,11 +27,9 @@ export class SessionLivePage implements OnInit, OnDestroy {
   private readonly confirm = inject(ConfirmService);
   readonly session = signal<SessionDto | null>(null);
   readonly attendance = signal<AttendanceDto | null>(null);
+  readonly voteWarning = signal(false);
   readonly tone = TONE;
   readonly outcomes = DECISION_OUTCOMES;
-  notes: Record<number, string> = {};
-  miscTitle = '';
-  miscDescription = '';
   decisions: Record<number, DecisionPayload> = {};
   private timer?: number;
   private attendanceSave = 0;
@@ -72,12 +70,19 @@ export class SessionLivePage implements OnInit, OnDestroy {
       next: (a) => {
         if (silent && this.attendanceSave !== this.attendanceApplied) return;
         this.attendance.set(a);
+        this.fitVotesToSeats();
       },
       error: () => undefined,
     });
   }
 
+  canMarkAttendance(): boolean {
+    const status = this.session()?.status;
+    return this.auth.has('ROLE_COUNCIL_SECRETARY') && (status === 'CONVENED' || status === 'STARTED' || status === 'SUSPENDED');
+  }
+
   setPresent(attendee: AttendanceDto['attendees'][number], present: boolean): void {
+    if (!this.canMarkAttendance()) return;
     attendee.present = present;
     this.saveAttendance(true);
   }
@@ -90,6 +95,7 @@ export class SessionLivePage implements OnInit, OnDestroy {
         if (saveId !== this.attendanceSave) return;
         this.attendanceApplied = saveId;
         this.attendance.set(a);
+        this.fitVotesToSeats();
         if (!quiet) this.toast.ok('sessions.live.attendanceSaved');
       },
       error: (e) => {
@@ -115,9 +121,58 @@ export class SessionLivePage implements OnInit, OnDestroy {
     });
   }
 
+  seats(): number {
+    return this.attendance()?.quorum.present ?? 0;
+  }
+
+  setVotes(itemId: number, field: 'votesFor' | 'votesAgainst' | 'abstentions', input: HTMLInputElement): void {
+    const draft = this.decisions[itemId];
+    if (!draft) return;
+    const raw = input.value.trim();
+    if (raw === '') {
+      draft[field] = 0;
+      this.voteWarning.set(false);
+      return;
+    }
+    const parsed = Number(raw);
+    if (!Number.isFinite(parsed)) {
+      input.value = String(this.votes(draft[field]));
+      return;
+    }
+    const entered = Math.max(0, Math.floor(parsed));
+    const allowed = Math.min(entered, this.roomFor(draft, field));
+    draft[field] = allowed;
+    if (entered !== allowed || String(entered) !== raw) {
+      input.value = String(allowed);
+    }
+    this.voteWarning.set(entered > allowed);
+  }
+
   recordDecision(item: AgendaItemDto): void {
     const draft = this.decisions[item.id];
-    const body: DecisionPayload = { ...draft, changeReason: draft.changeReason?.trim() || undefined };
+    const inFavor = this.votes(draft.votesFor);
+    const against = this.votes(draft.votesAgainst);
+    const abstentions = this.votes(draft.abstentions);
+    const seats = this.seats();
+    if (inFavor + against + abstentions > seats) {
+      this.toast.error('sessions.live.tooManyVotes', { count: seats });
+      return;
+    }
+    if (draft.outcome === 'APPROVED' && inFavor <= against) {
+      this.toast.error('sessions.live.approveNeedsMajority');
+      return;
+    }
+    if (draft.outcome === 'DENIED' && against <= inFavor) {
+      this.toast.error('sessions.live.denyNeedsMajority');
+      return;
+    }
+    const body: DecisionPayload = {
+      ...draft,
+      votesFor: inFavor,
+      votesAgainst: against,
+      abstentions,
+      changeReason: draft.changeReason?.trim() || undefined,
+    };
     this.api.recordDecision(this.id(), item.id, body).subscribe({
       next: () => {
         draft.changeReason = '';
@@ -128,28 +183,29 @@ export class SessionLivePage implements OnInit, OnDestroy {
     });
   }
 
-  addNote(item: AgendaItemDto): void {
-    const text = this.notes[item.id]?.trim();
-    if (!text) return;
-    this.api.saveDebateNotes(this.id(), item.id, text).subscribe({
-      next: () => {
-        this.notes[item.id] = '';
-        this.reload();
-      },
-      error: (e) => this.toast.apiError(e),
-    });
+  private votes(value: number): number {
+    return Math.max(0, Math.floor(Number(value) || 0));
   }
 
-  addMiscItem(): void {
-    if (!this.miscTitle.trim()) return;
-    this.api.addMiscItem(this.id(), this.miscTitle, this.miscDescription).subscribe({
-      next: (s) => {
-        this.session.set(s);
-        this.miscTitle = '';
-        this.miscDescription = '';
-      },
-      error: (e) => this.toast.apiError(e),
-    });
+  /** Seats still free for this field after the other two counts. */
+  private roomFor(draft: DecisionPayload, field: 'votesFor' | 'votesAgainst' | 'abstentions'): number {
+    const others = (field === 'votesFor' ? 0 : this.votes(draft.votesFor))
+      + (field === 'votesAgainst' ? 0 : this.votes(draft.votesAgainst))
+      + (field === 'abstentions' ? 0 : this.votes(draft.abstentions));
+    return Math.max(0, this.seats() - others);
+  }
+
+  /** If someone is marked absent, drop votes that no longer have a seat. */
+  private fitVotesToSeats(): void {
+    const seats = this.seats();
+    for (const draft of Object.values(this.decisions)) {
+      let room = seats;
+      for (const field of ['votesFor', 'votesAgainst', 'abstentions'] as const) {
+        const count = Math.min(this.votes(draft[field]), room);
+        draft[field] = count;
+        room -= count;
+      }
+    }
   }
 
   async finish(): Promise<void> {

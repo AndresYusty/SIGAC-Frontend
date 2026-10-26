@@ -4,9 +4,6 @@
     <h1>{{ 'sessions.title' | t }}</h1>
     <p class="lead">{{ (auth.has('ROLE_COUNCIL_SECRETARY') ? 'sessions.path' : 'sessions.lead') | t }}</p>
   </div>
-  @if (auth.has('ROLE_COUNCIL_SECRETARY')) {
-    <a routerLink="/sessions/new" class="btn">{{ 'sessions.schedule' | t }}</a>
-  }
 </div>
 <div class="toolbar">
   <label class="field">

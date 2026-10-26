@@ -146,10 +146,7 @@
   </div>
 
   <article class="card preview-card">
-    <div class="toolbar" style="margin: 0 0 0.6rem; justify-content: space-between">
-      <h2>{{ 'common.preview' | t }}</h2>
-      <button class="btn btn-ochre" type="button" (click)="preview()">{{ 'agreements.refresh' | t }}</button>
-    </div>
+    <h2>{{ 'common.preview' | t }}</h2>
     <p class="muted">{{ 'agreements.previewHint' | t }}</p>
     @if (pdf(); as src) {
       <iframe class="preview-frame" [src]="src" [title]="'common.preview' | t"></iframe>

@@ -9,7 +9,7 @@ export function apiMessage(err: unknown, i18n: I18nService): string {
   const body = err.error as ApiError | string | null;
   if (body && typeof body === 'object' && 'message' in body && body.message) {
     const extra = body.details?.length ? ` (${body.details.join('; ')})` : '';
-    return body.message + extra;
+    return translateServerMessage(body.message, i18n) + extra;
   }
   if (typeof body === 'string' && body.trim()) {
     return body;
@@ -24,6 +24,17 @@ export function apiMessage(err: unknown, i18n: I18nService): string {
     return i18n.t('errors.forbidden');
   }
   return err.status ? i18n.t('errors.status', { status: err.status }) : i18n.t('errors.network');
+}
+
+/** Server texts are fixed in English. Show them in the language selected in the screen. */
+function translateServerMessage(message: string, i18n: I18nService): string {
+  const attendance = message.match(/^Attendance cannot be recorded with the session in status (\w+)$/);
+  if (attendance) {
+    const label = i18n.t('enums.sessionStatus.' + attendance[1]);
+    const status = label.charAt(0).toLowerCase() + label.slice(1);
+    return i18n.t('errors.attendanceClosed', { status });
+  }
+  return message;
 }
 
 export function toQuery(params: Record<string, string | number | boolean | null | undefined>): Record<string, string | number | boolean> {

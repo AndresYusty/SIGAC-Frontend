@@ -1,5 +1,4 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '@core/auth/auth.service';
 import { Page } from '@core/http/api.models';
@@ -7,14 +6,13 @@ import { ConfirmService } from '@core/ui/confirm.service';
 import { ToastService } from '@core/ui/toast.service';
 import { LocalDatePipe } from '@shared/pipes/local-date.pipe';
 import { TranslatePipe } from '@shared/pipes/translate.pipe';
-import { TONE } from '@shared/utils/labels';
 import { LiveQuery } from '@shared/utils/live-query';
 import { MinutesApi } from '../../minutes.api';
-import { MINUTES_STATUSES, MinutesDto, MinutesStatus } from '../../minutes.models';
+import { MinutesDto } from '../../minutes.models';
 
 @Component({
   selector: 'app-minutes',
-  imports: [RouterLink, FormsModule, LocalDatePipe, TranslatePipe],
+  imports: [RouterLink, LocalDatePipe, TranslatePipe],
   templateUrl: './minutes.html',
 })
 export class MinutesPage implements OnInit {
@@ -22,9 +20,6 @@ export class MinutesPage implements OnInit {
   readonly auth = inject(AuthService);
   private readonly toast = inject(ToastService);
   private readonly confirm = inject(ConfirmService);
-  readonly statuses = MINUTES_STATUSES;
-  readonly tone = TONE;
-  status: MinutesStatus | '' = '';
   readonly page = signal<Page<MinutesDto> | null>(null);
   private readonly query = new LiveQuery();
 
@@ -43,13 +38,9 @@ export class MinutesPage implements OnInit {
     });
   }
 
-  apply(): void {
-    this.query.immediate(() => this.load());
-  }
-
   load(n = 0): void {
     const id = this.query.begin();
-    this.api.listMinutes(this.status, n).subscribe({
+    this.api.listMinutes('', n).subscribe({
       next: (p) => {
         if (this.query.isCurrent(id)) this.page.set(p);
       },

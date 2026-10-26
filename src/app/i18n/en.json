@@ -35,7 +35,8 @@
     "unauthorized": "Your session is invalid or has expired. Please sign in again.",
     "forbidden": "You do not have permission to perform this operation.",
     "status": "Error {{status}} while contacting the server.",
-    "network": "Network error."
+    "network": "Network error.",
+    "attendanceClosed": "Attendance cannot be changed because the session is {{status}}."
   },
   "common": {
     "actions": "Actions",
@@ -368,7 +369,7 @@
     "kicker": "Councils",
     "title": "Sessions",
     "lead": "Scheduling, agenda and live session management.",
-    "path": "Schedule the session, build the agenda, send the notice, hold it and generate the minutes.",
+    "path": "Sessions scheduled from a request. Open them to send the notice, hold the session and generate the minutes.",
     "place": {
       "hint": "Choose a scheduled session. Include adds it to the agenda.",
       "include": "Include",
@@ -384,7 +385,7 @@
         "cite": "The agenda already has items. Close it to send the notice to the people summoned.",
         "live": "The notice was sent. Enter the room, mark who is present and record the decision on each item.",
         "liveOpen": "Stay in the room. Mark attendance, record each item and, when you are done, finish the session.",
-        "minutes": "The session is over. Generate the minutes, review the text and send them for the president's signature."
+        "minutes": "The session is over. Generate the minutes: they are ready and emailed to the people who took part."
       },
       "liveHint": {
         "CONVENED": "Press Start. Then mark who is present and record each item.",
@@ -434,9 +435,9 @@
       "summonsPdf": "Summons PDF",
       "liveRoom": "Live room",
       "generateMinutes": "Generate minutes",
-      "generateMinutesMessage": "The minutes will be compiled from the finished session.",
+      "generateMinutesMessage": "The minutes are generated and emailed to the people who took part.",
       "generate": "Generate",
-      "minutesGenerated": "Minutes generated",
+      "minutesGenerated": "Minutes generated and emailed",
       "cited": "Summoned",
       "citedHint": "These people were chosen when the session was scheduled and receive the notice.",
       "buildAgenda": "Build agenda",
@@ -491,6 +492,7 @@
       "attendanceAndQuorum": "Attendance and quorum",
       "whoSits": "Attendance",
       "whoSitsHint": "Only the people summoned when the session was scheduled are listed. Mark who is present.",
+      "attendanceLocked": "The session is finished. Attendance cannot be changed.",
       "sits": "Present",
       "notSitting": "Absent",
       "required": "{{count}} of {{members}} are needed",
@@ -500,6 +502,10 @@
       "attendanceSaved": "Attendance saved",
       "outcome": "Decision",
       "decideHint": "Choose the decision, enter the votes and press Record.",
+      "voteSeats": "{{count}} members present can vote. For, against and abstentions cannot add up to more.",
+      "tooManyVotes": "{{count}} voting members are present. The votes cannot add up to more.",
+      "approveNeedsMajority": "To approve, the votes in favor must outnumber the votes against.",
+      "denyNeedsMajority": "To deny, the votes against must outnumber the votes in favor.",
       "responded": "responded",
       "quorumNotRequired": "No quorum required"
     },
@@ -532,12 +538,13 @@
   "minutes": {
     "kicker": "Documents",
     "title": "Minutes",
-    "lead": "Drafting, review and signature before publication.",
+    "lead": "Minutes of the sessions. When generated, they are emailed to the people who took part.",
+    "sent": "These are the minutes of the session. They were emailed to the people who took part.",
     "flow": {
-      "DRAFT": "The minutes are already filled in from the session. Change the text only if needed, save, and send them for signature.",
-      "EDITING": "Save the changes and, when the text is ready, send them for signature.",
+      "DRAFT": "Review the minutes in the PDF and send them for signature. Once signed, they are emailed to the people who took part in the session.",
+      "EDITING": "The minutes came back for review. Check the PDF and send them for signature again.",
       "PENDING_SIGNATURE": "The minutes are waiting for a signature. The president approves them or returns them with a note.",
-      "PUBLISHED": "The minutes are signed and published. They are no longer edited."
+      "PUBLISHED": "The minutes are signed. They were emailed to the people who took part in the session."
     },
     "council": "Council",
     "emptyTitle": "No minutes yet",

@@ -29,7 +29,11 @@ export class ToastService {
   }
 
   apiError(err: unknown): void {
-    this.push('error', apiMessage(err, this.i18n));
+    this.push('error', this.apiErrorText(err));
+  }
+
+  apiErrorText(err: unknown): string {
+    return apiMessage(err, this.i18n);
   }
 
   dismiss(id: number): void {

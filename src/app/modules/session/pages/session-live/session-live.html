@@ -44,6 +44,7 @@
             }
             @if (auth.has('ROLE_COUNCIL_SECRETARY') && s.status === 'STARTED' && decisions[item.id]) {
               <p class="muted">{{ 'sessions.live.decideHint' | t }}</p>
+              <p class="muted">{{ 'sessions.live.voteSeats' | t: { count: seats() } }}</p>
               <div class="grid grid-2">
                 <label class="field">
                   <span>{{ 'sessions.live.outcome' | t }}</span>
@@ -53,10 +54,13 @@
                     }
                   </select>
                 </label>
-                <label class="field"><span>{{ 'sessions.live.votesFor' | t }}</span><input type="number" min="0" [(ngModel)]="decisions[item.id].votesFor" /></label>
-                <label class="field"><span>{{ 'sessions.live.votesAgainst' | t }}</span><input type="number" min="0" [(ngModel)]="decisions[item.id].votesAgainst" /></label>
-                <label class="field"><span>{{ 'sessions.live.abstentions' | t }}</span><input type="number" min="0" [(ngModel)]="decisions[item.id].abstentions" /></label>
+                <label class="field"><span>{{ 'sessions.live.votesFor' | t }}</span><input type="number" min="0" [max]="seats()" [value]="decisions[item.id].votesFor" (input)="setVotes(item.id, 'votesFor', $any($event.target))" /></label>
+                <label class="field"><span>{{ 'sessions.live.votesAgainst' | t }}</span><input type="number" min="0" [max]="seats()" [value]="decisions[item.id].votesAgainst" (input)="setVotes(item.id, 'votesAgainst', $any($event.target))" /></label>
+                <label class="field"><span>{{ 'sessions.live.abstentions' | t }}</span><input type="number" min="0" [max]="seats()" [value]="decisions[item.id].abstentions" (input)="setVotes(item.id, 'abstentions', $any($event.target))" /></label>
               </div>
+              @if (voteWarning()) {
+                <p class="error-text">{{ 'sessions.live.tooManyVotes' | t: { count: seats() } }}</p>
+              }
               @if (item.outcome) {
                 <label class="field">
                   <span>{{ 'sessions.live.changeReason' | t }}</span>
@@ -66,11 +70,6 @@
               <div class="row-actions">
                 <button class="btn" type="button" (click)="recordDecision(item)">{{ 'sessions.live.recordDecision' | t }}</button>
               </div>
-              <label class="field">
-                <span>{{ 'sessions.live.debateNote' | t }}</span>
-                <textarea [(ngModel)]="notes[item.id]"></textarea>
-              </label>
-              <button class="btn btn-secondary" type="button" (click)="addNote(item)">{{ 'sessions.live.addNote' | t }}</button>
             } @else if (item.outcome) {
               <p>
                 <span class="badge" [class]="tone[item.outcome]">{{ 'enums.decisionOutcome.' + item.outcome | t }}</span>
@@ -82,14 +81,6 @@
           </article>
         }
       </div>
-      @if (auth.has('ROLE_COUNCIL_SECRETARY') && s.status === 'STARTED') {
-        <div class="live-misc">
-          <h3>{{ 'sessions.live.miscItem' | t }}</h3>
-          <label class="field"><span>{{ 'common.title' | t }}</span><input [(ngModel)]="miscTitle" /></label>
-          <label class="field"><span>{{ 'common.description' | t }}</span><textarea [(ngModel)]="miscDescription"></textarea></label>
-          <button class="btn" type="button" (click)="addMiscItem()">{{ 'common.add' | t }}</button>
-        </div>
-      }
     </section>
 
     <section class="card">
@@ -99,7 +90,7 @@
           <span class="chip">{{ a.quorum.present }}/{{ a.quorum.members }}</span>
         }
       </div>
-      <p class="muted">{{ 'sessions.live.whoSitsHint' | t }}</p>
+      <p class="muted">{{ (s.status === 'FINISHED' ? 'sessions.live.attendanceLocked' : 'sessions.live.whoSitsHint') | t }}</p>
       @if (attendance(); as a) {
         @if (a.quorum.applicable) {
           <div class="quorum">
@@ -116,7 +107,7 @@
           @for (attendee of a.attendees; track attendee.userId) {
             <li>
               <label class="member-row" [class.on]="attendee.present">
-                <input type="checkbox" [ngModel]="attendee.present" (ngModelChange)="setPresent(attendee, $event)" [disabled]="!auth.has('ROLE_COUNCIL_SECRETARY')" />
+                <input type="checkbox" [ngModel]="attendee.present" (ngModelChange)="setPresent(attendee, $event)" [disabled]="!canMarkAttendance()" />
                 <span>
                   <strong>{{ attendee.name }}</strong>
                   <span class="muted">{{ 'enums.role.' + attendee.role | t }}</span>

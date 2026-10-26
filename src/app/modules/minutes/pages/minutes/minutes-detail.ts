@@ -43,8 +43,7 @@ export class MinutesDetailPage implements OnInit, OnDestroy {
   }
 
   canEdit(m: MinutesDto): boolean {
-    if (this.auth.has('ROLE_ADMIN')) return true;
-    return this.auth.has('ROLE_COUNCIL_SECRETARY') && (m.status === 'DRAFT' || m.status === 'EDITING');
+    return this.auth.has('ROLE_ADMIN');
   }
 
   async remove(): Promise<void> {

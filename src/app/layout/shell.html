@@ -46,11 +46,23 @@
 
 @if (confirm.open()) {
   <div class="modal-backdrop" (click)="confirm.close(false)">
-    <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal" [class.modal-success]="confirm.success()" (click)="$event.stopPropagation()">
+      @if (confirm.success()) {
+        <div class="modal-check" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="9"></circle>
+            <path d="M7.8 12.4l2.7 2.7 5.7-6"></path>
+          </svg>
+        </div>
+      }
       <h2>{{ confirm.title() }}</h2>
-      <p class="lead">{{ confirm.message() }}</p>
+      @if (confirm.message()) {
+        <p class="lead">{{ confirm.message() }}</p>
+      }
       <div class="modal-actions">
-        <button class="btn btn-ghost" type="button" (click)="confirm.close(false)">{{ 'common.cancel' | t }}</button>
+        @if (!confirm.single()) {
+          <button class="btn btn-ghost" type="button" (click)="confirm.close(false)">{{ 'common.cancel' | t }}</button>
+        }
         <button class="btn" type="button" (click)="confirm.close(true)">{{ confirm.okLabel() }}</button>
       </div>
     </div>
