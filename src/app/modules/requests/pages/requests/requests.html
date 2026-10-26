@@ -21,6 +21,9 @@
   <label class="field">
     <span>{{ 'common.status' | t }}</span>
     <select [(ngModel)]="status" (ngModelChange)="apply()">
+      @if (auth.has('ROLE_COUNCIL_SECRETARY')) {
+        <option value="PENDING">{{ 'requests.list.pending' | t }}</option>
+      }
       <option value="">{{ 'common.all' | t }}</option>
       @for (s of statuses; track s) {
         <option [value]="s">{{ 'enums.requestStatus.' + s | t }}</option>
@@ -52,6 +55,9 @@
           <th>{{ 'common.program' | t }}</th>
         }
         <th>{{ 'common.status' | t }}</th>
+        @if (auth.has('ROLE_COUNCIL_SECRETARY')) {
+          <th>{{ 'requests.list.whatIsLeft' | t }}</th>
+        }
         <th>{{ 'requests.list.filedAt' | t }}</th>
         <th></th>
       </tr>
@@ -66,8 +72,20 @@
             <td>{{ r.program || ('requests.form.noProgram' | t) }}</td>
           }
           <td><span class="badge" [class]="tone[r.status]">{{ 'enums.requestStatus.' + r.status | t }}</span></td>
+          @if (auth.has('ROLE_COUNCIL_SECRETARY')) {
+            <td class="muted">{{ 'requests.list.next.' + r.status | t }}</td>
+          }
           <td>{{ r.filedAt | localDate: 'dd/MM/yyyy HH:mm' }}</td>
-          <td><a [routerLink]="['/requests', r.id]" class="btn btn-ghost">{{ 'common.open' | t }}</a></td>
+          <td class="row-actions">
+            @if (auth.has('ROLE_COUNCIL_SECRETARY') && r.status === 'APPROVED') {
+              <a class="btn" [routerLink]="['/sessions/new']" [queryParams]="{ request: r.id }">{{ 'requests.list.schedule' | t }}</a>
+            }
+            @if (auth.has('ROLE_ADMIN')) {
+              <a class="btn btn-secondary" [routerLink]="['/requests', r.id, 'edit']">{{ 'records.edit' | t }}</a>
+              <button class="btn btn-danger" type="button" (click)="remove(r)">{{ 'records.remove' | t }}</button>
+            }
+            <a [routerLink]="['/requests', r.id]" class="btn btn-ghost">{{ 'common.open' | t }}</a>
+          </td>
         </tr>
       }
     </tbody>
@@ -88,3 +106,15 @@
     {{ 'common.next' | t }}
   </button>
 </div>
+
+<details class="status-legend">
+  <summary>{{ 'requests.list.legend' | t }}</summary>
+  <ul>
+    @for (s of statuses; track s) {
+      <li>
+        <span class="badge" [class]="tone[s]">{{ 'enums.requestStatus.' + s | t }}</span>
+        <span>{{ 'requests.list.meaning.' + s | t }}</span>
+      </li>
+    }
+  </ul>
+</details>

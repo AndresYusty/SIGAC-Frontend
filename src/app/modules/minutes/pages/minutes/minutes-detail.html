@@ -10,6 +10,9 @@
       @if (m.status !== 'PUBLISHED') {
         <button class="btn btn-secondary" type="button" (click)="preview()">{{ 'minutes.previewPdf' | t }}</button>
       }
+      @if (auth.has('ROLE_ADMIN')) {
+        <button class="btn btn-danger" type="button" (click)="remove()">{{ 'records.remove' | t }}</button>
+      }
       <a routerLink="/minutes" class="btn btn-ghost">{{ 'common.back' | t }}</a>
     </div>
   </div>
@@ -28,7 +31,9 @@
         <textarea class="editor" [(ngModel)]="content" [attr.aria-label]="'minutes.content' | t"></textarea>
         <div class="row-actions" style="margin-top: 0.8rem">
           <button class="btn" type="button" (click)="save()">{{ 'common.save' | t }}</button>
-          <button class="btn btn-ochre" type="button" (click)="sendForSignature()">{{ 'minutes.sendForSignature' | t }}</button>
+          @if (m.status === 'DRAFT' || m.status === 'EDITING') {
+            <button class="btn btn-ochre" type="button" (click)="sendForSignature()">{{ 'minutes.sendForSignature' | t }}</button>
+          }
         </div>
       </article>
       <article class="card">

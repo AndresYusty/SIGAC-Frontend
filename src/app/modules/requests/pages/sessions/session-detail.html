@@ -13,9 +13,38 @@
       @if ((s.status === 'CONVENED' || s.status === 'STARTED' || s.status === 'SUSPENDED') && !auth.has('ROLE_COUNCIL_SECRETARY')) {
         <a [routerLink]="['/sessions', s.id, 'live']" class="btn">{{ 'sessions.detail.liveRoom' | t }}</a>
       }
+      @if (auth.has('ROLE_ADMIN')) {
+        <button class="btn btn-danger" type="button" (click)="removeSession()">{{ 'records.remove' | t }}</button>
+      }
       <a routerLink="/sessions" class="btn btn-ghost">{{ 'common.back' | t }}</a>
     </div>
   </div>
+
+  @if (auth.has('ROLE_ADMIN')) {
+    <article class="card" style="margin-bottom: 1rem">
+      <h2>{{ 'records.sessionData' | t }}</h2>
+      <p class="muted">{{ 'records.sessionHint' | t }}</p>
+      <div class="grid grid-2">
+        <label class="field">
+          <span>{{ 'sessions.councilType' | t }}</span>
+          <select [(ngModel)]="councilTypeId">
+            @for (ct of councilTypes(); track ct.id) {
+              <option [ngValue]="ct.id">{{ ct.code }} · {{ ct.name }}</option>
+            }
+          </select>
+        </label>
+        <label class="field">
+          <span>{{ 'sessions.new.dateTime' | t }}</span>
+          <input type="datetime-local" [(ngModel)]="scheduledAt" />
+        </label>
+        <label class="field">
+          <span>{{ 'sessions.location' | t }}</span>
+          <input [(ngModel)]="location" />
+        </label>
+      </div>
+      <button class="btn" type="button" [disabled]="savingSession()" (click)="saveSession()">{{ 'common.save' | t }}</button>
+    </article>
+  }
 
   @if (auth.has('ROLE_COUNCIL_SECRETARY')) {
     <article class="card flow-card">
@@ -57,60 +86,26 @@
     </article>
   }
 
-  @if (auth.has('ROLE_COUNCIL_SECRETARY') && !s.agendaClosed) {
-    <div class="agenda-desk">
-      <article class="card">
-        <div class="agenda-head">
-          <h2>{{ 'sessions.detail.waiting' | t }}</h2>
-          <span class="chip">{{ availableRequests().length }}</span>
-        </div>
-        <p class="muted">{{ 'sessions.detail.waitingHint' | t }}</p>
-
-        <label class="field" style="margin-top: 0.8rem">
-          <span>{{ 'common.search' | t }}</span>
-          <input [ngModel]="query()" (ngModelChange)="query.set($event)" [placeholder]="'sessions.detail.searchRequests' | t" />
-        </label>
-        <ul class="pick-list">
-          @for (r of availableRequests(); track r.id) {
-            <li>
-              <div>
-                <div class="pick-code">{{ r.code }}</div>
-                <div>{{ r.title }}</div>
-                <div class="muted">{{ 'enums.requestType.' + r.requestType | t }} · {{ r.requester }}</div>
-              </div>
-              <button class="btn" type="button" (click)="addItem(r.id)">{{ 'sessions.detail.addItem' | t }}</button>
-            </li>
-          } @empty {
-            <li class="pick-empty">{{ (query() ? 'sessions.detail.noneMatch' : 'sessions.detail.noneWaiting') | t }}</li>
-          }
-        </ul>
-      </article>
-      <article class="card">
-        <div class="agenda-head">
-          <h2>{{ 'sessions.detail.agenda' | t }}</h2>
-          <span class="chip">{{ s.items.length }}</span>
-        </div>
-        <ol class="agenda-order">
-          @for (item of s.items; track item.id; let i = $index) {
-            <li>
-              <span class="agenda-pos">{{ item.position }}</span>
-              <div>
-                <div>{{ item.title }}
-                  @if (item.miscellaneous) { <span class="chip">{{ 'sessions.misc' | t }}</span> }
-                  @if (item.urgent) { <span class="chip">{{ 'sessions.urgent' | t }}</span> }
-                </div>
-                <div class="muted">{{ item.requestCode || '—' }}</div>
-              </div>
-              <div class="row-actions">
-                <button class="btn btn-ghost" type="button" [attr.aria-label]="'sessions.detail.moveUp' | t" (click)="move(i, -1)">↑</button>
-                <button class="btn btn-ghost" type="button" [attr.aria-label]="'sessions.detail.moveDown' | t" (click)="move(i, 1)">↓</button>
-                <button class="btn btn-ghost" type="button" (click)="removeItem(item.id)">{{ 'sessions.detail.remove' | t }}</button>
-              </div>
-            </li>
-          } @empty {
-            <li class="pick-empty">{{ 'sessions.detail.emptyHint' | t }}</li>
-          }
-        </ol>
+  @if ((auth.has('ROLE_COUNCIL_SECRETARY') || auth.has('ROLE_ADMIN')) && !s.agendaClosed) {
+    <article class="card" style="margin-bottom: 1rem">
+        <h2>{{ 'sessions.detail.points' | t }}</h2>
+        <p class="muted">{{ 'sessions.detail.pointsHint' | t }}</p>
+        @for (item of s.items; track item.id) {
+          <div class="point">
+            @if (item.requestCode) {
+              <p class="kicker">{{ item.requestCode }}</p>
+            }
+            <h3>{{ item.title }}
+              @if (item.miscellaneous) { <span class="chip">{{ 'sessions.misc' | t }}</span> }
+              @if (item.urgent) { <span class="chip">{{ 'sessions.urgent' | t }}</span> }
+            </h3>
+            @if (item.description) {
+              <p>{{ item.description }}</p>
+            }
+          </div>
+        } @empty {
+          <p class="muted">{{ 'sessions.detail.emptyHint' | t }}</p>
+        }
         @if (s.councilKind === 'EXTRAORDINARY') {
           <h3 style="margin-top: 1rem">{{ 'sessions.urgentForm.title' | t }}</h3>
           <p class="muted">{{ 'sessions.urgentForm.hint' | t }}</p>
@@ -120,15 +115,14 @@
             <button class="btn btn-secondary" type="button" (click)="addUrgentItem()">{{ 'sessions.urgentForm.add' | t }}</button>
           </div>
         }
-      </article>
-    </div>
+    </article>
   }
 
   @if (s.councilKind === 'EXPANDED') {
     <article class="card" style="margin-bottom: 1rem">
       <h2>{{ 'sessions.guests.title' | t }}</h2>
       <p class="muted">{{ 'sessions.guests.hint' | t }}</p>
-      @if (auth.has('ROLE_COUNCIL_SECRETARY') && !s.agendaClosed) {
+      @if ((auth.has('ROLE_COUNCIL_SECRETARY') || auth.has('ROLE_ADMIN')) && !s.agendaClosed) {
         <div class="toolbar">
           <label class="field grow"><span>{{ 'common.name' | t }}</span><input [(ngModel)]="guest.name" maxlength="150" /></label>
           <label class="field grow"><span>{{ 'sessions.guests.email' | t }}</span><input type="email" [(ngModel)]="guest.email" maxlength="150" /></label>
@@ -153,7 +147,7 @@
                 <td>{{ g.email || '—' }}</td>
                 <td>{{ g.affiliation || '—' }}</td>
                 <td class="row-actions">
-                  @if (auth.has('ROLE_COUNCIL_SECRETARY') && !s.agendaClosed) {
+                  @if ((auth.has('ROLE_COUNCIL_SECRETARY') || auth.has('ROLE_ADMIN')) && !s.agendaClosed) {
                     <button class="btn btn-ghost" type="button" (click)="removeGuest(g.id)">{{ 'sessions.detail.remove' | t }}</button>
                   }
                 </td>
@@ -189,7 +183,7 @@
             <td>{{ item.requestCode || '—' }}</td>
             <td>{{ item.outcome ? ('enums.decisionOutcome.' + item.outcome | t) : ('sessions.detail.pending' | t) }}</td>
             <td class="row-actions">
-              @if (auth.has('ROLE_COUNCIL_SECRETARY') && !s.agendaClosed) {
+              @if ((auth.has('ROLE_COUNCIL_SECRETARY') || auth.has('ROLE_ADMIN')) && !s.agendaClosed) {
                 <button class="btn btn-ghost" type="button" [attr.aria-label]="'sessions.detail.moveUp' | t" [title]="'sessions.detail.moveUp' | t" (click)="move(i, -1)">↑</button>
                 <button class="btn btn-ghost" type="button" [attr.aria-label]="'sessions.detail.moveDown' | t" [title]="'sessions.detail.moveDown' | t" (click)="move(i, 1)">↓</button>
                 <button class="btn btn-ghost" type="button" (click)="removeItem(item.id)">{{ 'sessions.detail.remove' | t }}</button>

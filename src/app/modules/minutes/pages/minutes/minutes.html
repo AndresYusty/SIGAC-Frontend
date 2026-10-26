@@ -36,7 +36,12 @@
           <td>{{ m.faculty }}</td>
           <td>{{ m.sessionDate | localDate: 'dd/MM/yyyy' }}</td>
           <td><span class="badge" [class]="tone[m.status]">{{ 'enums.minutesStatus.' + m.status | t }}</span></td>
-          <td><a [routerLink]="['/minutes', m.id]" class="btn btn-ghost">{{ 'common.open' | t }}</a></td>
+          <td class="row-actions">
+            <a [routerLink]="['/minutes', m.id]" class="btn btn-ghost">{{ auth.has('ROLE_ADMIN') ? ('records.edit' | t) : ('common.open' | t) }}</a>
+            @if (auth.has('ROLE_ADMIN')) {
+              <button class="btn btn-danger" type="button" (click)="remove(m)">{{ 'records.remove' | t }}</button>
+            }
+          </td>
         </tr>
       }
     </tbody>

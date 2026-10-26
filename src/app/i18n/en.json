@@ -201,7 +201,27 @@
       "kicker": "Module 3",
       "title": "Requests",
       "lead": "Filing, review and tracking of matters for the council.",
-      "leadCouncil": "Open each filed request. Approve it to place it on a session, or return it with a reason.",
+      "leadCouncil": "On entry you see what is still open: filed requests to review and approved ones not yet on a session. All shows every request.",
+      "pending": "Pending",
+      "whatIsLeft": "Next step",
+      "legend": "What each status means",
+      "meaning": {
+        "FILED": "It reached the council secretariat and has not been reviewed yet.",
+        "RETURNED": "It was sent back to the program for correction.",
+        "REJECTED": "It will not continue in the council.",
+        "APPROVED": "It is ready to be placed on a session.",
+        "ON_AGENDA": "It is already on the agenda.",
+        "PROCESSED": "The council has already decided it."
+      },
+      "next": {
+        "FILED": "Review the request: approve, return or reject it.",
+        "RETURNED": "Returned to the program. Wait for the correction and a new filing.",
+        "REJECTED": "The matter is closed. No further action is required.",
+        "APPROVED": "Place it on a session agenda.",
+        "ON_AGENDA": "Placed on a session. It is decided when the council meets.",
+        "PROCESSED": "Already decided in session. The matter is closed."
+      },
+      "schedule": "Schedule",
       "leadFaculty": "Only the requests you filed for your program appear here. If the council returns them, correct them and send them again.",
       "emptyMine": "You have not filed any requests yet.",
       "emptyMineText": "Use File request to send a matter from your program.",
@@ -349,13 +369,18 @@
     "title": "Sessions",
     "lead": "Scheduling, agenda and live session management.",
     "path": "Schedule the session, build the agenda, send the notice, hold it and generate the minutes.",
+    "place": {
+      "hint": "Choose a scheduled session. Include adds it to the agenda.",
+      "include": "Include",
+      "added": "Request added to the session"
+    },
     "flow": {
       "agenda": "Agenda",
       "cite": "Notice",
       "live": "Session",
       "minutes": "Minutes",
       "now": {
-        "agenda": "Add the approved matters. When the agenda is ready, close it: that sends the notice.",
+        "agenda": "This session has no items yet. They are added when you schedule an approved request. When the agenda is ready, close it: that sends the notice.",
         "cite": "The agenda already has items. Close it to send the notice to the people summoned.",
         "live": "The notice was sent. Enter the room, mark who is present and record the decision on each item.",
         "liveOpen": "Stay in the room. Mark attendance, record each item and, when you are done, finish the session.",
@@ -377,11 +402,21 @@
       "kicker": "Agenda",
       "title": "Schedule session",
       "lead": "Choose the date, the place and who is summoned.",
+      "scheduleRequest": "Schedule request",
+      "withRequest": "This request is placed on the agenda when you create or choose the session.",
+      "existing": "On a session already scheduled",
+      "existingHint": "The agenda is still open. Choosing it adds the request at once.",
+      "noneOpen": "There is no open session. Create one below and the request is included.",
+      "orNew": "Or create the session with this request",
+      "submitWithRequest": "Create session and include",
+      "here": "Schedule here",
       "dateTime": "Date and time",
+      "past": "That date has already passed. Choose a later day and time.",
       "locationPlaceholder": "Boardroom / virtual meeting link",
       "data": "Session details",
       "cite": "Who is summoned",
-      "citeHint": "Mark counselors and participants. They receive the notice when the agenda is closed.",
+      "citeHint": "Mark the president and the counselors. They receive the notice when the agenda is closed.",
+      "selfCited": "You are already summoned. You do not need to mark yourself.",
       "searchPeople": "Name",
       "cited": "Summoned",
       "notCited": "Not summoned",
@@ -416,6 +451,8 @@
       "closeAgendaTitle": "Close agenda",
       "closeAgendaMessage": "The summons will be generated and sent to the members.",
       "agendaClosed": "Agenda closed and summons sent",
+      "points": "Matters to discuss",
+      "pointsHint": "This is what the council will discuss about the request in this session.",
       "agenda": "Agenda",
       "subject": "Subject",
       "decision": "Decision",
@@ -424,7 +461,7 @@
       "moveDown": "Move down",
       "remove": "Remove",
       "emptyTitle": "No items",
-      "emptyHint": "Add approved requests to the agenda.",
+      "emptyHint": "Matters are added when you schedule an approved request.",
       "selectRequest": "Select an approved request",
       "itemAdded": "Item added",
       "noticePdf": "Notice PDF"
@@ -638,5 +675,18 @@
       "saved": "{{label}} saved"
     },
     "texts": "Heading and signatures"
+  },
+  "records": {
+    "edit": "Edit",
+    "remove": "Delete",
+    "deleteTitle": "Delete",
+    "deleteRequest": "Filing {{code}} will be deleted. If it is on a session, it leaves the agenda.",
+    "deleteSession": "The session, its attendance and the minutes, if any, will be deleted. Requests from that session go back to approved.",
+    "deleteMinutes": "Minutes {{code}} will be deleted.",
+    "deleteAgreement": "Agreement {{code}} will be deleted.",
+    "deleted": "The record was deleted.",
+    "sessionSaved": "Session details updated.",
+    "sessionData": "Correct the session",
+    "sessionHint": "You can change the type, the date and the place. The agenda and the people summoned stay as they are."
   }
 }

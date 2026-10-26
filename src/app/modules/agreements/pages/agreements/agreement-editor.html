@@ -8,6 +8,9 @@
     <a routerLink="/agreements" class="btn btn-ghost">{{ 'common.back' | t }}</a>
     @if (id()) {
       <button class="btn btn-secondary" type="button" (click)="download()">{{ 'agreements.downloadPdf' | t }}</button>
+      @if (admin) {
+        <button class="btn btn-danger" type="button" (click)="remove()">{{ 'records.remove' | t }}</button>
+      }
     }
     <button class="btn" type="button" [disabled]="saving()" (click)="save()">
       {{ (saving() ? 'common.saving' : 'common.save') | t }}

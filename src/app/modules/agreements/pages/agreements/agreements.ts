@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '@core/auth/auth.service';
 import { AGREEMENT_WRITERS } from '@core/auth/role-groups';
+import { ConfirmService } from '@core/ui/confirm.service';
 import { Page } from '@core/http/api.models';
 import { I18nService } from '@core/i18n/i18n.service';
 import { ToastService } from '@core/ui/toast.service';
@@ -22,7 +23,10 @@ export class AgreementsPage implements OnInit, OnDestroy {
   private readonly api = inject(AgreementsApi);
   private readonly toast = inject(ToastService);
   readonly i18n = inject(I18nService);
-  readonly canWrite = inject(AuthService).has(...AGREEMENT_WRITERS);
+  private readonly auth = inject(AuthService);
+  private readonly confirm = inject(ConfirmService);
+  readonly canWrite = this.auth.has(...AGREEMENT_WRITERS);
+  readonly admin = this.auth.has('ROLE_ADMIN');
   readonly types = signal<AgreementTypeDto[]>([]);
   readonly page = signal<Page<AgreementSummaryDto> | null>(null);
   year: number | null = new Date().getFullYear();
@@ -59,6 +63,17 @@ export class AgreementsPage implements OnInit, OnDestroy {
 
   typeName(t: AgreementTypeDto): string {
     return this.i18n.lang() === 'en' ? t.nameEn : t.name;
+  }
+
+  async remove(a: AgreementSummaryDto): Promise<void> {
+    if (!(await this.confirm.ask('records.deleteTitle', 'records.deleteAgreement', 'records.remove', { code: a.label }))) return;
+    this.api.delete(a.id).subscribe({
+      next: () => {
+        this.toast.ok('records.deleted');
+        this.load(this.page()?.number ?? 0);
+      },
+      error: (e) => this.toast.apiError(e),
+    });
   }
 
   download(a: AgreementSummaryDto): void {

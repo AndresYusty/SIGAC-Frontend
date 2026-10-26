@@ -58,6 +58,7 @@ export interface RequestHistoryDto {
 
 export interface RequestSearch {
   status?: RequestStatus | '';
+  pending?: boolean;
   code?: string;
   from?: string;
   to?: string;

@@ -19,7 +19,7 @@ export const agreementsRoutes: Routes = [
   {
     path: 'agreements/:id',
     canActivate: [roleGuard],
-    data: { roles: AGREEMENT_WRITERS },
+    data: { roles: [...AGREEMENT_WRITERS, 'ROLE_ADMIN'] },
     loadComponent: () =>
       import('./pages/agreements/agreement-editor').then((m) => m.AgreementEditorPage),
   },

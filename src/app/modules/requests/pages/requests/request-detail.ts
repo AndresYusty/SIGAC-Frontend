@@ -1,6 +1,6 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthService } from '@core/auth/auth.service';
 import { ConfirmService } from '@core/ui/confirm.service';
 import { ToastService } from '@core/ui/toast.service';
@@ -19,6 +19,7 @@ import { RequestDto, RequestHistoryDto } from '../../requests.models';
 export class RequestDetailPage implements OnInit {
   private readonly api = inject(RequestsApi);
   private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
   readonly auth = inject(AuthService);
   private readonly toast = inject(ToastService);
   private readonly confirm = inject(ConfirmService);
@@ -51,6 +52,19 @@ export class RequestDetailPage implements OnInit {
   download(attachmentId: number, name: string): void {
     this.api.downloadAttachment(this.id(), attachmentId).subscribe({
       next: (b) => saveBlob(b, name || 'attachment.pdf'),
+      error: (e) => this.toast.apiError(e),
+    });
+  }
+
+  async remove(): Promise<void> {
+    const request = this.request();
+    if (!request) return;
+    if (!(await this.confirm.ask('records.deleteTitle', 'records.deleteRequest', 'records.remove', { code: request.code }))) return;
+    this.api.deleteRequest(request.id).subscribe({
+      next: () => {
+        this.toast.ok('records.deleted');
+        void this.router.navigate(['/requests']);
+      },
       error: (e) => this.toast.apiError(e),
     });
   }

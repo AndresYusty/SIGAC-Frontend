@@ -46,8 +46,11 @@
           <td>{{ a.subject }}</td>
           <td>{{ a.issueDate | localDate: 'dd/MM/yyyy' }}</td>
           <td class="row-actions">
-            @if (canWrite) {
-              <a [routerLink]="['/agreements', a.id]" class="btn btn-ghost">{{ 'common.edit' | t }}</a>
+            @if (canWrite || admin) {
+              <a [routerLink]="['/agreements', a.id]" class="btn btn-ghost">{{ 'records.edit' | t }}</a>
+            }
+            @if (admin) {
+              <button class="btn btn-danger" type="button" (click)="remove(a)">{{ 'records.remove' | t }}</button>
             }
             <button class="btn btn-secondary" type="button" (click)="download(a)">PDF</button>
           </td>

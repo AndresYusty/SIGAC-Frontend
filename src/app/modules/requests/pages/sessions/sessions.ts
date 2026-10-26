@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '@core/auth/auth.service';
 import { Page } from '@core/http/api.models';
+import { ConfirmService } from '@core/ui/confirm.service';
 import { ToastService } from '@core/ui/toast.service';
 import { LocalDatePipe } from '@shared/pipes/local-date.pipe';
 import { TranslatePipe } from '@shared/pipes/translate.pipe';
@@ -22,6 +23,7 @@ export class SessionsPage implements OnInit {
   private readonly api = inject(RequestsApi);
   readonly auth = inject(AuthService);
   private readonly toast = inject(ToastService);
+  private readonly confirm = inject(ConfirmService);
   readonly statuses = SESSION_STATUSES;
   readonly tone = TONE;
   status: SessionStatus | '' = '';
@@ -32,6 +34,18 @@ export class SessionsPage implements OnInit {
 
   ngOnInit(): void {
     this.load();
+  }
+
+  async remove(session: SessionSummaryDto): Promise<void> {
+    const label = `${session.councilType} · ${session.location || ''}`;
+    if (!(await this.confirm.ask('records.deleteTitle', 'records.deleteSession', 'records.remove', { code: label }))) return;
+    this.api.deleteSession(session.id).subscribe({
+      next: () => {
+        this.toast.ok('records.deleted');
+        this.load(this.page()?.number ?? 0);
+      },
+      error: (e) => this.toast.apiError(e),
+    });
   }
 
   apply(): void {

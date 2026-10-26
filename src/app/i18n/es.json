@@ -201,7 +201,27 @@
       "kicker": "Módulo 3",
       "title": "Solicitudes",
       "lead": "Radicación, evaluación y seguimiento de asuntos para consejo.",
-      "leadCouncil": "Abra cada solicitud radicada. Apruebe para llevarla a una sesión, o devuélvala con el motivo.",
+      "leadCouncil": "Al entrar ve lo pendiente: radicadas por evaluar y aprobadas que aún no están en una sesión. En Todos salen todas.",
+      "pending": "Pendientes",
+      "whatIsLeft": "Siguiente paso",
+      "legend": "Significado de los estados",
+      "meaning": {
+        "FILED": "Llegó a la secretaría del consejo y todavía no se evalúa.",
+        "RETURNED": "Se devolvió al programa para que la corrija.",
+        "REJECTED": "No continúa en el consejo.",
+        "APPROVED": "Quedó apta para entrar a una sesión.",
+        "ON_AGENDA": "Ya hace parte del orden del día.",
+        "PROCESSED": "El consejo ya la decidió."
+      },
+      "next": {
+        "FILED": "Evalúe la solicitud: apruebe, devuelva o rechace.",
+        "RETURNED": "Devuelta al programa. Espere la corrección y la nueva radicación.",
+        "REJECTED": "Trámite cerrado. No requiere actuación de la secretaría.",
+        "APPROVED": "Inclúyala en el orden del día de una sesión.",
+        "ON_AGENDA": "Incluida en una sesión. Se resuelve al celebrar el consejo.",
+        "PROCESSED": "Ya fue decidida en sesión. El trámite está cerrado."
+      },
+      "schedule": "Agendar",
       "leadFaculty": "Aquí solo aparecen las solicitudes que usted radicó para su programa. Si el consejo las devuelve, corríjalas y envíelas de nuevo.",
       "emptyMine": "Aún no ha radicado solicitudes.",
       "emptyMineText": "Use Radicar solicitud para enviar un asunto de su programa.",
@@ -349,13 +369,18 @@
     "title": "Sesiones",
     "lead": "Programación, orden del día y conducción en vivo.",
     "path": "Programe la sesión, arme el orden del día, cite, condúzcala y genere el acta.",
+    "place": {
+      "hint": "Elija una sesión programada. Incluir la agrega al orden del día.",
+      "include": "Incluir",
+      "added": "Solicitud incluida en la sesión"
+    },
     "flow": {
       "agenda": "Orden del día",
       "cite": "Citación",
       "live": "Sesión",
       "minutes": "Acta",
       "now": {
-        "agenda": "Agregue los asuntos aprobados. Cuando el orden esté listo, ciérrelo: eso envía la citación.",
+        "agenda": "Esta sesión aún no tiene puntos. Se agregan al agendar una solicitud aprobada. Cuando el orden esté listo, ciérrelo: eso envía la citación.",
         "cite": "El orden ya tiene puntos. Ciérrelo para enviar la citación a las personas citadas.",
         "live": "La citación ya se envió. Entre a la sala, marque quién está presente y registre la decisión de cada punto.",
         "liveOpen": "Siga en la sala. Marque la asistencia, registre cada punto y, cuando terminen, finalice la sesión.",
@@ -377,11 +402,21 @@
       "kicker": "Agenda",
       "title": "Programar sesión",
       "lead": "Elija la fecha, el lugar y a quién se cita.",
+      "scheduleRequest": "Agendar solicitud",
+      "withRequest": "Esta solicitud queda en el orden del día al crear o elegir la sesión.",
+      "existing": "En una sesión ya programada",
+      "existingHint": "Todavía se puede armar. Al elegirla, la solicitud entra de una vez.",
+      "noneOpen": "No hay una sesión abierta. Créela abajo: la solicitud queda incluida.",
+      "orNew": "O cree la sesión con esta solicitud",
+      "submitWithRequest": "Crear sesión e incluir",
+      "here": "Agendar aquí",
       "dateTime": "Fecha y hora",
+      "past": "Esa fecha ya pasó. Elija un día y una hora posteriores.",
       "locationPlaceholder": "Sala de juntas / enlace virtual",
       "data": "Datos de la sesión",
       "cite": "A quién se cita",
-      "citeHint": "Marque consejeros y participantes. Recibirán la citación al cerrar el orden del día.",
+      "citeHint": "Marque al presidente y a los consejeros. Recibirán la citación al cerrar el orden del día.",
+      "selfCited": "Usted ya queda citado. No hace falta marcarlo.",
       "searchPeople": "Nombre",
       "cited": "Citado",
       "notCited": "No citar",
@@ -416,6 +451,8 @@
       "closeAgendaTitle": "Cerrar agenda",
       "closeAgendaMessage": "Se generará la citación y se enviará a los integrantes.",
       "agendaClosed": "Agenda cerrada y citación enviada",
+      "points": "Puntos a tratar",
+      "pointsHint": "Es lo que el consejo va a tratar de la solicitud en esta sesión.",
       "agenda": "Orden del día",
       "subject": "Asunto",
       "decision": "Decisión",
@@ -424,7 +461,7 @@
       "moveDown": "Bajar",
       "remove": "Quitar",
       "emptyTitle": "Sin puntos",
-      "emptyHint": "Agregue solicitudes aprobadas al orden del día.",
+      "emptyHint": "Los asuntos entran al agendar una solicitud aprobada.",
       "selectRequest": "Seleccione una solicitud aprobada",
       "itemAdded": "Punto agregado",
       "noticePdf": "Citación PDF"
@@ -638,5 +675,18 @@
       "saved": "{{label}} guardado"
     },
     "texts": "Encabezado y firmas"
+  },
+  "records": {
+    "edit": "Modificar",
+    "remove": "Eliminar",
+    "deleteTitle": "Eliminar",
+    "deleteRequest": "Se elimina la radicación {{code}}. Si está en una sesión, sale del orden del día.",
+    "deleteSession": "Se elimina la sesión, su asistencia y el acta, si existe. Las solicitudes de esa sesión vuelven a quedar aprobadas.",
+    "deleteMinutes": "Se elimina el acta {{code}}.",
+    "deleteAgreement": "Se elimina el acuerdo {{code}}.",
+    "deleted": "Se eliminó el registro.",
+    "sessionSaved": "Datos de la sesión actualizados.",
+    "sessionData": "Corregir la sesión",
+    "sessionHint": "Puede cambiar el tipo, la fecha y el lugar. El orden del día y los citados se conservan."
   }
 }

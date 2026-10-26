@@ -36,6 +36,9 @@ export class RequestsApi {
   updateRequest(id: number, fd: FormData) {
     return this.http.put<RequestDto>(`${this.base}/requests/${id}`, fd);
   }
+  deleteRequest(id: number) {
+    return this.http.delete<void>(`${this.base}/requests/${id}`);
+  }
   approveRequest(id: number) {
     return this.http.post<RequestDto>(`${this.base}/requests/${id}/approve`, {});
   }
@@ -69,6 +72,12 @@ export class RequestsApi {
       location,
       memberIds,
     });
+  }
+  correctSession(id: number, councilTypeId: number, scheduledAt: string, location: string | null) {
+    return this.http.put<SessionDto>(`${this.base}/sessions/${id}`, { councilTypeId, scheduledAt, location });
+  }
+  deleteSession(id: number) {
+    return this.http.delete<void>(`${this.base}/sessions/${id}`);
   }
   addAgendaItem(sessionId: number, requestId: number) {
     return this.http.post<SessionDto>(`${this.base}/sessions/${sessionId}/items`, { requestId });

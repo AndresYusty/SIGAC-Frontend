@@ -24,6 +24,9 @@ export class MinutesApi {
   updateMinutesContent(id: number, htmlContent: string) {
     return this.http.put<MinutesDto>(`${this.base}/minutes/${id}/content`, { htmlContent });
   }
+  deleteMinutes(id: number) {
+    return this.http.delete<void>(`${this.base}/minutes/${id}`);
+  }
   previewMinutes(id: number) {
     return this.http.get(`${this.base}/minutes/${id}/preview`, { responseType: 'blob' });
   }

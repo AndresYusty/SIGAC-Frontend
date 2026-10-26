@@ -1,7 +1,7 @@
 import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthService } from '@core/auth/auth.service';
 import { ConfirmService } from '@core/ui/confirm.service';
 import { ToastService } from '@core/ui/toast.service';
@@ -22,6 +22,7 @@ export class MinutesDetailPage implements OnInit, OnDestroy {
   private readonly api = inject(MinutesApi);
   private readonly repository = inject(RepositoryApi);
   private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
   readonly auth = inject(AuthService);
   private readonly toast = inject(ToastService);
   private readonly confirm = inject(ConfirmService);
@@ -42,7 +43,21 @@ export class MinutesDetailPage implements OnInit, OnDestroy {
   }
 
   canEdit(m: MinutesDto): boolean {
+    if (this.auth.has('ROLE_ADMIN')) return true;
     return this.auth.has('ROLE_COUNCIL_SECRETARY') && (m.status === 'DRAFT' || m.status === 'EDITING');
+  }
+
+  async remove(): Promise<void> {
+    const minutes = this.minutes();
+    if (!minutes) return;
+    if (!(await this.confirm.ask('records.deleteTitle', 'records.deleteMinutes', 'records.remove', { code: minutes.serialNumber }))) return;
+    this.api.deleteMinutes(minutes.id).subscribe({
+      next: () => {
+        this.toast.ok('records.deleted');
+        void this.router.navigate(['/minutes']);
+      },
+      error: (e) => this.toast.apiError(e),
+    });
   }
 
   private id(): number {

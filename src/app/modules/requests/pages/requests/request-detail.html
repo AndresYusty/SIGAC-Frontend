@@ -9,7 +9,10 @@
     </div>
     <div class="row-actions">
       <span class="badge" [class]="tone[req.status]">{{ 'enums.requestStatus.' + req.status | t }}</span>
-      @if (auth.has('ROLE_FACULTY_SECRETARY') && (req.status === 'FILED' || req.status === 'RETURNED')) {
+      @if (auth.has('ROLE_ADMIN')) {
+        <a [routerLink]="['/requests', req.id, 'edit']" class="btn btn-secondary">{{ 'records.edit' | t }}</a>
+        <button class="btn btn-danger" type="button" (click)="remove()">{{ 'records.remove' | t }}</button>
+      } @else if (auth.has('ROLE_FACULTY_SECRETARY') && (req.status === 'FILED' || req.status === 'RETURNED')) {
         <a [routerLink]="['/requests', req.id, 'edit']" class="btn btn-secondary">{{ 'requests.detail.edit' | t }}</a>
       }
       <a routerLink="/requests" class="btn btn-ghost">{{ 'common.back' | t }}</a>

@@ -5,12 +5,13 @@ import { AuthService } from '@core/auth/auth.service';
 import { ConfirmService } from '@core/ui/confirm.service';
 import { ToastService } from '@core/ui/toast.service';
 import { MinutesApi } from '@modules/minutes';
+import { CouncilTypeDto, UsersApi } from '@modules/users';
 import { LocalDatePipe } from '@shared/pipes/local-date.pipe';
 import { TranslatePipe } from '@shared/pipes/translate.pipe';
 import { saveBlob } from '@shared/utils/files';
 import { TONE } from '@shared/utils/labels';
 import { RequestsApi } from '../../requests.api';
-import { GuestPayload, RequestDto, SessionDto } from '../../requests.models';
+import { GuestPayload, SessionDto } from '../../requests.models';
 
 @Component({
   selector: 'app-session-detail',
@@ -19,6 +20,7 @@ import { GuestPayload, RequestDto, SessionDto } from '../../requests.models';
 })
 export class SessionDetailPage implements OnInit {
   private readonly api = inject(RequestsApi);
+  private readonly usersApi = inject(UsersApi);
   private readonly minutesApi = inject(MinutesApi);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
@@ -26,23 +28,15 @@ export class SessionDetailPage implements OnInit {
   private readonly toast = inject(ToastService);
   private readonly confirm = inject(ConfirmService);
   readonly session = signal<SessionDto | null>(null);
-  readonly approvedRequests = signal<RequestDto[]>([]);
-  readonly query = signal('');
-  readonly availableRequests = computed(() => {
-    const taken = new Set(
-      (this.session()?.items ?? []).map((item) => item.requestCode).filter((code): code is string => !!code),
-    );
-    const text = this.query().trim().toLowerCase();
-    return this.approvedRequests().filter((request) => {
-      if (taken.has(request.code)) return false;
-      if (!text) return true;
-      return [request.code, request.title, request.requester, request.program ?? ''].join(' ').toLowerCase().includes(text);
-    });
-  });
   urgentTitle = '';
   urgentDescription = '';
   guest: GuestPayload = { name: '', email: '', affiliation: '' };
   readonly tone = TONE;
+  readonly councilTypes = signal<CouncilTypeDto[]>([]);
+  councilTypeId = 0;
+  scheduledAt = '';
+  location = '';
+  readonly savingSession = signal(false);
   readonly flowOrder = ['agenda', 'cite', 'live', 'minutes'] as const;
   readonly flowStep = computed(() => {
     const s = this.session();
@@ -52,15 +46,10 @@ export class SessionDetailPage implements OnInit {
   });
 
   ngOnInit(): void {
+    if (this.auth.has('ROLE_ADMIN')) {
+      this.usersApi.listCouncilTypes().subscribe({ next: (types) => this.councilTypes.set(types) });
+    }
     this.reload();
-    this.loadApproved();
-  }
-
-  private loadApproved(): void {
-    this.api.searchRequests({ status: 'APPROVED', size: 200 }).subscribe({
-      next: (p) => this.approvedRequests.set(p.content),
-      error: () => undefined,
-    });
   }
 
   private id(): number {
@@ -69,16 +58,11 @@ export class SessionDetailPage implements OnInit {
 
   reload(): void {
     this.api.getSession(this.id()).subscribe({
-      next: (s) => this.session.set(s),
-      error: (e) => this.toast.apiError(e),
-    });
-  }
-
-  addItem(requestId: number): void {
-    this.api.addAgendaItem(this.id(), requestId).subscribe({
       next: (s) => {
         this.session.set(s);
-        this.toast.ok('sessions.detail.itemAdded');
+        this.councilTypeId = s.councilTypeId;
+        this.scheduledAt = s.scheduledAt.slice(0, 16);
+        this.location = s.location ?? '';
       },
       error: (e) => this.toast.apiError(e),
     });
@@ -154,6 +138,32 @@ export class SessionDetailPage implements OnInit {
       return 'sessions.flow.now.liveOpen';
     }
     return 'sessions.flow.now.' + this.flowStep();
+  }
+
+  saveSession(): void {
+    this.savingSession.set(true);
+    this.api.correctSession(this.id(), this.councilTypeId, this.scheduledAt, this.location.trim() || null).subscribe({
+      next: (s) => {
+        this.session.set(s);
+        this.savingSession.set(false);
+        this.toast.ok('records.sessionSaved');
+      },
+      error: (e) => {
+        this.savingSession.set(false);
+        this.toast.apiError(e);
+      },
+    });
+  }
+
+  async removeSession(): Promise<void> {
+    if (!(await this.confirm.ask('records.deleteTitle', 'records.deleteSession', 'records.remove'))) return;
+    this.api.deleteSession(this.id()).subscribe({
+      next: () => {
+        this.toast.ok('records.deleted');
+        void this.router.navigate(['/sessions']);
+      },
+      error: (e) => this.toast.apiError(e),
+    });
   }
 
   async closeAgenda(): Promise<void> {

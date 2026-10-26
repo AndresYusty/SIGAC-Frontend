@@ -2,6 +2,7 @@ import { Component, computed, inject, OnDestroy, OnInit, signal } from '@angular
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { AuthService } from '@core/auth/auth.service';
 import { I18nService } from '@core/i18n/i18n.service';
 import { ConfirmService } from '@core/ui/confirm.service';
 import { ToastService } from '@core/ui/toast.service';
@@ -34,6 +35,7 @@ export class AgreementEditorPage implements OnInit, OnDestroy {
   private readonly confirm = inject(ConfirmService);
   private readonly sanitizer = inject(DomSanitizer);
   readonly i18n = inject(I18nService);
+  readonly admin = inject(AuthService).has('ROLE_ADMIN');
   readonly sections: Section[] = ['recitals', 'articles'];
 
   readonly id = signal<number | null>(null);
@@ -190,6 +192,19 @@ export class AgreementEditorPage implements OnInit, OnDestroy {
         );
       },
       error: () => this.pdf.set(null),
+    });
+  }
+
+  async remove(): Promise<void> {
+    const id = this.id();
+    if (!id) return;
+    if (!(await this.confirm.ask('records.deleteTitle', 'records.deleteAgreement', 'records.remove', { code: this.label() }))) return;
+    this.api.delete(id).subscribe({
+      next: () => {
+        this.toast.ok('records.deleted');
+        void this.router.navigate(['/agreements']);
+      },
+      error: (e) => this.toast.apiError(e),
     });
   }
 

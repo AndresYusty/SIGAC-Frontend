@@ -18,7 +18,7 @@ export const requestsRoutes: Routes = [
   {
     path: 'requests/:id/edit',
     canActivate: [roleGuard],
-    data: { roles: ['ROLE_FACULTY_SECRETARY'] },
+    data: { roles: ['ROLE_FACULTY_SECRETARY', 'ROLE_ADMIN'] },
     loadComponent: () => import('./pages/requests/request-form').then((m) => m.RequestFormPage),
   },
   {

@@ -38,10 +38,11 @@ export class RequestFormPage implements OnInit {
   });
 
   ngOnInit(): void {
+    const raw = this.route.snapshot.paramMap.get('id');
     const mine = this.auth.user()?.programId;
     if (mine) {
       this.form.controls.programId.setValue(mine);
-    } else {
+    } else if (!raw) {
       this.usersApi.listUniversities().subscribe({
         next: (universities) => {
           const university = universities[0];
@@ -58,7 +59,6 @@ export class RequestFormPage implements OnInit {
         },
       });
     }
-    const raw = this.route.snapshot.paramMap.get('id');
     if (raw) {
       const id = Number(raw);
       this.id.set(id);
@@ -71,6 +71,9 @@ export class RequestFormPage implements OnInit {
             requestType: r.requestType,
             programId: r.programId ?? '',
           });
+          if (!mine && this.auth.has('ROLE_ADMIN')) {
+            this.usersApi.listPrograms(r.facultyId).subscribe((programs) => this.programs.set(programs));
+          }
         },
         error: (e) => this.toast.apiError(e),
       });

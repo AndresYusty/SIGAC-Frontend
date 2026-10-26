@@ -1,11 +1,36 @@
 <div class="page-head">
   <div>
     <p class="kicker">{{ 'sessions.new.kicker' | t }}</p>
-    <h1>{{ 'sessions.new.title' | t }}</h1>
-    <p class="lead">{{ 'sessions.new.lead' | t }}</p>
+    <h1>{{ (request() ? 'sessions.new.scheduleRequest' : 'sessions.new.title') | t }}</h1>
+    <p class="lead">{{ (request() ? 'sessions.new.withRequest' : 'sessions.new.lead') | t }}</p>
   </div>
   <a routerLink="/sessions" class="btn btn-ghost">{{ 'common.back' | t }}</a>
 </div>
+@if (request(); as item) {
+  <article class="card place-note">
+    <strong>{{ item.code }}</strong> {{ item.title }}
+  </article>
+  <article class="card" style="margin-bottom: 1rem">
+    <h2>{{ 'sessions.new.existing' | t }}</h2>
+    <p class="muted">{{ 'sessions.new.existingHint' | t }}</p>
+    @if (openSessions().length) {
+      <ul class="pick-list">
+        @for (s of openSessions(); track s.id) {
+          <li>
+            <div>
+              <strong>{{ s.councilType }}</strong>
+              <div class="muted">{{ s.scheduledAt | localDate: 'dd/MM/yyyy HH:mm' }} · {{ s.location || ('sessions.virtualLocation' | t) }}</div>
+            </div>
+            <button class="btn" type="button" [disabled]="saving()" (click)="includeIn(s.id)">{{ 'sessions.new.here' | t }}</button>
+          </li>
+        }
+      </ul>
+    } @else {
+      <p class="muted">{{ 'sessions.new.noneOpen' | t }}</p>
+    }
+  </article>
+  <h2 class="place-or">{{ 'sessions.new.orNew' | t }}</h2>
+}
 <form class="schedule-desk" [formGroup]="form" (ngSubmit)="submit()">
   <article class="card schedule-data">
     <h2>{{ 'sessions.new.data' | t }}</h2>
@@ -22,21 +47,27 @@
     </label>
     <label class="field">
       <span>{{ 'sessions.new.dateTime' | t }}</span>
-      <input type="datetime-local" formControlName="scheduledAt" />
+      <input type="datetime-local" formControlName="scheduledAt" [min]="earliest" />
+      @if (form.controls.scheduledAt.touched && form.controls.scheduledAt.hasError('past')) {
+        <small class="error-text">{{ 'sessions.new.past' | t }}</small>
+      }
     </label>
     <label class="field">
       <span>{{ (kind() === 'VIRTUAL' ? 'sessions.new.locationOptional' : 'sessions.location') | t }}</span>
       <input formControlName="location" [placeholder]="(kind() === 'VIRTUAL' ? 'sessions.new.virtualPlaceholder' : 'sessions.new.locationPlaceholder') | t" />
     </label>
-    <button class="btn" type="submit" [disabled]="saving()">{{ 'sessions.new.submit' | t }}</button>
+    <button class="btn" type="submit" [disabled]="saving()">{{ (request() ? 'sessions.new.submitWithRequest' : 'sessions.new.submit') | t }}</button>
   </article>
 
   <article class="card">
     <div class="agenda-head">
       <h2>{{ 'sessions.new.cite' | t }}</h2>
-      <span class="chip">{{ selectedIds().length }}</span>
+      <span class="chip">{{ citedCount() }}</span>
     </div>
     <p class="muted">{{ 'sessions.new.citeHint' | t }}</p>
+    @if (countsSelf()) {
+      <p class="muted">{{ 'sessions.new.selfCited' | t }}</p>
+    }
     <label class="field">
       <span>{{ 'common.search' | t }}</span>
       <input [ngModel]="personQuery()" (ngModelChange)="personQuery.set($event)" [ngModelOptions]="{ standalone: true }" [placeholder]="'sessions.new.searchPeople' | t" />

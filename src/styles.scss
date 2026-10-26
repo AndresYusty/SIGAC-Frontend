@@ -719,6 +719,44 @@ tr:hover td {
   background: var(--ochre-paper);
 }
 
+.place-note {
+  margin: 0 0 1rem;
+}
+
+.place-or {
+  margin: 0 0 0.75rem;
+  font-size: 1.05rem;
+}
+
+.status-legend {
+  margin-top: 1.25rem;
+  color: var(--gray);
+
+  summary {
+    width: fit-content;
+    cursor: pointer;
+    font-size: 0.88rem;
+    color: var(--wine);
+  }
+
+  ul {
+    list-style: none;
+    margin: 0.75rem 0 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 0.55rem 1.25rem;
+  }
+
+  li {
+    display: flex;
+    align-items: baseline;
+    gap: 0.55rem;
+    color: var(--gray);
+    font-size: 0.88rem;
+  }
+}
+
 .badge {
   display: inline-flex;
   align-items: center;
@@ -866,6 +904,20 @@ tr:hover td {
 .agenda-desk {
   margin-bottom: 1rem;
   align-items: start;
+}
+
+.point {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--gray-light);
+}
+
+.point h3 {
+  margin: 0.2rem 0 0.45rem;
+}
+
+.point p {
+  margin: 0;
 }
 
 .agenda-head {

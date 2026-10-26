@@ -36,6 +36,9 @@ export class AgreementsApi {
   update(id: number, body: AgreementPayload) {
     return this.http.put<AgreementDto>(`${this.base}/${id}`, body);
   }
+  delete(id: number) {
+    return this.http.delete<void>(`${this.base}/${id}`);
+  }
   preview(body: AgreementPayload) {
     return this.http.post(`${this.base}/preview`, body, { responseType: 'blob' });
   }
