@@ -18,7 +18,7 @@ export class ForgotPage {
   private readonly i18n = inject(I18nService);
   readonly loading = signal(false);
   readonly error = signal('');
-  readonly success = signal('');
+  readonly sent = signal(false);
   readonly form = this.fb.nonNullable.group({
     email: ['', [Validators.required, Validators.email]],
   });
@@ -30,10 +30,11 @@ export class ForgotPage {
     }
     this.loading.set(true);
     this.error.set('');
+    this.sent.set(false);
     this.auth.forgotPassword(this.form.controls.email.value).subscribe({
-      next: (res) => {
+      next: () => {
         this.loading.set(false);
-        this.success.set(res.message);
+        this.sent.set(true);
       },
       error: (err) => {
         this.loading.set(false);
