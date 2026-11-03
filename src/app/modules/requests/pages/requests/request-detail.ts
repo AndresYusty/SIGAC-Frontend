@@ -2,6 +2,8 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthService } from '@core/auth/auth.service';
+import { translateServerText } from '@core/http/server-messages';
+import { I18nService } from '@core/i18n/i18n.service';
 import { ConfirmService } from '@core/ui/confirm.service';
 import { ToastService } from '@core/ui/toast.service';
 import { LocalDatePipe } from '@shared/pipes/local-date.pipe';
@@ -22,12 +24,17 @@ export class RequestDetailPage implements OnInit {
   private readonly router = inject(Router);
   readonly auth = inject(AuthService);
   private readonly toast = inject(ToastService);
+  private readonly i18n = inject(I18nService);
   private readonly confirm = inject(ConfirmService);
   readonly request = signal<RequestDto | null>(null);
   readonly history = signal<RequestHistoryDto[]>([]);
   reason = '';
   readonly tone = TONE;
   readonly formatBytes = formatBytes;
+
+  reasonText(reason: string): string {
+    return translateServerText(reason, this.i18n);
+  }
 
   ngOnInit(): void {
     this.reload();

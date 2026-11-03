@@ -26,6 +26,9 @@ const EXACT: Record<string, string> = {
   'You can only view the requests you filed': 'errors.server.viewOwnRequests',
   'You can only view the requests of your program': 'errors.server.viewProgramRequests',
   'Request not found': 'errors.server.requestNotFound',
+  'Request filed': 'errors.server.requestFiled',
+  'Resubmitted after corrections': 'errors.server.resubmitted',
+  'Approved by Council Secretary': 'errors.server.approvedBySecretary',
   'Attachment not found': 'errors.server.attachmentNotFound',
   'This council type is no longer in use': 'errors.server.councilTypeRetired',
   'The request belongs to another Faculty': 'errors.server.requestOtherFaculty',
@@ -107,6 +110,17 @@ const EXACT: Record<string, string> = {
   'must not be empty': 'errors.server.notEmpty',
   'must be a well-formed email address': 'errors.server.email',
   'must be a future date': 'errors.server.futureDate',
+  'The academic period must be 1(A) or 2(B)': 'errors.server.periodInvalid',
+  'Complete the student identity data': 'errors.server.identityRequired',
+  'Enter the name of the counselor teacher': 'errors.server.counselorRequired',
+  'Specify what the request is about': 'errors.server.otherRequired',
+  'Select whether the cancellation is of a course or of the academic period': 'errors.server.cancellationRequired',
+  'Add at least one course': 'errors.server.courseRequired',
+  'The form allows at most six courses': 'errors.server.courseLimit',
+  'A course name is required': 'errors.server.courseName',
+  'The course list is not valid': 'errors.server.coursesInvalid',
+  'The document is not required for this request': 'errors.server.documentNotRequired',
+  'Each attachment must identify the document it supports': 'errors.server.documentCode',
   'no debe estar vacío': 'errors.server.notBlank',
   'no debe ser nulo': 'errors.server.notNull',
   'debe ser una dirección de correo electrónico con formato correcto': 'errors.server.email',
@@ -294,6 +308,15 @@ const PATTERNS: Pattern[] = [
     re: /^Line (\d+): .+ \(the document must be well-formed XHTML: close every tag and use &#160; instead of &nbsp;\)$/,
     key: 'errors.server.xhtmlLine',
     params: (m) => ({ line: m[1] }),
+  },
+  {
+    re: /^Missing required document: ([A-Z0-9_]+)$/,
+    key: 'errors.server.missingDocument',
+    params: (m, i18n) => {
+      const key = `enums.requestDocument.${m[1]}`;
+      const label = i18n.t(key);
+      return { document: label === key ? m[1] : label };
+    },
   },
   {
     re: /^Could not parse the document: .+$/,

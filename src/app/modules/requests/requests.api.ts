@@ -5,6 +5,7 @@ import { toQuery } from '@core/http/http-utils';
 import { environment } from '../../../environments/environment';
 import {
   GuestPayload,
+  RequestCatalog,
   RequestDto,
   RequestHistoryDto,
   RequestSearch,
@@ -19,6 +20,9 @@ export class RequestsApi {
   private readonly http = inject(HttpClient);
   private readonly base = environment.apiUrl;
 
+  catalog() {
+    return this.http.get<RequestCatalog>(`${this.base}/requests/catalog`);
+  }
   searchRequests(params: RequestSearch) {
     return this.http.get<Page<RequestDto>>(`${this.base}/requests`, {
       params: toQuery({ ...params, sort: 'filedAt,desc' }),

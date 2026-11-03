@@ -4,7 +4,7 @@
       <p class="kicker">{{ req.code }}</p>
       <h1>{{ req.title }}</h1>
       <p class="lead">
-        {{ req.faculty }} · {{ 'enums.requestType.' + req.requestType | t }} · {{ 'requests.detail.filedBy' | t: { name: req.filedBy } }}
+        {{ req.faculty }} · {{ req.campus }} · {{ 'enums.requestBranch.' + req.branch | t }} · {{ 'enums.requestTopic.' + req.requestType | t }} · {{ 'requests.detail.filedBy' | t: { name: req.filedBy } }}
       </p>
     </div>
     <div class="row-actions">
@@ -21,13 +21,61 @@
 
   <div class="split">
     <article class="card">
-      <h2>{{ 'common.description' | t }}</h2>
+      <h2>{{ 'requests.form.applicant' | t }}</h2>
+      <p>
+        {{ req.requester }}
+        @if (req.studentCode) { · {{ req.studentCode }} }
+        @if (req.identityDocument) { · {{ req.identityDocument }} }
+        @if (req.identityIssuedIn) { · {{ 'requests.form.issuedIn' | t }} {{ req.identityIssuedIn }} }
+      </p>
+      <p class="muted">
+        @if (req.email) { {{ req.email }} }
+        @if (req.phone) { · {{ req.phone }} }
+        @if (req.filedOn) { · {{ req.filedOn }} }
+        @if (req.academicPeriod) { · {{ req.academicPeriod === 'A' ? '1 (A)' : '2 (B)' }} }
+      </p>
+      @if (req.counselorName) {
+        <p>{{ 'requests.form.counselor' | t }}: {{ req.counselorName }}</p>
+      }
+      @if (req.otherDetail) {
+        <p>{{ 'requests.form.otherDetail' | t }}: {{ req.otherDetail }}</p>
+      }
+      @if (req.cancellationKind) {
+        <p>{{ req.cancellationKind === 'COURSE' ? ('requests.form.cancelCourse' | t) : ('requests.form.cancelPeriod' | t) }}</p>
+      }
+      @if (req.courses.length) {
+        <h3 style="margin-top: 1.2rem">{{ 'requests.form.courses' | t }}</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>{{ 'requests.form.courseName' | t }}</th>
+                <th>{{ 'requests.form.group' | t }}</th>
+                <th>{{ 'requests.form.courseNumber' | t }}</th>
+                <th>{{ 'requests.form.grade' | t }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (course of req.courses; track course.line) {
+                <tr>
+                  <td>{{ course.courseName }}</td>
+                  <td>{{ course.groupCode }}</td>
+                  <td>{{ course.courseNumber }}</td>
+                  <td>{{ course.gradeNumber }} {{ course.gradeWords }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+      <h2 style="margin-top: 1.2rem">{{ 'requests.form.justification' | t }}</h2>
       <p>{{ req.description }}</p>
       <h3 style="margin-top: 1.2rem">{{ 'requests.detail.attachments' | t }}</h3>
       @for (a of req.attachments; track a.id) {
         <div class="check-row">
           <div>
-            <strong>{{ a.name }}</strong>
+            <strong>{{ a.documentCode ? ('enums.requestDocument.' + a.documentCode | t) : a.name }}</strong>
+            <div>{{ a.name }}</div>
             <div class="muted">{{ formatBytes(a.sizeBytes) }}</div>
           </div>
           <button class="btn btn-ghost" type="button" (click)="download(a.id, a.name)">{{ 'common.download' | t }}</button>
@@ -60,7 +108,7 @@
             <div class="timeline-item">
               <strong>{{ h.newStatus ? ('enums.requestStatus.' + h.newStatus | t) : '' }}</strong>
               <div class="muted">{{ h.user }} · {{ h.occurredAt | localDate: 'dd/MM/yyyy HH:mm' }}</div>
-              @if (h.reason) { <p>{{ h.reason }}</p> }
+              @if (h.reason) { <p>{{ reasonText(h.reason) }}</p> }
             </div>
           }
         </div>

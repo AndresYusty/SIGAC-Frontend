@@ -7,46 +7,220 @@
   <a routerLink="/requests" class="btn btn-ghost">{{ 'common.back' | t }}</a>
 </div>
 
-<form class="card grid" [formGroup]="form" (ngSubmit)="submit()" style="max-width: 820px">
-  <label class="field">
-    <span>{{ 'common.title' | t }}</span>
-    <input formControlName="title" />
-  </label>
-  <label class="field">
-    <span>{{ 'requests.form.requester' | t }}</span>
-    <input formControlName="requester" />
-  </label>
-  <div class="grid grid-2">
-    <label class="field">
-      <span>{{ 'common.type' | t }}</span>
-      <select formControlName="requestType">
-        @for (type of types; track type) {
-          <option [value]="type">{{ 'enums.requestType.' + type | t }}</option>
-        }
-      </select>
-    </label>
-    <label class="field">
-      <span>{{ 'common.program' | t }}</span>
-      @if (ownProgram) {
-        <input [value]="ownProgram" readonly />
-      } @else {
-        <select formControlName="programId">
-          <option value="">{{ 'requests.form.noProgram' | t }}</option>
-          @for (p of programs(); track p.id) {
-            <option [value]="p.id">{{ p.name }}</option>
+<form class="grid" [formGroup]="form" (ngSubmit)="submit()" style="max-width: 980px">
+  <section class="card grid">
+    <h2>{{ 'requests.form.topic' | t }}</h2>
+    <div class="grid grid-2">
+      <label class="field">
+        <span>{{ 'requests.form.branch' | t }}</span>
+        <select [value]="branch()" (change)="selectBranch($any($event.target).value)">
+          <option value="">{{ 'requests.form.pickBranch' | t }}</option>
+          @for (item of catalog()?.branches ?? []; track item.code) {
+            <option [value]="item.code">{{ 'enums.requestBranch.' + item.code | t }}</option>
           }
         </select>
+      </label>
+      <label class="field">
+        <span>{{ 'requests.form.matter' | t }}</span>
+        <select formControlName="requestType" (change)="selectTopic($any($event.target).value)">
+          <option value="">{{ 'requests.form.pickTopic' | t }}</option>
+          @for (item of topics(); track item.code) {
+            <option [value]="item.code">{{ 'enums.requestTopic.' + item.code | t }}</option>
+          }
+        </select>
+      </label>
+    </div>
+    @if (topic()?.cancellationChoice) {
+      <label class="field">
+        <span>{{ 'requests.form.cancellationKind' | t }}</span>
+        <select formControlName="cancellationKind">
+          <option value="">{{ 'requests.form.pickCancellation' | t }}</option>
+          <option value="COURSE">{{ 'requests.form.cancelCourse' | t }}</option>
+          <option value="PERIOD">{{ 'requests.form.cancelPeriod' | t }}</option>
+        </select>
+      </label>
+    }
+    @if (topic()?.otherDetail) {
+      <label class="field">
+        <span>{{ 'requests.form.otherDetail' | t }}</span>
+        <input formControlName="otherDetail" />
+      </label>
+    }
+  </section>
+
+  <section class="card grid">
+    <h2>{{ 'requests.form.place' | t }}</h2>
+    <div class="grid grid-2">
+      <label class="field">
+        <span>{{ 'requests.form.faculty' | t }}</span>
+        <input [value]="catalog()?.faculty || ''" readonly />
+      </label>
+      <label class="field">
+        <span>{{ 'requests.form.campus' | t }}</span>
+        <input [value]="catalog()?.campus || ''" readonly />
+      </label>
+      <label class="field">
+        <span>{{ 'requests.form.date' | t }}</span>
+        <input type="date" formControlName="filedOn" />
+      </label>
+      @if (branch() === 'STUDENT') {
+        <label class="field">
+          <span>{{ 'requests.form.period' | t }}</span>
+          <select formControlName="academicPeriod">
+            <option value="A">1 (A)</option>
+            <option value="B">2 (B)</option>
+          </select>
+        </label>
       }
+      <label class="field">
+        <span>{{ 'common.program' | t }}</span>
+        @if (catalog()?.program) {
+          <input [value]="catalog()?.program" readonly />
+        } @else {
+          <select formControlName="programId">
+            <option value="">{{ 'requests.form.noProgram' | t }}</option>
+            @for (p of programs(); track p.id) {
+              <option [value]="p.id">{{ p.name }}</option>
+            }
+          </select>
+        }
+      </label>
+    </div>
+  </section>
+
+  <section class="card grid">
+    <h2>{{ 'requests.form.applicant' | t }}</h2>
+    <div class="grid grid-2">
+      <label class="field">
+        <span>{{ 'requests.form.requester' | t }}</span>
+        <input formControlName="requester" />
+      </label>
+      @if (branch() === 'STUDENT') {
+        <label class="field">
+          <span>{{ 'requests.form.studentCode' | t }}</span>
+          <input formControlName="studentCode" />
+        </label>
+        <label class="field">
+          <span>{{ 'requests.form.identity' | t }}</span>
+          <input formControlName="identityDocument" />
+        </label>
+        <label class="field">
+          <span>{{ 'requests.form.issuedIn' | t }}</span>
+          <input formControlName="identityIssuedIn" />
+        </label>
+      }
+      <label class="field">
+        <span>{{ 'common.email' | t }}</span>
+        <input type="email" formControlName="email" />
+      </label>
+      <label class="field">
+        <span>{{ 'requests.form.phone' | t }}</span>
+        <input formControlName="phone" />
+      </label>
+      @if (branch() === 'STUDENT') {
+        <label class="field">
+          <span>{{ 'requests.form.counselor' | t }}</span>
+          <input formControlName="counselorName" />
+        </label>
+        <label class="field">
+          <span>{{ 'requests.form.electronicNotice' | t }}</span>
+          <select formControlName="electronicNotice">
+            <option [ngValue]="true">{{ 'common.yes' | t }}</option>
+            <option [ngValue]="false">{{ 'common.no' | t }}</option>
+          </select>
+        </label>
+      }
+    </div>
+  </section>
+
+  @if (showCourses()) {
+    <section class="card grid">
+      <h2>{{ 'requests.form.courses' | t }}</h2>
+      <p class="lead">{{ 'requests.form.coursesLead' | t }}</p>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>{{ 'requests.form.courseName' | t }}</th>
+              <th>{{ 'requests.form.group' | t }}</th>
+              <th>{{ 'requests.form.subgroup' | t }}</th>
+              <th>{{ 'requests.form.courseNumber' | t }}</th>
+              @if (topic()?.grades) {
+                <th>{{ 'requests.form.grade' | t }}</th>
+                <th>{{ 'requests.form.gradeWords' | t }}</th>
+                <th>{{ 'requests.form.attended' | t }}</th>
+                <th>{{ 'requests.form.failing' | t }}</th>
+              }
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of courses(); track $index) {
+              <tr>
+                <td><input [value]="row.courseName" (input)="patchCourse($index, 'courseName', $any($event.target).value)" /></td>
+                <td><input [value]="row.groupCode" (input)="patchCourse($index, 'groupCode', $any($event.target).value)" /></td>
+                <td><input [value]="row.subgroup" (input)="patchCourse($index, 'subgroup', $any($event.target).value)" /></td>
+                <td><input [value]="row.courseNumber" (input)="patchCourse($index, 'courseNumber', $any($event.target).value)" /></td>
+                @if (topic()?.grades) {
+                  <td><input [value]="row.gradeNumber" (input)="patchCourse($index, 'gradeNumber', $any($event.target).value)" /></td>
+                  <td><input [value]="row.gradeWords" (input)="patchCourse($index, 'gradeWords', $any($event.target).value)" /></td>
+                  <td>
+                    <select [value]="row.attendedRegularly" (change)="patchCourse($index, 'attendedRegularly', $any($event.target).value)">
+                      <option value=""></option>
+                      <option value="true">{{ 'common.yes' | t }}</option>
+                      <option value="false">{{ 'common.no' | t }}</option>
+                    </select>
+                  </td>
+                  <td>
+                    <select [value]="row.failingCourse" (change)="patchCourse($index, 'failingCourse', $any($event.target).value)">
+                      <option value=""></option>
+                      <option value="true">{{ 'common.yes' | t }}</option>
+                      <option value="false">{{ 'common.no' | t }}</option>
+                    </select>
+                  </td>
+                }
+                <td>
+                  @if (courses().length > 1) {
+                    <button class="btn btn-ghost" type="button" (click)="removeCourse($index)">{{ 'requests.form.removeCourse' | t }}</button>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      @if (courses().length < 6) {
+        <button class="btn btn-secondary" type="button" (click)="addCourse()">{{ 'requests.form.addCourse' | t }}</button>
+      }
+      @if (topic()?.grades) {
+        <p class="muted">{{ 'requests.form.teacherOnly' | t }}</p>
+      }
+    </section>
+  }
+
+  <section class="card grid">
+    <label class="field">
+      <span>{{ 'requests.form.justification' | t }}</span>
+      <textarea formControlName="justification" rows="5"></textarea>
     </label>
-  </div>
-  <label class="field">
-    <span>{{ 'common.description' | t }}</span>
-    <textarea formControlName="description"></textarea>
-  </label>
-  <label class="field">
-    <span>{{ 'requests.form.attachments' | t }}</span>
-    <input type="file" accept="application/pdf" multiple (change)="onFiles($event)" />
-  </label>
+  </section>
+
+  @if (topic(); as current) {
+    <section class="card grid">
+      <h2>{{ 'requests.form.documents' | t }}</h2>
+      <p class="lead">{{ 'requests.form.documentsLead' | t }}</p>
+      @for (code of current.documents; track code) {
+        <label class="field">
+          <span>{{ 'enums.requestDocument.' + code | t }}</span>
+          @if (already(code); as saved) {
+            <span class="muted">{{ 'requests.form.already' | t: { name: saved.name } }}</span>
+          }
+          <input type="file" accept="application/pdf" (change)="onFile(code, $event)" />
+        </label>
+      }
+    </section>
+  }
+
   <div class="row-actions">
     <button class="btn" type="submit" [disabled]="saving()">{{ (saving() ? 'common.saving' : 'common.save') | t }}</button>
   </div>

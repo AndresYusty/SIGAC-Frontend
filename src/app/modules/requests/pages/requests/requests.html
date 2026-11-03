@@ -67,7 +67,7 @@
         <tr>
           <td>{{ r.code }}</td>
           <td>{{ r.title }}</td>
-          <td>{{ 'enums.requestType.' + r.requestType | t }}</td>
+          <td>{{ 'enums.requestTopic.' + r.requestType | t }}</td>
           @if (auth.has('ROLE_FACULTY_SECRETARY')) {
             <td>{{ r.program || ('requests.form.noProgram' | t) }}</td>
           }
