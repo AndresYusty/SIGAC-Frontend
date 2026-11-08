@@ -894,7 +894,7 @@
     "subject": "Epígrafe",
     "emptyTitle": "Aún no hay acuerdos",
     "emptyHint": "Cree el primero con el botón Nuevo acuerdo.",
-    "editorLead": "Elija el tipo, llene los datos del caso y revise el PDF a la derecha.",
+    "editorLead": "Elija el tipo y llene los datos del caso. El texto del acuerdo sale de la plantilla.",
     "downloadPdf": "Descargar PDF",
     "data": "Datos del acuerdo",
     "type": "Tipo de acuerdo",
@@ -909,6 +909,10 @@
     "fields": "Datos del caso",
     "fillExamples": "Usar datos de ejemplo",
     "fieldsHint": "Cada dato reemplaza su {{campo}} en el texto. Los que falten se ven resaltados en amarillo en el PDF.",
+    "tableRows": "Filas de la tabla",
+    "tableRowsHint": "Agregue o quite filas. Si el acuerdo repite la tabla, las dos quedan iguales.",
+    "addTableRow": "Agregar fila",
+    "removeTableRow": "Quitar fila",
     "recitals": "Considerando",
     "articles": "Acuerda",
     "block": {
@@ -921,7 +925,7 @@
     "remove": "Quitar",
     "addRow": "+ Fila",
     "refresh": "Actualizar",
-    "previewHint": "Se actualiza solo al escribir. Use **texto** para negrilla.",
+    "previewHint": "Se actualiza al llenar los datos. El texto fijo sale de la plantilla del tipo.",
     "changeTypeTitle": "Cambiar el tipo de acuerdo",
     "changeTypeMessage": "Se reemplazarán los textos por los del nuevo tipo. Los datos del caso con el mismo nombre se conservan.",
     "toast": {

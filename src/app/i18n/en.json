@@ -894,7 +894,7 @@
     "subject": "Subject",
     "emptyTitle": "No agreements yet",
     "emptyHint": "Create the first one with the New agreement button.",
-    "editorLead": "Choose the type, fill in the case data and check the PDF on the right.",
+    "editorLead": "Choose the type and fill in the case data. The agreement text comes from the template.",
     "downloadPdf": "Download PDF",
     "data": "Agreement data",
     "type": "Agreement type",
@@ -909,6 +909,10 @@
     "fields": "Case data",
     "fillExamples": "Use sample data",
     "fieldsHint": "Each value replaces its {{field}} in the text. Missing ones are highlighted in yellow in the PDF.",
+    "tableRows": "Table rows",
+    "tableRowsHint": "Add or remove rows. If the agreement repeats the table, both copies stay the same.",
+    "addTableRow": "Add row",
+    "removeTableRow": "Remove row",
     "recitals": "Whereas",
     "articles": "Resolves",
     "block": {
@@ -921,7 +925,7 @@
     "remove": "Remove",
     "addRow": "+ Row",
     "refresh": "Refresh",
-    "previewHint": "It refreshes as you type. Use **text** for bold.",
+    "previewHint": "It updates as you fill in the data. The fixed text comes from the type template.",
     "changeTypeTitle": "Change the agreement type",
     "changeTypeMessage": "The texts will be replaced with those of the new type. Case data with the same name is kept.",
     "toast": {

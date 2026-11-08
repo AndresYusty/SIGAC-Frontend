@@ -51,96 +51,47 @@
       <p class="muted">{{ 'agreements.fieldsHint' | t }}</p>
       <div class="grid grid-2">
         @for (f of type()?.fields ?? []; track f.key) {
-          <label class="field">
-            <span>{{ fieldLabel(f) }}</span>
-            <input [(ngModel)]="model.values[f.key]" [placeholder]="f.example" />
-          </label>
-        }
-      </div>
-    </article>
-
-    <article class="card grid">
-      <h2>{{ 'agreements.texts' | t }}</h2>
-      <label class="field">
-        <span>{{ 'agreements.subject' | t }}</span>
-        <textarea rows="2" [(ngModel)]="model.subject"></textarea>
-      </label>
-      <label class="field">
-        <span>{{ 'agreements.councilTitle' | t }}</span>
-        <input [(ngModel)]="model.councilTitle" />
-      </label>
-      <label class="field">
-        <span>{{ 'agreements.legalBasis' | t }}</span>
-        <input [(ngModel)]="model.legalBasis" />
-      </label>
-      <div class="grid grid-2">
-        <label class="field">
-          <span>{{ 'agreements.president' | t }}</span>
-          <input [(ngModel)]="model.presidentName" />
-        </label>
-        <label class="field">
-          <span>{{ 'agreements.secretary' | t }}</span>
-          <input [(ngModel)]="model.secretaryName" />
-        </label>
-      </div>
-      <label class="field">
-        <span>{{ 'agreements.closing' | t }}</span>
-        <input [(ngModel)]="model.closing" />
-      </label>
-    </article>
-
-    @for (section of sections; track section) {
-      <article class="card grid">
-        <h2>{{ 'agreements.' + section | t }}</h2>
-        @for (b of model[section]; track trackIndex($index); let i = $index) {
-          <div class="block">
-            <div class="block-head">
-              <span class="chip">{{ 'agreements.block.' + b.type | t }}</span>
-              <div class="row-actions">
-                <button class="btn btn-ghost" type="button" [title]="'agreements.moveUp' | t" (click)="moveBlock(section, i, -1)">↑</button>
-                <button class="btn btn-ghost" type="button" [title]="'agreements.moveDown' | t" (click)="moveBlock(section, i, 1)">↓</button>
-                <button class="btn btn-ghost" type="button" [title]="'agreements.remove' | t" (click)="removeBlock(section, i)">✕</button>
-              </div>
-            </div>
-            @if (b.type === 'table') {
-              <div class="table-wrap block-table">
-                <table>
-                  <thead>
-                    <tr>
-                      @for (c of b.columns; track trackIndex($index); let ci = $index) {
-                        <th>
-                          <input [(ngModel)]="b.columns![ci]" />
-                          <button class="link" type="button" (click)="removeColumn(b, ci)">✕</button>
-                        </th>
-                      }
-                      <th><button class="btn btn-ghost" type="button" (click)="addColumn(b)">+</button></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    @for (row of b.rows; track trackIndex($index); let ri = $index) {
-                      <tr>
-                        @for (cell of row; track trackIndex($index); let ci = $index) {
-                          <td><input [(ngModel)]="row[ci]" /></td>
-                        }
-                        <td><button class="link" type="button" (click)="removeRow(b, ri)">✕</button></td>
-                      </tr>
-                    }
-                  </tbody>
-                </table>
-              </div>
-              <button class="btn btn-ghost" type="button" (click)="addRow(b)">{{ 'agreements.addRow' | t }}</button>
-            } @else {
-              <textarea rows="4" [(ngModel)]="b.text"></textarea>
-            }
-          </div>
-        }
-        <div class="row-actions">
-          @if (section === 'articles') {
-            <button class="btn btn-ghost" type="button" (click)="addBlock('articles', 'article')">+ {{ 'agreements.block.article' | t }}</button>
+          @if (!hiddenFields().has(f.key)) {
+            <label class="field">
+              <span>{{ fieldLabel(f) }}</span>
+              <input [(ngModel)]="model.values[f.key]" [placeholder]="f.example" />
+            </label>
           }
-          <button class="btn btn-ghost" type="button" (click)="addBlock(section, 'paragraph')">+ {{ 'agreements.block.paragraph' | t }}</button>
-          <button class="btn btn-ghost" type="button" (click)="addBlock(section, 'table')">+ {{ 'agreements.block.table' | t }}</button>
+        }
+      </div>
+    </article>
+
+    @for (table of tables(); track table.key; let ti = $index) {
+      <article class="card grid">
+        <h2>{{ 'agreements.tableRows' | t }}</h2>
+        <p class="muted">{{ 'agreements.tableRowsHint' | t }}</p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                @for (column of table.columns; track $index) {
+                  <th>{{ columnLabel(column) }}</th>
+                }
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (row of table.rows; track $index; let ri = $index) {
+                <tr>
+                  @for (cell of row; track $index; let ci = $index) {
+                    <td>
+                      <input [value]="cell" (input)="patchCell(ti, ri, ci, $any($event.target).value)" />
+                    </td>
+                  }
+                  <td>
+                    <button class="btn btn-ghost" type="button" (click)="removeTableRow(ti, ri)">{{ 'agreements.removeTableRow' | t }}</button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
         </div>
+        <button class="btn btn-secondary" type="button" (click)="addTableRow(ti)">{{ 'agreements.addTableRow' | t }}</button>
       </article>
     }
   </div>

@@ -9,16 +9,14 @@ import { ToastService } from '@core/ui/toast.service';
 import { TranslatePipe } from '@shared/pipes/translate.pipe';
 import { blobUrl, filenameFromDisposition, saveBlob } from '@shared/utils/files';
 import { AgreementsApi } from '../../agreements.api';
+import { applyTableRows, buildTables, EditableTable, fieldsHiddenByTables } from '../../agreement-tables';
 import {
   AgreementBlock,
   AgreementDefaultsDto,
   AgreementField,
   AgreementPayload,
   AgreementTypeDto,
-  BlockType,
 } from '../../agreements.models';
-
-type Section = 'recitals' | 'articles';
 
 const today = () => new Date().toLocaleDateString('en-CA');
 
@@ -36,7 +34,6 @@ export class AgreementEditorPage implements OnInit, OnDestroy {
   private readonly sanitizer = inject(DomSanitizer);
   readonly i18n = inject(I18nService);
   readonly admin = inject(AuthService).has('ROLE_ADMIN');
-  readonly sections: Section[] = ['recitals', 'articles'];
 
   readonly id = signal<number | null>(null);
   readonly label = signal('');
@@ -46,6 +43,11 @@ export class AgreementEditorPage implements OnInit, OnDestroy {
   readonly pdf = signal<SafeResourceUrl | null>(null);
   readonly typeCode = signal('');
   readonly type = computed(() => this.types().find((t) => t.code === this.typeCode()));
+  readonly tables = signal<EditableTable[]>([]);
+  readonly hiddenFields = computed(() => {
+    const current = this.type();
+    return current ? fieldsHiddenByTables(current) : new Set<string>();
+  });
 
   model: AgreementPayload = this.empty();
   private rawPdf?: string;
@@ -123,56 +125,48 @@ export class AgreementEditorPage implements OnInit, OnDestroy {
       recitals: copy(t.recitals),
       articles: copy(t.articles),
     };
+    this.tables.set(buildTables(t));
+    this.applyTables();
     this.refresh(0);
   }
 
   fillExamples(): void {
+    const hidden = this.hiddenFields();
     for (const f of this.type()?.fields ?? []) {
+      if (hidden.has(f.key)) continue;
       if (!this.model.values[f.key]) this.model.values[f.key] = f.example;
     }
     this.refresh(0);
   }
 
-  addBlock(section: Section, type: BlockType): void {
-    const block: AgreementBlock =
-      type === 'table' ? { type, columns: ['', ''], rows: [['', '']] } : { type, text: '' };
-    this.model[section].push(block);
-    this.refresh();
+  columnLabel(column: string): string {
+    return column.replace(/\{\{\s*([A-Za-z0-9_]+)\s*\}\}/g, (_, key: string) => this.model.values[key]?.trim() || key);
   }
 
-  removeBlock(section: Section, i: number): void {
-    this.model[section].splice(i, 1);
-    this.refresh();
+  addTableRow(index: number): void {
+    this.tables.update((tables) => tables.map((table, i) => i === index
+      ? { ...table, rows: [...table.rows, table.columns.map(() => '')] }
+      : table));
+    this.refresh(0);
   }
 
-  moveBlock(section: Section, i: number, step: number): void {
-    const list = this.model[section];
-    const j = i + step;
-    if (j < 0 || j >= list.length) return;
-    [list[i], list[j]] = [list[j], list[i]];
-    this.refresh();
+  removeTableRow(tableIndex: number, rowIndex: number): void {
+    this.tables.update((tables) => tables.map((table, i) => {
+      if (i !== tableIndex) return table;
+      const rows = table.rows.filter((_, row) => row !== rowIndex);
+      return { ...table, rows: rows.length ? rows : [table.columns.map(() => '')] };
+    }));
+    this.refresh(0);
   }
 
-  addRow(b: AgreementBlock): void {
-    b.rows = [...(b.rows ?? []), (b.columns ?? []).map(() => '')];
-    this.refresh();
-  }
-
-  removeRow(b: AgreementBlock, i: number): void {
-    b.rows!.splice(i, 1);
-    this.refresh();
-  }
-
-  addColumn(b: AgreementBlock): void {
-    b.columns = [...(b.columns ?? []), ''];
-    b.rows = (b.rows ?? []).map((r) => [...r, '']);
-    this.refresh();
-  }
-
-  removeColumn(b: AgreementBlock, c: number): void {
-    b.columns!.splice(c, 1);
-    b.rows!.forEach((r) => r.splice(c, 1));
-    this.refresh();
+  patchCell(tableIndex: number, rowIndex: number, columnIndex: number, value: string): void {
+    this.tables.update((tables) => tables.map((table, i) => {
+      if (i !== tableIndex) return table;
+      const rows = table.rows.map((row, r) => r === rowIndex
+        ? row.map((cell, c) => c === columnIndex ? value : cell)
+        : row);
+      return { ...table, rows };
+    }));
   }
 
   /** Waits until the user stops typing before asking the server for a new PDF. */
@@ -183,6 +177,7 @@ export class AgreementEditorPage implements OnInit, OnDestroy {
 
   preview(): void {
     if (!this.model.typeCode || !this.model.issueDate) return;
+    this.applyTables();
     this.api.preview(this.model).subscribe({
       next: (b) => {
         if (this.rawPdf) URL.revokeObjectURL(this.rawPdf);
@@ -209,6 +204,7 @@ export class AgreementEditorPage implements OnInit, OnDestroy {
   }
 
   save(): void {
+    this.applyTables();
     this.saving.set(true);
     const id = this.id();
     const request = id ? this.api.update(id, this.model) : this.api.create(this.model);
@@ -243,8 +239,9 @@ export class AgreementEditorPage implements OnInit, OnDestroy {
     });
   }
 
-  trackIndex(i: number): number {
-    return i;
+  private applyTables(): void {
+    this.model.recitals = applyTableRows(this.model.recitals, this.tables());
+    this.model.articles = applyTableRows(this.model.articles, this.tables());
   }
 
   private load(id: number): void {
@@ -266,6 +263,9 @@ export class AgreementEditorPage implements OnInit, OnDestroy {
           recitals: a.recitals,
           articles: a.articles,
         };
+        const current = this.types().find((t) => t.code === a.typeCode);
+        this.tables.set(current ? buildTables(current, [...a.recitals, ...a.articles]) : []);
+        this.applyTables();
         this.refresh(0);
       },
       error: (e) => this.toast.apiError(e),
