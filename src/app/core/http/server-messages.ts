@@ -44,6 +44,8 @@ const EXACT: Record<string, string> = {
   'Summon at least one voting member: the president or a counselor': 'errors.server.summonVoter',
   'Only a SUSPENDED session can be resumed': 'errors.server.resumeSuspended',
   'There are items without a recorded decision; the session cannot be finished': 'errors.server.openDecisions',
+  'A point that already has a decision cannot be removed from the agenda': 'errors.server.decidedPoint',
+  'The request is already on an agenda': 'errors.server.requestOnAgenda',
   'Para modificar la decisión indique el motivo del cambio': 'errors.server.decisionReason',
   'The note does not contain valid text': 'errors.server.noteEmpty',
   'Para aprobar, los votos a favor tienen que ser más que los en contra': 'errors.server.approveMajority',
@@ -222,6 +224,11 @@ const PATTERNS: Pattern[] = [
   {
     re: /^Debate notes can only be recorded while the session is STARTED \(current status: (\w+)\)$/,
     key: 'errors.server.notesWhileStarted',
+    params: (m, i18n) => ({ status: statusLabel(i18n, m[1], 'sessionStatus') }),
+  },
+  {
+    re: /^A miscellaneous request can only be added while the session is in progress \(current status: (\w+)\)$/,
+    key: 'errors.server.miscRequestWhileOpen',
     params: (m, i18n) => ({ status: statusLabel(i18n, m[1], 'sessionStatus') }),
   },
   {

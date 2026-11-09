@@ -1,10 +1,14 @@
 <div class="page-head">
   <div>
     <p class="kicker">{{ 'requests.form.kicker' | t }}</p>
-    <h1>{{ (id() ? 'requests.form.editTitle' : 'requests.form.newTitle') | t }}</h1>
-    <p class="lead">{{ 'requests.form.lead' | t }}</p>
+    <h1>{{ (liveSessionId() ? 'requests.form.liveTitle' : (id() ? 'requests.form.editTitle' : 'requests.form.newTitle')) | t }}</h1>
+    <p class="lead">{{ (liveSessionId() ? 'requests.form.liveLead' : 'requests.form.lead') | t }}</p>
   </div>
-  <a routerLink="/requests" class="btn btn-ghost">{{ 'common.back' | t }}</a>
+  @if (liveSessionId(); as sessionId) {
+    <a [routerLink]="['/sessions', sessionId, 'live']" class="btn btn-ghost">{{ 'common.back' | t }}</a>
+  } @else {
+    <a routerLink="/requests" class="btn btn-ghost">{{ 'common.back' | t }}</a>
+  }
 </div>
 
 <form class="grid" [formGroup]="form" (ngSubmit)="submit()" style="max-width: 980px">

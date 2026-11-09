@@ -53,8 +53,8 @@
       }
     </label>
     <label class="field">
-      <span>{{ (kind() === 'VIRTUAL' ? 'sessions.new.locationOptional' : 'sessions.location') | t }}</span>
-      <input formControlName="location" [placeholder]="(kind() === 'VIRTUAL' ? 'sessions.new.virtualPlaceholder' : 'sessions.new.locationPlaceholder') | t" />
+      <span>{{ (kind() === 'VIRTUAL' ? 'sessions.new.platform' : 'sessions.location') | t }}</span>
+      <input formControlName="location" [placeholder]="(kind() === 'VIRTUAL' ? 'sessions.new.platformPlaceholder' : 'sessions.new.locationPlaceholder') | t" />
     </label>
     <button class="btn" type="submit" [disabled]="saving()">{{ (request() ? 'sessions.new.submitWithRequest' : 'sessions.new.submit') | t }}</button>
   </article>

@@ -37,6 +37,9 @@ export class RequestsApi {
   fileRequest(fd: FormData) {
     return this.http.post<RequestDto>(`${this.base}/requests`, fd);
   }
+  fileLiveRequest(sessionId: number, fd: FormData) {
+    return this.http.post<SessionDto>(`${this.base}/sessions/${sessionId}/misc-requests`, fd);
+  }
   updateRequest(id: number, fd: FormData) {
     return this.http.put<RequestDto>(`${this.base}/requests/${id}`, fd);
   }
@@ -68,6 +71,9 @@ export class RequestsApi {
   }
   summonable() {
     return this.http.get<SummonedDto[]>(`${this.base}/sessions/summonable`);
+  }
+  updateSummons(sessionId: number, memberIds: number[]) {
+    return this.http.put<SessionDto>(`${this.base}/sessions/${sessionId}/summons`, { memberIds });
   }
   createSession(councilTypeId: number, scheduledAt: string, location: string | null, memberIds: number[]) {
     return this.http.post<SessionDto>(`${this.base}/sessions`, {

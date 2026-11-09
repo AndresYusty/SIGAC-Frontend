@@ -7,7 +7,7 @@ export interface QuorumDto {
   required: number;
   percentage: number;
   reached: boolean;
-  /** False for virtual councils, which are decided by whoever responds. */
+  /** False only when the council kind does not deliberate. A virtual council does. */
   applicable: boolean;
 }
 

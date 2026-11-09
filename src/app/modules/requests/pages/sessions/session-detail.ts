@@ -11,7 +11,7 @@ import { TranslatePipe } from '@shared/pipes/translate.pipe';
 import { saveBlob } from '@shared/utils/files';
 import { TONE } from '@shared/utils/labels';
 import { RequestsApi } from '../../requests.api';
-import { GuestPayload, SessionDto } from '../../requests.models';
+import { GuestPayload, RequestDto, SessionDto, SummonedDto } from '../../requests.models';
 
 @Component({
   selector: 'app-session-detail',
@@ -28,6 +28,15 @@ export class SessionDetailPage implements OnInit {
   private readonly toast = inject(ToastService);
   private readonly confirm = inject(ConfirmService);
   readonly session = signal<SessionDto | null>(null);
+  readonly approved = signal<RequestDto[]>([]);
+  readonly people = signal<SummonedDto[]>([]);
+  readonly personQuery = signal('');
+  readonly visiblePeople = computed(() => {
+    const self = this.auth.user()?.id;
+    const text = this.personQuery().trim().toLowerCase();
+    return this.people().filter((person) => person.userId !== self && (!text || person.name.toLowerCase().includes(text)));
+  });
+  requestQuery = '';
   urgentTitle = '';
   urgentDescription = '';
   guest: GuestPayload = { name: '', email: '', affiliation: '' };
@@ -49,6 +58,12 @@ export class SessionDetailPage implements OnInit {
     if (this.auth.has('ROLE_ADMIN')) {
       this.usersApi.listCouncilTypes().subscribe({ next: (types) => this.councilTypes.set(types) });
     }
+    if (this.auth.has('ROLE_COUNCIL_SECRETARY') || this.auth.has('ROLE_ADMIN')) {
+      this.api.summonable().subscribe({
+        next: (people) => this.people.set(people),
+        error: (e) => this.toast.apiError(e),
+      });
+    }
     this.reload();
   }
 
@@ -63,6 +78,50 @@ export class SessionDetailPage implements OnInit {
         this.councilTypeId = s.councilTypeId;
         this.scheduledAt = s.scheduledAt.slice(0, 16);
         this.location = s.location ?? '';
+        if (!s.agendaClosed && (this.auth.has('ROLE_COUNCIL_SECRETARY') || this.auth.has('ROLE_ADMIN'))) {
+          this.loadApproved();
+        }
+      },
+      error: (e) => this.toast.apiError(e),
+    });
+  }
+
+  visibleApproved(): RequestDto[] {
+    const query = this.requestQuery.trim().toLowerCase();
+    if (!query) return this.approved();
+    return this.approved().filter((item) =>
+      `${item.code} ${item.title} ${item.requester}`.toLowerCase().includes(query));
+  }
+
+  countsSelf(): boolean {
+    const self = this.auth.user()?.id;
+    return self != null && (this.session()?.summoned ?? []).some((person) => person.userId === self);
+  }
+
+  isCited(userId: number): boolean {
+    return (this.session()?.summoned ?? []).some((person) => person.userId === userId);
+  }
+
+  setCited(userId: number, cited: boolean): void {
+    const current = (this.session()?.summoned ?? []).map((person) => person.userId);
+    const memberIds = cited
+      ? [...new Set([...current, userId])]
+      : current.filter((id) => id !== userId);
+    this.api.updateSummons(this.id(), memberIds).subscribe({
+      next: (s) => {
+        this.session.set(s);
+        this.toast.ok('sessions.detail.summonsSaved');
+      },
+      error: (e) => this.toast.apiError(e),
+    });
+  }
+
+  addRequest(requestId: number): void {
+    this.api.addAgendaItem(this.id(), requestId).subscribe({
+      next: (s) => {
+        this.session.set(s);
+        this.approved.update((list) => list.filter((item) => item.id !== requestId));
+        this.toast.ok('sessions.detail.itemAdded');
       },
       error: (e) => this.toast.apiError(e),
     });
@@ -181,6 +240,13 @@ export class SessionDetailPage implements OnInit {
     this.api.downloadNotice(this.id()).subscribe({
       next: (b) => saveBlob(b, 'Citación.pdf'),
       error: (e) => this.toast.apiError(e),
+    });
+  }
+
+  private loadApproved(): void {
+    this.api.searchRequests({ status: 'APPROVED', size: 50 }).subscribe({
+      next: (page) => this.approved.set(page.content),
+      error: () => undefined,
     });
   }
 

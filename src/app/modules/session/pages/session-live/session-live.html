@@ -25,17 +25,52 @@
         <h2>{{ 'sessions.detail.agenda' | t }}</h2>
         <span class="chip">{{ s.items.length }}</span>
       </div>
+      @if (canEditAgenda()) {
+        <p class="muted">{{ 'sessions.live.agendaHint' | t }}</p>
+        <label class="field">
+          <span>{{ 'sessions.detail.waiting' | t }}</span>
+          <input [(ngModel)]="requestQuery" [placeholder]="'sessions.detail.searchRequests' | t" />
+        </label>
+        @for (request of visibleApproved(); track request.id) {
+          <div class="row-actions" style="margin-bottom: .5rem">
+            <span>{{ request.code }} · {{ request.title }}</span>
+            <button class="btn btn-secondary" type="button" (click)="addRequest(request.id)">{{ 'sessions.detail.addItem' | t }}</button>
+          </div>
+        } @empty {
+          <p class="muted">{{ (requestQuery.trim() ? 'sessions.detail.noneMatch' : 'sessions.detail.noneWaiting') | t }}</p>
+        }
+        <div class="row-actions" style="margin: .75rem 0">
+          <a class="btn" [routerLink]="['/requests/new']" [queryParams]="{ session: s.id }">{{ 'sessions.live.newRequest' | t }}</a>
+        </div>
+        @if (s.councilKind === 'EXTRAORDINARY') {
+          <h3>{{ 'sessions.urgentForm.title' | t }}</h3>
+          <p class="muted">{{ 'sessions.urgentForm.hint' | t }}</p>
+          <div class="toolbar">
+            <label class="field grow"><span>{{ 'common.title' | t }}</span><input [(ngModel)]="urgentTitle" maxlength="300" /></label>
+            <label class="field grow"><span>{{ 'common.description' | t }}</span><input [(ngModel)]="urgentDescription" /></label>
+            <button class="btn btn-secondary" type="button" (click)="addUrgentItem()">{{ 'sessions.urgentForm.add' | t }}</button>
+          </div>
+        }
+      }
       <div class="live-points">
-        @for (item of s.items; track item.id) {
+        @for (item of s.items; track item.id; let i = $index) {
           <article class="live-point">
             <div class="live-point-title">
               <span class="agenda-pos">{{ item.position }}</span>
               <div>
                 <h3>{{ item.title }}</h3>
+                @if (item.requestCode) { <p class="kicker">{{ item.requestCode }}</p> }
                 @if (item.description) { <p class="muted">{{ item.description }}</p> }
                 <div class="row-actions">
                   @if (item.urgent) { <span class="chip">{{ 'sessions.urgent' | t }}</span> }
                   @if (item.miscellaneous) { <span class="chip">{{ 'sessions.misc' | t }}</span> }
+                  @if (canEditAgenda()) {
+                    <button class="btn btn-ghost" type="button" [attr.aria-label]="'sessions.detail.moveUp' | t" (click)="move(i, -1)">↑</button>
+                    <button class="btn btn-ghost" type="button" [attr.aria-label]="'sessions.detail.moveDown' | t" (click)="move(i, 1)">↓</button>
+                    @if (!item.outcome) {
+                      <button class="btn btn-ghost" type="button" (click)="removeItem(item.id)">{{ 'sessions.detail.remove' | t }}</button>
+                    }
+                  }
                 </div>
               </div>
             </div>

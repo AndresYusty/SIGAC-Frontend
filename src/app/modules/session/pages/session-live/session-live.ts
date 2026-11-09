@@ -4,7 +4,7 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { AuthService } from '@core/auth/auth.service';
 import { ConfirmService } from '@core/ui/confirm.service';
 import { ToastService } from '@core/ui/toast.service';
-import { AgendaItemDto, DECISION_OUTCOMES, RequestsApi, SessionDto } from '@modules/requests';
+import { AgendaItemDto, DECISION_OUTCOMES, RequestDto, RequestsApi, SessionDto } from '@modules/requests';
 import { LocalDatePipe } from '@shared/pipes/local-date.pipe';
 import { TranslatePipe } from '@shared/pipes/translate.pipe';
 import { TONE } from '@shared/utils/labels';
@@ -28,6 +28,10 @@ export class SessionLivePage implements OnInit, OnDestroy {
   readonly session = signal<SessionDto | null>(null);
   readonly attendance = signal<AttendanceDto | null>(null);
   readonly voteWarning = signal(false);
+  readonly approved = signal<RequestDto[]>([]);
+  requestQuery = '';
+  urgentTitle = '';
+  urgentDescription = '';
   readonly tone = TONE;
   readonly outcomes = DECISION_OUTCOMES;
   decisions: Record<number, DecisionPayload> = {};
@@ -61,6 +65,7 @@ export class SessionLivePage implements OnInit, OnDestroy {
             changeReason: '',
           };
         }
+        if (!silent && this.canEditAgenda()) this.loadApproved();
       },
       error: (e) => {
         if (!silent) this.toast.apiError(e);
@@ -73,6 +78,63 @@ export class SessionLivePage implements OnInit, OnDestroy {
         this.fitVotesToSeats();
       },
       error: () => undefined,
+    });
+  }
+
+  canEditAgenda(): boolean {
+    const status = this.session()?.status;
+    return this.auth.has('ROLE_COUNCIL_SECRETARY') && (status === 'STARTED' || status === 'SUSPENDED');
+  }
+
+  visibleApproved(): RequestDto[] {
+    const query = this.requestQuery.trim().toLowerCase();
+    if (!query) return this.approved();
+    return this.approved().filter((item) =>
+      `${item.code} ${item.title} ${item.requester}`.toLowerCase().includes(query));
+  }
+
+  addRequest(requestId: number): void {
+    this.requestsApi.addAgendaItem(this.id(), requestId).subscribe({
+      next: (s) => {
+        this.session.set(s);
+        this.approved.update((list) => list.filter((item) => item.id !== requestId));
+        this.toast.ok('sessions.detail.itemAdded');
+      },
+      error: (e) => this.toast.apiError(e),
+    });
+  }
+
+  addUrgentItem(): void {
+    if (!this.urgentTitle.trim()) {
+      this.toast.error('sessions.urgentForm.titleRequired');
+      return;
+    }
+    this.requestsApi.addUrgentItem(this.id(), this.urgentTitle.trim(), this.urgentDescription.trim()).subscribe({
+      next: (s) => {
+        this.session.set(s);
+        this.urgentTitle = '';
+        this.urgentDescription = '';
+        this.toast.ok('sessions.detail.itemAdded');
+      },
+      error: (e) => this.toast.apiError(e),
+    });
+  }
+
+  removeItem(itemId: number): void {
+    this.requestsApi.removeAgendaItem(this.id(), itemId).subscribe({
+      next: (s) => this.session.set(s),
+      error: (e) => this.toast.apiError(e),
+    });
+  }
+
+  move(index: number, dir: -1 | 1): void {
+    const items = [...(this.session()?.items ?? [])];
+    const target = index + dir;
+    if (target < 0 || target >= items.length) return;
+    [items[index], items[target]] = [items[target], items[index]];
+    this.requestsApi.reorderAgendaItems(this.id(), items.map((item) => item.id)).subscribe({
+      next: (s) => this.session.set(s),
+      error: (e) => this.toast.apiError(e),
     });
   }
 
@@ -209,7 +271,16 @@ export class SessionLivePage implements OnInit, OnDestroy {
   }
 
   async finish(): Promise<void> {
-    if (!(await this.confirm.ask('sessions.live.finishTitle', 'sessions.live.finishMessage', 'sessions.live.finish'))) return;
+    const pending = (this.session()?.items ?? []).some((item) => !item.outcome);
+    const message = pending ? 'sessions.live.finishPending' : 'sessions.live.finishMessage';
+    if (!(await this.confirm.ask('sessions.live.finishTitle', message, 'sessions.live.finish'))) return;
     this.act('finish');
+  }
+
+  private loadApproved(): void {
+    this.requestsApi.searchRequests({ status: 'APPROVED', size: 30 }).subscribe({
+      next: (page) => this.approved.set(page.content),
+      error: () => undefined,
+    });
   }
 }

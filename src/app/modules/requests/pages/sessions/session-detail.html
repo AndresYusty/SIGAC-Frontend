@@ -66,7 +66,38 @@
     </article>
   }
 
-  @if (s.summoned?.length) {
+  @if ((auth.has('ROLE_COUNCIL_SECRETARY') || auth.has('ROLE_ADMIN')) && !s.agendaClosed) {
+    <article class="card cited-card">
+      <div class="agenda-head">
+        <h2>{{ 'sessions.detail.cited' | t }}</h2>
+        <span class="chip">{{ s.summoned.length }}</span>
+      </div>
+      <p class="muted">{{ 'sessions.detail.citedEditHint' | t }}</p>
+      @if (countsSelf()) {
+        <p class="muted">{{ 'sessions.new.selfCited' | t }}</p>
+      }
+      <label class="field">
+        <span>{{ 'common.search' | t }}</span>
+        <input [ngModel]="personQuery()" (ngModelChange)="personQuery.set($event)" [placeholder]="'sessions.new.searchPeople' | t" />
+      </label>
+      <ul class="member-list">
+        @for (p of visiblePeople(); track p.userId) {
+          <li>
+            <label class="member-row" [class.on]="isCited(p.userId)">
+              <input type="checkbox" [ngModel]="isCited(p.userId)" (ngModelChange)="setCited(p.userId, $event)" />
+              <span>
+                <strong>{{ p.name }}</strong>
+                <span class="muted">{{ 'enums.role.' + p.role | t }}</span>
+              </span>
+              <span class="member-state">{{ (isCited(p.userId) ? 'sessions.new.cited' : 'sessions.new.notCited') | t }}</span>
+            </label>
+          </li>
+        } @empty {
+          <li class="pick-empty">{{ (personQuery() ? 'sessions.new.noneMatch' : 'sessions.new.nonePeople') | t }}</li>
+        }
+      </ul>
+    </article>
+  } @else if (s.summoned?.length) {
     <article class="card cited-card">
       <div class="agenda-head">
         <h2>{{ 'sessions.detail.cited' | t }}</h2>
@@ -90,21 +121,40 @@
     <article class="card" style="margin-bottom: 1rem">
         <h2>{{ 'sessions.detail.points' | t }}</h2>
         <p class="muted">{{ 'sessions.detail.pointsHint' | t }}</p>
-        @for (item of s.items; track item.id) {
+        @for (item of s.items; track item.id; let i = $index) {
           <div class="point">
             @if (item.requestCode) {
               <p class="kicker">{{ item.requestCode }}</p>
             }
-            <h3>{{ item.title }}
+            <h3>{{ item.position }}. {{ item.title }}
               @if (item.miscellaneous) { <span class="chip">{{ 'sessions.misc' | t }}</span> }
               @if (item.urgent) { <span class="chip">{{ 'sessions.urgent' | t }}</span> }
             </h3>
             @if (item.description) {
               <p>{{ item.description }}</p>
             }
+            <div class="row-actions">
+              <button class="btn btn-ghost" type="button" [attr.aria-label]="'sessions.detail.moveUp' | t" (click)="move(i, -1)">↑</button>
+              <button class="btn btn-ghost" type="button" [attr.aria-label]="'sessions.detail.moveDown' | t" (click)="move(i, 1)">↓</button>
+              <button class="btn btn-ghost" type="button" (click)="removeItem(item.id)">{{ 'sessions.detail.remove' | t }}</button>
+            </div>
           </div>
         } @empty {
           <p class="muted">{{ 'sessions.detail.emptyHint' | t }}</p>
+        }
+        <h3 style="margin-top: 1rem">{{ 'sessions.detail.waiting' | t }}</h3>
+        <p class="muted">{{ 'sessions.detail.waitingHint' | t }}</p>
+        <label class="field">
+          <span>{{ 'common.search' | t }}</span>
+          <input [(ngModel)]="requestQuery" [placeholder]="'sessions.detail.searchRequests' | t" />
+        </label>
+        @for (request of visibleApproved(); track request.id) {
+          <div class="row-actions" style="margin-bottom: .5rem">
+            <span>{{ request.code }} · {{ request.title }}</span>
+            <button class="btn btn-secondary" type="button" (click)="addRequest(request.id)">{{ 'sessions.detail.addItem' | t }}</button>
+          </div>
+        } @empty {
+          <p class="muted">{{ (requestQuery.trim() ? 'sessions.detail.noneMatch' : 'sessions.detail.noneWaiting') | t }}</p>
         }
         @if (s.councilKind === 'EXTRAORDINARY') {
           <h3 style="margin-top: 1rem">{{ 'sessions.urgentForm.title' | t }}</h3>

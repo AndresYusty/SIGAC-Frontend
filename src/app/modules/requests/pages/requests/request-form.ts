@@ -46,6 +46,7 @@ export class RequestFormPage implements OnInit {
   readonly files = signal<Record<string, File>>({});
   readonly courses = signal<CourseDraft[]>([emptyCourse()]);
   readonly saving = signal(false);
+  readonly liveSessionId = signal<number | null>(null);
   readonly branch = signal<RequestBranch | ''>('');
   readonly topicCode = signal('');
 
@@ -76,6 +77,18 @@ export class RequestFormPage implements OnInit {
 
   ngOnInit(): void {
     const raw = this.route.snapshot.paramMap.get('id');
+    const sessionRaw = this.route.snapshot.queryParamMap.get('session');
+    const sessionId = Number(sessionRaw);
+    if (sessionRaw && Number.isFinite(sessionId) && sessionId > 0) {
+      this.liveSessionId.set(sessionId);
+    }
+    const councilOnly = this.auth.has('ROLE_COUNCIL_SECRETARY')
+      && !this.auth.has('ROLE_FACULTY_SECRETARY')
+      && !this.auth.has('ROLE_ADMIN');
+    if (councilOnly && !this.liveSessionId() && !raw) {
+      void this.router.navigate(['/sessions']);
+      return;
+    }
     this.api.catalog().subscribe({
       next: (catalog) => {
         this.catalog.set(catalog);
@@ -85,8 +98,13 @@ export class RequestFormPage implements OnInit {
       },
       error: (e) => this.toast.apiError(e),
     });
-    if (!this.auth.user()?.programId && !raw && this.auth.has('ROLE_ADMIN')) {
-      this.loadPrograms();
+    if (!this.auth.user()?.programId && !raw) {
+      const facultyId = this.auth.user()?.facultyId;
+      if (facultyId) {
+        this.usersApi.listPrograms(facultyId).subscribe({ next: (programs) => this.programs.set(programs) });
+      } else if (this.auth.has('ROLE_ADMIN')) {
+        this.loadPrograms();
+      }
     }
     if (raw) {
       const id = Number(raw);
@@ -259,6 +277,20 @@ export class RequestFormPage implements OnInit {
     }
     this.saving.set(true);
     const id = this.id();
+    const sessionId = this.liveSessionId();
+    if (!id && sessionId) {
+      this.api.fileLiveRequest(sessionId, fd).subscribe({
+        next: () => {
+          this.toast.ok('sessions.live.requestAdded');
+          void this.router.navigate(['/sessions', sessionId, 'live']);
+        },
+        error: (e) => {
+          this.saving.set(false);
+          this.toast.apiError(e);
+        },
+      });
+      return;
+    }
     const req = id ? this.api.updateRequest(id, fd) : this.api.fileRequest(fd);
     req.subscribe({
       next: (saved) => {

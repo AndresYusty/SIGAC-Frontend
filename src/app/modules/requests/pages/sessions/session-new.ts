@@ -111,12 +111,12 @@ export class SessionNewPage implements OnInit {
     }
   }
 
-  /** Virtual councils are held by email, so the location is optional. */
+  /** A virtual council still needs the link of the platform where it meets. */
   private applyKind(councilTypeId: number): void {
     const kind = this.councilTypes().find((t) => t.id === councilTypeId)?.kind ?? null;
     this.kind.set(kind);
     const location = this.form.controls.location;
-    location.setValidators(kind === 'VIRTUAL' ? [] : [Validators.required]);
+    location.setValidators([Validators.required]);
     location.updateValueAndValidity();
   }
 

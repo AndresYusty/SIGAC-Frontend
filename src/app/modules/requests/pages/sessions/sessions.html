@@ -58,3 +58,15 @@
   <span>{{ 'common.pageOf' | t: { page: (page()?.number ?? 0) + 1, total: page()?.totalPages || 1 } }}</span>
   <button class="btn btn-ghost" type="button" [disabled]="page()?.last" (click)="load((page()?.number ?? -1) + 1)">{{ 'common.next' | t }}</button>
 </div>
+
+<details class="status-legend">
+  <summary>{{ 'sessions.legend' | t }}</summary>
+  <ul>
+    @for (st of statuses; track st) {
+      <li>
+        <span class="badge" [class]="tone[st]">{{ 'enums.sessionStatus.' + st | t }}</span>
+        <span>{{ 'sessions.meaning.' + st | t }}</span>
+      </li>
+    }
+  </ul>
+</details>
