@@ -22,6 +22,7 @@
     "repository": "Repositorio",
     "templates": "Plantillas",
     "users": "Usuarios",
+    "support": "Personal de apoyo",
     "hierarchy": "Jerarquía",
     "settings": "Configuración",
     "audit": "Auditoría",
@@ -119,6 +120,8 @@
       "programInUse": "No se puede eliminar: hay personas o solicitudes en este programa.",
       "emailTaken": "Ya hay un usuario registrado con ese correo.",
       "selfDeactivate": "No puede desactivar su propia cuenta.",
+      "supportStaffOnly": "Solo puede activar o inactivar a las secretarías de su jurisdicción.",
+      "programHeadNeedsProgram": "El jefe de programa debe quedar asignado a un programa.",
       "currentPassword": "La contraseña actual no es correcta.",
       "roleNeedsFaculty": "Los roles operativos requieren una facultad (RN-01).",
       "programFaculty": "El programa no pertenece a la facultad indicada.",
@@ -130,6 +133,7 @@
       "compromisedHash": "Documento comprometido: la huella SHA-256 no coincide con la registrada al firmar. La descarga se bloqueó y se avisó a los administradores.",
       "repoPublishedOnly": "En el repositorio solo están disponibles las actas publicadas.",
       "attendedOnly": "Solo puede consultar las actas de las sesiones a las que asistió.",
+      "agreementsAttendedOnly": "Solo puede consultar los acuerdos de las sesiones a las que asistió.",
       "badCredentials": "Las credenciales de ingreso no son correctas.",
       "accountDisabled": "La cuenta está desactivada. Comuníquese con la administración.",
       "templateErrors": "La plantilla tiene errores y no se puede usar.",
@@ -241,9 +245,10 @@
     "role": {
       "ROLE_ADMIN": "Administrador",
       "ROLE_COUNCIL_SECRETARY": "Secretaría del Consejo",
-      "ROLE_FACULTY_SECRETARY": "Secretaría de Facultad",
-      "ROLE_PRESIDENT": "Presidente (Decano)",
-      "ROLE_COUNCIL_MEMBER": "Consejero"
+      "ROLE_FACULTY_SECRETARY": "Secretaría de programa",
+      "ROLE_PRESIDENT": "Decano (jefe de facultad)",
+      "ROLE_COUNCIL_MEMBER": "Consejero",
+      "ROLE_PROGRAM_HEAD": "Jefe de programa"
     },
     "requestType": {
       "ACADEMIC": "Académica",
@@ -538,7 +543,16 @@
     "updated": "Usuario actualizado",
     "created": "Usuario creado",
     "statusUpdated": "Estado actualizado",
-    "passwordRequired": "La contraseña es obligatoria"
+    "passwordRequired": "La contraseña es obligatoria",
+    "programRequired": "El jefe de programa requiere un programa.",
+    "invalid": "Revise los campos. El correo debe ser válido y los datos obligatorios no pueden quedar vacíos.",
+    "support": {
+      "kicker": "Jurisdicción",
+      "title": "Personal de apoyo",
+      "leadDean": "Como decano, jefe de facultad, active o inactive a las secretarías de su facultad.",
+      "leadProgram": "Como jefe de programa, active o inactive a la secretaría de su programa.",
+      "empty": "No hay secretarías en su jurisdicción."
+    }
   },
   "hierarchy": {
     "kicker": "Estructura",
@@ -655,7 +669,7 @@
       "locationPlaceholder": "Sala de juntas / enlace virtual",
       "data": "Datos de la sesión",
       "cite": "A quién se cita",
-      "citeHint": "Marque al presidente y a los consejeros. Recibirán la citación al cerrar el orden del día.",
+      "citeHint": "Marque al presidente, a los consejeros y al jefe de programa cuando actúe en el consejo. Recibirán la citación al cerrar el orden del día.",
       "selfCited": "Usted ya queda citado. No hace falta marcarlo.",
       "searchPeople": "Nombre",
       "cited": "Citado",

@@ -23,6 +23,7 @@ export const TONE: Record<string, string> = {
   ROLE_FACULTY_SECRETARY: 'info',
   ROLE_PRESIDENT: 'warn',
   ROLE_COUNCIL_MEMBER: 'muted',
+  ROLE_PROGRAM_HEAD: 'warn',
 };
 
 export function formatBytes(n: number): string {

@@ -82,7 +82,13 @@
             <option [value]="p.id">{{ p.name }}</option>
           }
         </select>
+        @if (form.controls.role.value === 'ROLE_PROGRAM_HEAD' && !form.controls.programId.value) {
+          <small class="error-text">{{ 'users.programRequired' | t }}</small>
+        }
       </label>
+      @if (formError()) {
+        <p class="error-text">{{ formError() }}</p>
+      }
       <div class="modal-actions">
         <button class="btn btn-ghost" type="button" (click)="showForm = false">{{ 'common.cancel' | t }}</button>
         <button class="btn" type="submit">{{ 'common.save' | t }}</button>

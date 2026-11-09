@@ -1,0 +1,43 @@
+<div class="page-head">
+  <div>
+    <p class="kicker">{{ 'users.support.kicker' | t }}</p>
+    <h1>{{ 'users.support.title' | t }}</h1>
+    <p class="lead">{{ (auth.has('ROLE_PRESIDENT') ? 'users.support.leadDean' : 'users.support.leadProgram') | t }}</p>
+  </div>
+</div>
+<article class="card table-wrap">
+  @if (staff().length === 0) {
+    <p class="muted">{{ 'users.support.empty' | t }}</p>
+  } @else {
+    <table>
+      <thead>
+        <tr>
+          <th>{{ 'common.name' | t }}</th>
+          <th>{{ 'common.email' | t }}</th>
+          <th>{{ 'common.roles' | t }}</th>
+          <th>{{ 'common.program' | t }}</th>
+          <th>{{ 'common.status' | t }}</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (u of staff(); track u.id) {
+          <tr>
+            <td>{{ u.name }}</td>
+            <td>{{ u.email }}</td>
+            <td>
+              @for (r of u.roles; track r) {
+                <span class="chip">{{ 'enums.role.' + r | t }}</span>
+              }
+            </td>
+            <td>{{ u.programName || '—' }}</td>
+            <td><span class="badge" [class]="u.active ? 'ok' : 'muted'">{{ (u.active ? 'common.active' : 'common.inactive') | t }}</span></td>
+            <td class="row-actions">
+              <button class="btn btn-ghost" type="button" (click)="toggle(u)">{{ (u.active ? 'users.deactivate' : 'users.activate') | t }}</button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+</article>

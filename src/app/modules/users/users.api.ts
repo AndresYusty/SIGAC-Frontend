@@ -38,6 +38,9 @@ export class UsersApi {
       params: { active },
     });
   }
+  listSupportStaff() {
+    return this.http.get<UserDto[]>(`${this.base}/users/support`);
+  }
 
   listUniversities() {
     return this.http.get<NodeDto[]>(`${this.base}/hierarchy/universities`);

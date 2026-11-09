@@ -27,6 +27,12 @@ export const usersRoutes: Routes = [
     loadComponent: () => import('./pages/users/users').then((m) => m.UsersPage),
   },
   {
+    path: 'staff',
+    canActivate: [roleGuard],
+    data: { roles: ['ROLE_PRESIDENT', 'ROLE_PROGRAM_HEAD'] },
+    loadComponent: () => import('./pages/staff/staff').then((m) => m.StaffPage),
+  },
+  {
     path: 'hierarchy',
     canActivate: [roleGuard],
     data: { roles: ['ROLE_ADMIN'] },

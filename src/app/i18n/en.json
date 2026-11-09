@@ -22,6 +22,7 @@
     "repository": "Repository",
     "templates": "Templates",
     "users": "Users",
+    "support": "Support staff",
     "hierarchy": "Hierarchy",
     "settings": "Settings",
     "audit": "Audit",
@@ -119,6 +120,8 @@
       "programInUse": "Cannot delete: there are people or requests in this program.",
       "emailTaken": "A user with that email is already registered.",
       "selfDeactivate": "You cannot deactivate your own account.",
+      "supportStaffOnly": "You can only activate or deactivate the secretaries under your authority.",
+      "programHeadNeedsProgram": "A program head must be assigned to a program.",
       "currentPassword": "The current password is incorrect.",
       "roleNeedsFaculty": "Operational roles require a faculty (RN-01).",
       "programFaculty": "The program does not belong to the given faculty.",
@@ -130,6 +133,7 @@
       "compromisedHash": "Compromised document: the SHA-256 fingerprint does not match the one recorded at signing. The download was blocked and administrators were notified.",
       "repoPublishedOnly": "Only published minutes are available in the repository.",
       "attendedOnly": "You can only access the minutes of the sessions you attended.",
+      "agreementsAttendedOnly": "You can only access the agreements of the sessions you attended.",
       "badCredentials": "Incorrect sign-in credentials.",
       "accountDisabled": "User account deactivated. Please contact the administration.",
       "templateErrors": "The template contains errors and cannot be used.",
@@ -241,9 +245,10 @@
     "role": {
       "ROLE_ADMIN": "Administrator",
       "ROLE_COUNCIL_SECRETARY": "Council Secretary",
-      "ROLE_FACULTY_SECRETARY": "Faculty Secretary",
-      "ROLE_PRESIDENT": "President (Dean)",
-      "ROLE_COUNCIL_MEMBER": "Council member"
+      "ROLE_FACULTY_SECRETARY": "Program secretary",
+      "ROLE_PRESIDENT": "Dean (faculty head)",
+      "ROLE_COUNCIL_MEMBER": "Council member",
+      "ROLE_PROGRAM_HEAD": "Program head"
     },
     "requestType": {
       "ACADEMIC": "Academic",
@@ -538,7 +543,16 @@
     "updated": "User updated",
     "created": "User created",
     "statusUpdated": "Status updated",
-    "passwordRequired": "Password is required"
+    "passwordRequired": "Password is required",
+    "programRequired": "A program head must be assigned to a program.",
+    "invalid": "Check the fields. The email must be valid and the required data cannot be empty.",
+    "support": {
+      "kicker": "Jurisdiction",
+      "title": "Support staff",
+      "leadDean": "As dean and faculty head, activate or deactivate the secretaries of your faculty.",
+      "leadProgram": "As program head, activate or deactivate the secretary of your program.",
+      "empty": "There are no secretaries in your jurisdiction."
+    }
   },
   "hierarchy": {
     "kicker": "Structure",
@@ -655,7 +669,7 @@
       "locationPlaceholder": "Boardroom / virtual meeting link",
       "data": "Session details",
       "cite": "Who is summoned",
-      "citeHint": "Mark the president and the counselors. They receive the notice when the agenda is closed.",
+      "citeHint": "Mark the president, the counselors, and the program head when they sit on the council. They receive the notice when the agenda is closed.",
       "selfCited": "You are already summoned. You do not need to mark yourself.",
       "searchPeople": "Name",
       "cited": "Summoned",

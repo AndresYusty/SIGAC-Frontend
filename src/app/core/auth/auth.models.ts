@@ -4,6 +4,7 @@ export const ROLES = [
   'ROLE_FACULTY_SECRETARY',
   'ROLE_PRESIDENT',
   'ROLE_COUNCIL_MEMBER',
+  'ROLE_PROGRAM_HEAD',
 ] as const;
 
 export type RoleName = (typeof ROLES)[number];
