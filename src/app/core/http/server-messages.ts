@@ -38,6 +38,11 @@ const EXACT: Record<string, string> = {
   'The guest does not belong to this session': 'errors.server.guestMissing',
   'The agenda has no items: add at least one approved request or urgent item': 'errors.server.agendaEmpty',
   'The notice has not been issued yet: the agenda is not closed': 'errors.server.noticeNotIssued',
+  'The session is already finished; the notice cannot be resent': 'errors.server.noticeResendFinished',
+  'There are no recipients for the notice email': 'errors.server.noticeNoRecipients',
+  'Email sending is disabled on the server': 'errors.server.mailDisabled',
+  'This session has no support documents to download': 'errors.server.noSupportsZip',
+  'Download link not found or expired': 'errors.server.supportsLinkExpired',
   'Session not found': 'errors.server.sessionNotFound',
   'The agenda has already been closed and published; it cannot be modified (RN-09)': 'errors.server.agendaClosed',
   'The item does not belong to this session': 'errors.server.itemMissing',
@@ -200,6 +205,11 @@ const PATTERNS: Pattern[] = [
     re: /^Only APPROVED requests can be added \(current status: (\w+)\)$/,
     key: 'errors.server.approvedOnly',
     params: (m, i18n) => ({ status: statusLabel(i18n, m[1], 'requestStatus') }),
+  },
+  {
+    re: /^Could not send the notice email to: (.+)$/,
+    key: 'errors.server.noticeSendFailed',
+    params: (m) => ({ recipients: m[1] }),
   },
   {
     re: /^User (\d+) cannot be summoned to this council$/,

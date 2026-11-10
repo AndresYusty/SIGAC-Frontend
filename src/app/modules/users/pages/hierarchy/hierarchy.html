@@ -41,7 +41,7 @@
           <h2>{{ current().key + '.title' | t }}</h2>
           <p>{{ current().key + '.description' | t }}</p>
         </div>
-        @if (!creating()) {
+        @if (!creating() && step() > 0) {
           <button class="btn btn-secondary" type="button" (click)="openForm()">
             <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" /></svg>
             {{ current().key + '.register' | t }}
@@ -109,13 +109,17 @@
               </span>
               <span class="wz-actions" (click)="$event.stopPropagation()">
                 <button class="btn btn-ghost" type="button" (click)="openEdit(n)">{{ 'hierarchy.edit' | t }}</button>
-                <button class="btn btn-ghost" type="button" (click)="remove(n)">{{ 'hierarchy.remove' | t }}</button>
+                @if (step() > 0) {
+                  <button class="btn btn-ghost" type="button" (click)="remove(n)">{{ 'hierarchy.remove' | t }}</button>
+                }
               </span>
             </div>
           } @empty {
             <p class="wz-empty">
               @if (filter()) {
                 {{ 'hierarchy.noResults' | t: { query: filter() } }}
+              } @else if (step() === 0) {
+                {{ 'hierarchy.emptyUniversity' | t }}
               } @else {
                 {{ 'hierarchy.emptyBefore' | t }} <b>{{ current().key + '.register' | t }}</b> {{ 'hierarchy.emptyAfter' | t }}
               }

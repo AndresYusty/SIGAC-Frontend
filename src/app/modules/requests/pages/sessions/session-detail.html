@@ -8,8 +8,12 @@
     <div class="row-actions">
       <span class="badge" [class]="tone[s.status]">{{ 'enums.sessionStatus.' + s.status | t }}</span>
       @if (s.agendaClosed) {
-        <button class="btn btn-secondary" type="button" (click)="previewNotice()">{{ 'common.view' | t }}</button>
-        <button class="btn btn-ghost" type="button" (click)="downloadNotice()">{{ 'sessions.detail.noticePdf' | t }}</button>
+        <button class="btn btn-secondary" type="button" (click)="previewNotice()">{{ 'sessions.detail.viewNotice' | t }}</button>
+        @if (auth.has('ROLE_COUNCIL_SECRETARY') && s.status !== 'FINISHED') {
+          <button class="btn btn-ochre" type="button" [disabled]="resendingNotice()" (click)="resendNotice()">
+            {{ 'sessions.detail.resendNotice' | t }}
+          </button>
+        }
       }
       @if ((s.status === 'CONVENED' || s.status === 'STARTED' || s.status === 'SUSPENDED') && !auth.has('ROLE_COUNCIL_SECRETARY')) {
         <a [routerLink]="['/sessions', s.id, 'live']" class="btn">{{ 'sessions.detail.liveRoom' | t }}</a>
@@ -137,8 +141,19 @@
             @for (file of item.attachments ?? []; track file.id) {
               <div class="doc-row">
                 <span>{{ file.documentCode ? ('enums.requestDocument.' + file.documentCode | t) : file.name }}</span>
-                <button class="btn btn-ghost" type="button" (click)="previewAttachment(item.requestId!, file)">{{ 'common.view' | t }}</button>
-                <button class="btn btn-ghost" type="button" (click)="downloadAttachment(item.requestId!, file)">{{ 'common.download' | t }}</button>
+                <button class="btn btn-ghost btn-icon" type="button" [attr.aria-label]="'common.view' | t" [title]="'common.view' | t" (click)="previewAttachment(item.requestId!, file)">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                    <circle cx="12" cy="12" r="3"/>
+                  </svg>
+                </button>
+                <button class="btn btn-ghost btn-icon" type="button" [attr.aria-label]="'common.download' | t" [title]="'common.download' | t" (click)="downloadAttachment(item.requestId!, file)">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="7 10 12 15 17 10"/>
+                    <line x1="12" y1="15" x2="12" y2="3"/>
+                  </svg>
+                </button>
               </div>
             }
             <div class="row-actions">
@@ -150,29 +165,58 @@
         } @empty {
           <p class="muted">{{ 'sessions.detail.emptyHint' | t }}</p>
         }
-        <h3 style="margin-top: 1rem">{{ 'sessions.detail.waiting' | t }}</h3>
-        <p class="muted">{{ 'sessions.detail.waitingHint' | t }}</p>
-        <label class="field">
-          <span>{{ 'common.search' | t }}</span>
-          <input [(ngModel)]="requestQuery" [placeholder]="'sessions.detail.searchRequests' | t" />
-        </label>
-        @for (request of visibleApproved(); track request.id) {
-          <div style="margin-bottom: .5rem">
-            <div class="row-actions">
-              <span>{{ request.code }} · {{ request.title }}</span>
-              <button class="btn btn-secondary" type="button" (click)="addRequest(request.id)">{{ 'sessions.detail.addItem' | t }}</button>
-            </div>
-            @for (file of request.attachments; track file.id) {
-              <div class="doc-row">
-                <span>{{ file.documentCode ? ('enums.requestDocument.' + file.documentCode | t) : file.name }}</span>
-                <button class="btn btn-ghost" type="button" (click)="previewAttachment(request.id, file)">{{ 'common.view' | t }}</button>
-                <button class="btn btn-ghost" type="button" (click)="downloadAttachment(request.id, file)">{{ 'common.download' | t }}</button>
-              </div>
+        <div class="waiting-block">
+          <h3>{{ 'sessions.detail.waiting' | t }}</h3>
+          <p class="muted">{{ 'sessions.detail.waitingHint' | t }}</p>
+          <label class="field">
+            <span>{{ 'common.search' | t }}</span>
+            <input [(ngModel)]="requestQuery" [placeholder]="'sessions.detail.searchRequests' | t" />
+          </label>
+          <div class="waiting-list">
+            @for (request of visibleApproved(); track request.id) {
+              <article class="waiting-item">
+                <div class="waiting-item-head">
+                  <div class="waiting-item-text">
+                    <p class="kicker">{{ request.code }}</p>
+                    <strong>{{ request.title }}</strong>
+                    @if (request.program || request.faculty || request.campus) {
+                      <span class="muted">
+                        @if (request.program) { {{ request.program }} }
+                        @if (request.faculty) { @if (request.program) { · } {{ request.faculty }} }
+                        @if (request.campus) { @if (request.program || request.faculty) { · } {{ request.campus }} }
+                      </span>
+                    }
+                  </div>
+                  <button class="btn btn-secondary" type="button" (click)="addRequest(request.id)">
+                    {{ 'sessions.detail.addItem' | t }}
+                  </button>
+                </div>
+                @if (request.attachments.length) {
+                  @for (file of request.attachments; track file.id) {
+                    <div class="doc-row">
+                      <span>{{ file.documentCode ? ('enums.requestDocument.' + file.documentCode | t) : file.name }}</span>
+                      <button class="btn btn-ghost btn-icon" type="button" [attr.aria-label]="'common.view' | t" [title]="'common.view' | t" (click)="previewAttachment(request.id, file)">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                          <circle cx="12" cy="12" r="3"/>
+                        </svg>
+                      </button>
+                      <button class="btn btn-ghost btn-icon" type="button" [attr.aria-label]="'common.download' | t" [title]="'common.download' | t" (click)="downloadAttachment(request.id, file)">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                          <polyline points="7 10 12 15 17 10"/>
+                          <line x1="12" y1="15" x2="12" y2="3"/>
+                        </svg>
+                      </button>
+                    </div>
+                  }
+                }
+              </article>
+            } @empty {
+              <p class="muted">{{ (requestQuery.trim() ? 'sessions.detail.noneMatch' : 'sessions.detail.noneWaiting') | t }}</p>
             }
           </div>
-        } @empty {
-          <p class="muted">{{ (requestQuery.trim() ? 'sessions.detail.noneMatch' : 'sessions.detail.noneWaiting') | t }}</p>
-        }
+        </div>
         @if (s.councilKind === 'EXTRAORDINARY') {
           <h3 style="margin-top: 1rem">{{ 'sessions.urgentForm.title' | t }}</h3>
           <p class="muted">{{ 'sessions.urgentForm.hint' | t }}</p>
@@ -251,8 +295,19 @@
               @for (file of item.attachments ?? []; track file.id) {
                 <div class="doc-row">
                   <span>{{ file.documentCode ? ('enums.requestDocument.' + file.documentCode | t) : file.name }}</span>
-                  <button class="btn btn-ghost" type="button" (click)="previewAttachment(item.requestId!, file)">{{ 'common.view' | t }}</button>
-                  <button class="btn btn-ghost" type="button" (click)="downloadAttachment(item.requestId!, file)">{{ 'common.download' | t }}</button>
+                  <button class="btn btn-ghost btn-icon" type="button" [attr.aria-label]="'common.view' | t" [title]="'common.view' | t" (click)="previewAttachment(item.requestId!, file)">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                      <circle cx="12" cy="12" r="3"/>
+                    </svg>
+                  </button>
+                  <button class="btn btn-ghost btn-icon" type="button" [attr.aria-label]="'common.download' | t" [title]="'common.download' | t" (click)="downloadAttachment(item.requestId!, file)">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                      <polyline points="7 10 12 15 17 10"/>
+                      <line x1="12" y1="15" x2="12" y2="3"/>
+                    </svg>
+                  </button>
                 </div>
               }
             </td>

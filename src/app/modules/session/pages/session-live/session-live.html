@@ -27,18 +27,36 @@
       </div>
       @if (canEditAgenda()) {
         <p class="muted">{{ 'sessions.live.agendaHint' | t }}</p>
-        <label class="field">
-          <span>{{ 'sessions.detail.waiting' | t }}</span>
-          <input [(ngModel)]="requestQuery" [placeholder]="'sessions.detail.searchRequests' | t" />
-        </label>
-        @for (request of visibleApproved(); track request.id) {
-          <div class="row-actions" style="margin-bottom: .5rem">
-            <span>{{ request.code }} · {{ request.title }}</span>
-            <button class="btn btn-secondary" type="button" (click)="addRequest(request.id)">{{ 'sessions.detail.addItem' | t }}</button>
+        <div class="waiting-block">
+          <label class="field">
+            <span>{{ 'sessions.detail.waiting' | t }}</span>
+            <input [(ngModel)]="requestQuery" [placeholder]="'sessions.detail.searchRequests' | t" />
+          </label>
+          <div class="waiting-list">
+            @for (request of visibleApproved(); track request.id) {
+              <article class="waiting-item">
+                <div class="waiting-item-head">
+                  <div class="waiting-item-text">
+                    <p class="kicker">{{ request.code }}</p>
+                    <strong>{{ request.title }}</strong>
+                    @if (request.program || request.faculty || request.campus) {
+                      <span class="muted">
+                        @if (request.program) { {{ request.program }} }
+                        @if (request.faculty) { @if (request.program) { · } {{ request.faculty }} }
+                        @if (request.campus) { @if (request.program || request.faculty) { · } {{ request.campus }} }
+                      </span>
+                    }
+                  </div>
+                  <button class="btn btn-secondary" type="button" (click)="addRequest(request.id)">
+                    {{ 'sessions.detail.addItem' | t }}
+                  </button>
+                </div>
+              </article>
+            } @empty {
+              <p class="muted">{{ (requestQuery.trim() ? 'sessions.detail.noneMatch' : 'sessions.detail.noneWaiting') | t }}</p>
+            }
           </div>
-        } @empty {
-          <p class="muted">{{ (requestQuery.trim() ? 'sessions.detail.noneMatch' : 'sessions.detail.noneWaiting') | t }}</p>
-        }
+        </div>
         <div class="row-actions" style="margin: .75rem 0">
           <a class="btn" [routerLink]="['/requests/new']" [queryParams]="{ session: s.id }">{{ 'sessions.live.newRequest' | t }}</a>
         </div>
@@ -54,7 +72,7 @@
       }
       <div class="live-points">
         @for (item of s.items; track item.id; let i = $index) {
-          <article class="live-point">
+          <article class="live-point" [class.decided]="!!item.outcome">
             <div class="live-point-title">
               <span class="agenda-pos">{{ item.position }}</span>
               <div>
@@ -77,9 +95,18 @@
             @if (item.debateNotes) {
               <p class="muted"><b>{{ 'sessions.live.notes' | t }}</b> {{ item.debateNotes }}</p>
             }
+            @if (item.outcome) {
+              <div class="decision-status">
+                <strong>{{ 'sessions.live.decisionRecorded' | t }}</strong>
+                <span class="badge" [class]="tone[item.outcome]">{{ 'enums.decisionOutcome.' + item.outcome | t }}</span>
+                <span>{{ 'sessions.live.voteSummary' | t: { votesFor: item.votesFor, votesAgainst: item.votesAgainst, abstentions: item.abstentions } }}</span>
+              </div>
+            }
             @if (auth.has('ROLE_COUNCIL_SECRETARY') && s.status === 'STARTED' && decisions[item.id]) {
-              <p class="muted">{{ 'sessions.live.decideHint' | t }}</p>
-              <p class="muted">{{ 'sessions.live.voteSeats' | t: { count: seats() } }}</p>
+              <p class="muted">{{ (item.outcome ? 'sessions.live.decideEditHint' : 'sessions.live.decideHint') | t }}</p>
+              @if (!item.outcome) {
+                <p class="muted">{{ 'sessions.live.voteSeats' | t: { count: seats() } }}</p>
+              }
               <label class="field">
                 <span>{{ 'sessions.live.pointDescription' | t }}</span>
                 <textarea rows="3" maxlength="4000" [(ngModel)]="decisions[item.id].pointDescription" [placeholder]="'sessions.live.pointDescriptionPlaceholder' | t"></textarea>
@@ -107,14 +134,11 @@
                 </label>
               }
               <div class="row-actions">
-                <button class="btn" type="button" (click)="recordDecision(item)">{{ 'sessions.live.recordDecision' | t }}</button>
+                <button class="btn" type="button" (click)="recordDecision(item)">
+                  {{ (item.outcome ? 'sessions.live.updateDecision' : 'sessions.live.recordDecision') | t }}
+                </button>
               </div>
-            } @else if (item.outcome) {
-              <p>
-                <span class="badge" [class]="tone[item.outcome]">{{ 'enums.decisionOutcome.' + item.outcome | t }}</span>
-                · {{ 'sessions.live.voteSummary' | t: { votesFor: item.votesFor, votesAgainst: item.votesAgainst, abstentions: item.abstentions } }}
-              </p>
-            } @else {
+            } @else if (!item.outcome) {
               <p class="muted">{{ 'sessions.live.noDecision' | t }}</p>
             }
           </article>

@@ -4,6 +4,8 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthService } from '@core/auth/auth.service';
 import { DocumentViewerService } from '@core/ui/document-viewer.service';
 import { ToastService } from '@core/ui/toast.service';
+import { AgreementsApi } from '@modules/agreements/agreements.api';
+import { AgreementTypeDto } from '@modules/agreements/agreements.models';
 import { NodeDto, UsersApi } from '@modules/users';
 import { TranslatePipe } from '@shared/pipes/translate.pipe';
 import { saveBlob } from '@shared/utils/files';
@@ -27,6 +29,17 @@ interface CourseDraft {
   failingCourse: '' | 'true' | 'false';
 }
 
+/** Already covered as TEMA (or not a student petition); keep them out of "Tipo de petición". */
+const PETITION_TYPE_EXCLUDED = new Set([
+  'READMISSION',
+  'PERIOD_CANCELLATION',
+  'PERIOD_CANCELLATION_DENIED',
+  'COURSE_CANCELLATION',
+  'GRADE_CORRECTION',
+  'RESEARCH_GROUP_UPDATE',
+  'SEEDBED_UPDATE',
+]);
+
 @Component({
   selector: 'app-request-form',
   imports: [FormsModule, ReactiveFormsModule, RouterLink, TranslatePipe],
@@ -36,6 +49,7 @@ export class RequestFormPage implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly api = inject(RequestsApi);
   private readonly usersApi = inject(UsersApi);
+  private readonly agreementsApi = inject(AgreementsApi);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly toast = inject(ToastService);
@@ -48,6 +62,7 @@ export class RequestFormPage implements OnInit {
   readonly existing = signal<AttachmentDto[]>([]);
   readonly files = signal<Record<string, File>>({});
   readonly courses = signal<CourseDraft[]>([emptyCourse()]);
+  readonly agreementTypes = signal<AgreementTypeDto[]>([]);
   readonly saving = signal(false);
   readonly liveSessionId = signal<number | null>(null);
   readonly branch = signal<RequestBranch | ''>('');
@@ -76,7 +91,32 @@ export class RequestFormPage implements OnInit {
     return this.catalog()?.branches.find((item) => item.code === branch)?.topics ?? [];
   });
 
+  /** Student topics in labeled groups; other branches stay as a flat list. */
+  readonly topicGroups = computed(() => {
+    const topics = this.topics();
+    if (this.branch() !== 'STUDENT') {
+      return [{ key: '', topics }];
+    }
+    const byCode = new Map(topics.map((item) => [item.code, item]));
+    const groups: { key: string; codes: string[] }[] = [
+      { key: 'citizen', codes: ['PETITION', 'COMPLAINT', 'CLAIM'] },
+      { key: 'academic', codes: ['REENTRY', 'GRADE_RECTIFICATION', 'COURSE_CANCELLATION', 'PERIOD_CANCELLATION'] },
+      { key: 'other', codes: ['SPECIAL_CASE'] },
+    ];
+    return groups
+      .map((group) => ({
+        key: group.key,
+        topics: group.codes.map((code) => byCode.get(code)).filter((item): item is TopicDto => !!item),
+      }))
+      .filter((group) => group.topics.length > 0);
+  });
+
   readonly topic = computed(() => this.topics().find((item) => item.code === this.topicCode()) ?? null);
+
+  /** Agreement models for petitions, without duplicating dedicated temas. */
+  readonly petitionTypes = computed(() =>
+    this.agreementTypes().filter((item) => !PETITION_TYPE_EXCLUDED.has(item.code)),
+  );
 
   ngOnInit(): void {
     const raw = this.route.snapshot.paramMap.get('id');
@@ -99,6 +139,12 @@ export class RequestFormPage implements OnInit {
           this.form.controls.programId.setValue(catalog.programId);
         }
       },
+      error: (e) => this.toast.apiError(e),
+    });
+    this.agreementsApi.listTypes().subscribe({
+      next: (types) => this.agreementTypes.set(
+        [...types].sort((a, b) => a.name.localeCompare(b.name, 'es')),
+      ),
       error: (e) => this.toast.apiError(e),
     });
     if (!this.auth.user()?.programId && !raw) {
@@ -162,21 +208,49 @@ export class RequestFormPage implements OnInit {
     this.topicCode.set('');
     this.form.controls.requestType.setValue('');
     this.form.controls.cancellationKind.setValue('');
+    this.form.controls.otherDetail.setValue('');
     this.files.set({});
   }
 
   selectTopic(code: string): void {
     this.topicCode.set(code);
     this.form.controls.requestType.setValue(code);
-    this.form.controls.cancellationKind.setValue('');
+    this.form.controls.otherDetail.setValue('');
+    // Kind is fixed by the topic itself (no second dropdown).
+    this.form.controls.cancellationKind.setValue(
+      code === 'COURSE_CANCELLATION' || code === 'CANCELLATION' ? 'COURSE'
+        : code === 'PERIOD_CANCELLATION' ? 'PERIOD' : '',
+    );
     this.files.set({});
   }
 
   showCourses(): boolean {
-    const topic = this.topic();
-    if (!topic) return false;
-    if (topic.courses) return true;
-    return topic.cancellationChoice && this.form.controls.cancellationKind.value === 'COURSE';
+    return !!this.topic()?.courses;
+  }
+
+  /** Label for the subtype field (petition type, complaint type, …). */
+  detailLabelKey(): string {
+    switch (this.topicCode()) {
+      case 'PETITION':
+        return 'requests.form.petitionType';
+      case 'COMPLAINT':
+        return 'requests.form.complaintType';
+      case 'CLAIM':
+        return 'requests.form.claimType';
+      default:
+        return 'requests.form.otherDetail';
+    }
+  }
+
+  detailPlaceholderKey(): string {
+    switch (this.topicCode()) {
+      case 'COMPLAINT':
+        return 'requests.form.complaintTypePlaceholder';
+      case 'CLAIM':
+        return 'requests.form.claimTypePlaceholder';
+      default:
+        return 'requests.form.otherDetailPlaceholder';
+    }
   }
 
   onFile(code: string, ev: Event): void {
@@ -246,10 +320,6 @@ export class RequestFormPage implements OnInit {
     }
     if (topic.otherDetail && !this.form.controls.otherDetail.value.trim()) {
       this.toast.error('requests.form.otherRequired');
-      return;
-    }
-    if (topic.cancellationChoice && !this.form.controls.cancellationKind.value) {
-      this.toast.error('requests.form.cancellationRequired');
       return;
     }
     const missing = topic.documents.filter((code) => !this.files()[code] && !this.already(code));

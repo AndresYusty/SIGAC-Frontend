@@ -29,26 +29,35 @@
         <span>{{ 'requests.form.matter' | t }}</span>
         <select formControlName="requestType" (change)="selectTopic($any($event.target).value)">
           <option value="">{{ 'requests.form.pickTopic' | t }}</option>
-          @for (item of topics(); track item.code) {
-            <option [value]="item.code">{{ 'enums.requestTopic.' + item.code | t }}</option>
+          @for (group of topicGroups(); track group.key) {
+            @if (group.key) {
+              <optgroup [label]="'requests.form.topicGroup.' + group.key | t">
+                @for (item of group.topics; track item.code) {
+                  <option [value]="item.code">{{ 'enums.requestTopic.' + item.code | t }}</option>
+                }
+              </optgroup>
+            } @else {
+              @for (item of group.topics; track item.code) {
+                <option [value]="item.code">{{ 'enums.requestTopic.' + item.code | t }}</option>
+              }
+            }
           }
         </select>
       </label>
     </div>
-    @if (topic()?.cancellationChoice) {
-      <label class="field required">
-        <span>{{ 'requests.form.cancellationKind' | t }}</span>
-        <select formControlName="cancellationKind">
-          <option value="">{{ 'requests.form.pickCancellation' | t }}</option>
-          <option value="COURSE">{{ 'requests.form.cancelCourse' | t }}</option>
-          <option value="PERIOD">{{ 'requests.form.cancelPeriod' | t }}</option>
-        </select>
-      </label>
-    }
     @if (topic()?.otherDetail) {
       <label class="field required">
-        <span>{{ 'requests.form.otherDetail' | t }}</span>
-        <input formControlName="otherDetail" />
+        <span>{{ detailLabelKey() | t }}</span>
+        @if (topicCode() === 'PETITION') {
+          <select formControlName="otherDetail">
+            <option value="">{{ 'requests.form.pickPetitionType' | t }}</option>
+            @for (item of petitionTypes(); track item.code) {
+              <option [value]="item.name">{{ item.name }}</option>
+            }
+          </select>
+        } @else {
+          <input formControlName="otherDetail" [placeholder]="detailPlaceholderKey() | t" />
+        }
       </label>
     }
   </section>

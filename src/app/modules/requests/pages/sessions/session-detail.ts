@@ -48,6 +48,7 @@ export class SessionDetailPage implements OnInit {
   scheduledAt = '';
   location = '';
   readonly savingSession = signal(false);
+  readonly resendingNotice = signal(false);
   readonly flowOrder = ['agenda', 'cite', 'live', 'minutes'] as const;
   readonly flowStep = computed(() => {
     const s = this.session();
@@ -238,6 +239,24 @@ export class SessionDetailPage implements OnInit {
     });
   }
 
+  async resendNotice(): Promise<void> {
+    if (!(await this.confirm.ask('sessions.detail.resendNoticeTitle', 'sessions.detail.resendNoticeMessage', 'sessions.detail.resendNotice'))) {
+      return;
+    }
+    this.resendingNotice.set(true);
+    this.api.resendNotice(this.id()).subscribe({
+      next: (s) => {
+        this.session.set(s);
+        this.resendingNotice.set(false);
+        this.toast.ok('sessions.detail.noticeResent');
+      },
+      error: (e) => {
+        this.resendingNotice.set(false);
+        this.toast.apiError(e);
+      },
+    });
+  }
+
   previewNotice(): void {
     this.docs.show(this.api.downloadNotice(this.id()), 'Citación.pdf');
   }
@@ -249,13 +268,6 @@ export class SessionDetailPage implements OnInit {
   downloadAttachment(requestId: number, file: AttachmentDto): void {
     this.api.downloadAttachment(requestId, file.id).subscribe({
       next: (b) => saveBlob(b, file.name || 'documento.pdf'),
-      error: (e) => this.toast.apiError(e),
-    });
-  }
-
-  downloadNotice(): void {
-    this.api.downloadNotice(this.id()).subscribe({
-      next: (b) => saveBlob(b, 'Citación.pdf'),
       error: (e) => this.toast.apiError(e),
     });
   }

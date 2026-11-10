@@ -38,7 +38,12 @@
         <p>{{ 'requests.form.counselor' | t }}: {{ req.counselorName }}</p>
       }
       @if (req.otherDetail) {
-        <p>{{ 'requests.form.otherDetail' | t }}: {{ req.otherDetail }}</p>
+        <p>
+          {{ (req.requestType === 'PETITION' ? 'requests.form.petitionType'
+            : req.requestType === 'COMPLAINT' ? 'requests.form.complaintType'
+            : req.requestType === 'CLAIM' ? 'requests.form.claimType'
+            : 'requests.form.otherDetail') | t }}: {{ req.otherDetail }}
+        </p>
       }
       @if (req.cancellationKind) {
         <p>{{ req.cancellationKind === 'COURSE' ? ('requests.form.cancelCourse' | t) : ('requests.form.cancelPeriod' | t) }}</p>

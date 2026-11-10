@@ -115,7 +115,13 @@ export class RequestsApi {
   closeAgenda(sessionId: number) {
     return this.http.post<SessionDto>(`${this.base}/sessions/${sessionId}/close-agenda`, {});
   }
+  resendNotice(sessionId: number) {
+    return this.http.post<SessionDto>(`${this.base}/sessions/${sessionId}/resend-notice`, {});
+  }
   downloadNotice(sessionId: number) {
     return this.http.get(`${this.base}/sessions/${sessionId}/citacion`, { responseType: 'blob' });
+  }
+  downloadSupportsZip(sessionId: number) {
+    return this.http.get(`${this.base}/sessions/${sessionId}/soportes`, { responseType: 'blob' });
   }
 }

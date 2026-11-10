@@ -179,6 +179,7 @@ export class HierarchyPage implements OnInit {
 
   async remove(node: NodeDto): Promise<void> {
     const level = this.step();
+    if (level === 0) return;
     if (!(await this.confirm.ask('hierarchy.deleteTitle', 'hierarchy.deleteMessage', 'hierarchy.remove', { name: node.name }))) {
       return;
     }
