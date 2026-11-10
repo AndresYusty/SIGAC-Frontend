@@ -38,6 +38,7 @@ const PETITION_TYPE_EXCLUDED = new Set([
   'GRADE_CORRECTION',
   'RESEARCH_GROUP_UPDATE',
   'SEEDBED_UPDATE',
+  'BLANK_AGREEMENT',
 ]);
 
 @Component({
@@ -115,7 +116,7 @@ export class RequestFormPage implements OnInit {
 
   /** Agreement models for petitions, without duplicating dedicated temas. */
   readonly petitionTypes = computed(() =>
-    this.agreementTypes().filter((item) => !PETITION_TYPE_EXCLUDED.has(item.code)),
+    this.agreementTypes().filter((item) => item.kind !== 'MEMORANDUM' && !PETITION_TYPE_EXCLUDED.has(item.code)),
   );
 
   ngOnInit(): void {

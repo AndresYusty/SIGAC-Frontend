@@ -265,6 +265,11 @@ const PATTERNS: Pattern[] = [
     params: (m) => ({ number: m[1], year: m[2] }),
   },
   {
+    re: /^Memorandum No\. (\d+) of (\d+) already exists in this Faculty$/,
+    key: 'errors.server.memoExists',
+    params: (m) => ({ number: m[1], year: m[2] }),
+  },
+  {
     re: /^Unknown agreement type: (.+)$/,
     key: 'errors.server.agreementType',
     params: (m) => ({ code: m[1] }),

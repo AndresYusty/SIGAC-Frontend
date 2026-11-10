@@ -3,7 +3,6 @@ import { RouterLink } from '@angular/router';
 import { AuthService } from '@core/auth/auth.service';
 import { Page } from '@core/http/api.models';
 import { ConfirmService } from '@core/ui/confirm.service';
-import { DocumentViewerService } from '@core/ui/document-viewer.service';
 import { ToastService } from '@core/ui/toast.service';
 import { RepositoryApi } from '@modules/repository';
 import { LocalDatePipe } from '@shared/pipes/local-date.pipe';
@@ -21,7 +20,6 @@ import { MinutesDto } from '../../minutes.models';
 export class MinutesPage implements OnInit {
   private readonly api = inject(MinutesApi);
   private readonly repository = inject(RepositoryApi);
-  private readonly docs = inject(DocumentViewerService);
   readonly auth = inject(AuthService);
   private readonly toast = inject(ToastService);
   private readonly confirm = inject(ConfirmService);
@@ -30,14 +28,6 @@ export class MinutesPage implements OnInit {
 
   ngOnInit(): void {
     this.load();
-  }
-
-  preview(minutes: MinutesDto): void {
-    const name = `${minutes.serialNumber}.pdf`;
-    const source = minutes.status === 'PUBLISHED'
-      ? this.repository.viewMinutes(minutes.id)
-      : this.api.previewMinutes(minutes.id);
-    this.docs.show(source, name);
   }
 
   download(minutes: MinutesDto): void {

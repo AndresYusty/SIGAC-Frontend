@@ -1,7 +1,9 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthService } from '@core/auth/auth.service';
+import { ApiError } from '@core/http/api.models';
 import { ConfirmService } from '@core/ui/confirm.service';
 import { DocumentViewerService } from '@core/ui/document-viewer.service';
 import { ToastService } from '@core/ui/toast.service';
@@ -286,7 +288,34 @@ export class SessionDetailPage implements OnInit {
         this.toast.ok('sessions.detail.minutesGenerated');
         void this.router.navigate(['/minutes', m.id]);
       },
+      error: (e) => {
+        if (isMinutesAlreadyExist(e)) {
+          this.ensureAgreementDrafts();
+          return;
+        }
+        this.toast.apiError(e);
+      },
+    });
+  }
+
+  private ensureAgreementDrafts(): void {
+    this.minutesApi.ensureAgreementDrafts(this.id()).subscribe({
+      next: (r) => {
+        if (r.created > 0) {
+          this.toast.ok('sessions.detail.agreementDraftsCreated', { count: r.created });
+        } else {
+          this.toast.info('sessions.detail.agreementDraftsAlreadyOk');
+        }
+      },
       error: (e) => this.toast.apiError(e),
     });
   }
+}
+
+function isMinutesAlreadyExist(err: unknown): boolean {
+  if (!(err instanceof HttpErrorResponse) || err.status !== 409) {
+    return false;
+  }
+  const body = err.error as ApiError | null;
+  return !!body && typeof body === 'object' && body.message === 'Minutes already exist for this session';
 }

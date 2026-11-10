@@ -3,7 +3,7 @@ import { inject, Injectable } from '@angular/core';
 import { Page } from '@core/http/api.models';
 import { toQuery } from '@core/http/http-utils';
 import { environment } from '../../../environments/environment';
-import { MinutesDto, MinutesStatus } from './minutes.models';
+import { AgreementDraftsResult, MinutesDto, MinutesStatus } from './minutes.models';
 
 @Injectable({ providedIn: 'root' })
 export class MinutesApi {
@@ -20,6 +20,9 @@ export class MinutesApi {
   }
   generateMinutes(sessionId: number) {
     return this.http.post<MinutesDto>(`${this.base}/minutes/session/${sessionId}`, {});
+  }
+  ensureAgreementDrafts(sessionId: number) {
+    return this.http.post<AgreementDraftsResult>(`${this.base}/minutes/session/${sessionId}/agreement-drafts`, {});
   }
   updateMinutesContent(id: number, htmlContent: string) {
     return this.http.put<MinutesDto>(`${this.base}/minutes/${id}/content`, { htmlContent });

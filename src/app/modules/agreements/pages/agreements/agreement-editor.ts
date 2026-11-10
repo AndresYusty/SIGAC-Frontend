@@ -16,7 +16,10 @@ import {
   AgreementField,
   AgreementPayload,
   AgreementTypeDto,
+  BlockType,
 } from '../../agreements.models';
+
+type Section = 'recitals' | 'articles';
 
 const today = () => new Date().toLocaleDateString('en-CA');
 
@@ -34,6 +37,7 @@ export class AgreementEditorPage implements OnInit, OnDestroy {
   private readonly sanitizer = inject(DomSanitizer);
   readonly i18n = inject(I18nService);
   readonly admin = inject(AuthService).has('ROLE_ADMIN');
+  readonly sections: Section[] = ['recitals', 'articles'];
 
   readonly id = signal<number | null>(null);
   readonly label = signal('');
@@ -44,6 +48,22 @@ export class AgreementEditorPage implements OnInit, OnDestroy {
   private previewBlob: Blob | null = null;
   readonly typeCode = signal('');
   readonly type = computed(() => this.types().find((t) => t.code === this.typeCode()));
+  readonly memo = computed(() => this.type()?.kind === 'MEMORANDUM');
+  /** Selector options: blank documents first, then agreement models, then memorandum models. */
+  readonly typeGroups = computed(() => {
+    const all = this.types();
+    const blank = (t: AgreementTypeDto) => t.code.startsWith('BLANK_');
+    return [
+      { key: 'blank', types: all.filter(blank) },
+      { key: 'agreements', types: all.filter((t) => !blank(t) && t.kind !== 'MEMORANDUM') },
+      { key: 'memos', types: all.filter((t) => !blank(t) && t.kind === 'MEMORANDUM') },
+    ].filter((group) => group.types.length > 0);
+  });
+  readonly visibleSections = computed<Section[]>(() => (this.memo() ? ['recitals'] : this.sections));
+  readonly nextNumber = computed(() => {
+    const d = this.defaults();
+    return d ? (this.memo() ? d.nextMemoNumber : d.nextNumber) : '';
+  });
   readonly tables = signal<EditableTable[]>([]);
   readonly hiddenFields = computed(() => {
     const current = this.type();
@@ -69,7 +89,9 @@ export class AgreementEditorPage implements OnInit, OnDestroy {
               this.model.councilTitle = d.councilTitle;
               this.model.presidentName = d.presidentName;
               this.model.secretaryName = d.secretaryName;
-              this.selectType(types[0].code);
+              const requested = this.route.snapshot.queryParamMap.get('type');
+              const initial = types.find((t) => t.code === requested) ?? types[0];
+              this.selectType(initial.code);
             },
             error: (e) => this.toast.apiError(e),
           });
@@ -113,12 +135,19 @@ export class AgreementEditorPage implements OnInit, OnDestroy {
     this.typeCode.set(code);
     const values: Record<string, string> = {};
     for (const f of t.fields) values[f.key] = this.model.values[f.key] ?? '';
-    if (values['facultyName'] === '' && this.defaults()) {
-      values['facultyName'] = this.defaults()!.faculty.replace(/^facultad de\s+/i, '');
+    const d = this.defaults();
+    if (values['facultyName'] === '' && d) {
+      values['facultyName'] = d.faculty.replace(/^facultad de\s+/i, '');
+    }
+    const memo = t.kind === 'MEMORANDUM';
+    let councilTitle = this.model.councilTitle;
+    if (d && (!councilTitle || councilTitle === d.councilTitle || councilTitle === d.memoFrom)) {
+      councilTitle = memo ? d.memoFrom : d.councilTitle;
     }
     this.model = {
       ...this.model,
       typeCode: code,
+      councilTitle,
       subject: t.subject,
       legalBasis: t.legalBasis,
       closing: t.closing,
@@ -138,6 +167,25 @@ export class AgreementEditorPage implements OnInit, OnDestroy {
       if (!this.model.values[f.key]) this.model.values[f.key] = f.example;
     }
     this.refresh(0);
+  }
+
+  addBlock(section: Section, type: BlockType): void {
+    if (type === 'table') return;
+    this.model[section].push({ type, text: '' });
+    this.refresh();
+  }
+
+  removeBlock(section: Section, index: number): void {
+    this.model[section].splice(index, 1);
+    this.refresh();
+  }
+
+  moveBlock(section: Section, index: number, step: number): void {
+    const list = this.model[section];
+    const next = index + step;
+    if (next < 0 || next >= list.length) return;
+    [list[index], list[next]] = [list[next], list[index]];
+    this.refresh();
   }
 
   columnLabel(column: string): string {

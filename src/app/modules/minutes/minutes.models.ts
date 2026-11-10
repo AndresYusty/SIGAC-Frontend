@@ -15,3 +15,7 @@ export interface MinutesDto {
   signedAt: string | null;
   htmlContent: string | null;
 }
+
+export interface AgreementDraftsResult {
+  created: number;
+}

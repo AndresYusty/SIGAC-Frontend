@@ -14,8 +14,12 @@ export interface AgreementField {
   example: string;
 }
 
+export type DocumentKind = 'AGREEMENT' | 'MEMORANDUM';
+
 export interface AgreementTypeDto {
   code: string;
+  /** Absent for agreements. */
+  kind?: DocumentKind | null;
   name: string;
   nameEn: string;
   subject: string;
@@ -44,6 +48,7 @@ export interface AgreementPayload {
 export interface AgreementDto extends AgreementPayload {
   id: number;
   label: string;
+  kind: DocumentKind;
   number: number;
   year: number;
   typeName: string;
@@ -57,6 +62,7 @@ export interface AgreementDto extends AgreementPayload {
 export interface AgreementSummaryDto {
   id: number;
   label: string;
+  kind: DocumentKind;
   number: number;
   year: number;
   typeCode: string;
@@ -72,7 +78,9 @@ export interface AgreementDefaultsDto {
   faculty: string;
   year: number;
   nextNumber: number;
+  nextMemoNumber: number;
   councilTitle: string;
+  memoFrom: string;
   city: string;
   presidentName: string;
   secretaryName: string;
