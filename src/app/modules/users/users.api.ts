@@ -38,6 +38,9 @@ export class UsersApi {
       params: { active },
     });
   }
+  deleteUser(id: number) {
+    return this.http.delete<void>(`${this.base}/users/${id}`);
+  }
   listSupportStaff() {
     return this.http.get<UserDto[]>(`${this.base}/users/support`);
   }

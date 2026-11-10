@@ -6,10 +6,16 @@ import { Page } from '@core/http/api.models';
 import { ConfirmService } from '@core/ui/confirm.service';
 import { ToastService } from '@core/ui/toast.service';
 import { TranslatePipe } from '@shared/pipes/translate.pipe';
+import { forkJoin } from 'rxjs';
 import { UsersApi } from '../../users.api';
 import { NodeDto } from '../../users.models';
 
 const DEFAULT_ROLE: RoleName = 'ROLE_COUNCIL_MEMBER';
+
+interface FacultyOption {
+  id: number;
+  label: string;
+}
 
 @Component({
   selector: 'app-users',
@@ -24,9 +30,10 @@ export class UsersPage implements OnInit {
   private readonly i18n = inject(I18nService);
   readonly page = signal<Page<UserDto> | null>(null);
   readonly formError = signal('');
-  readonly faculties = signal<NodeDto[]>([]);
+  readonly faculties = signal<FacultyOption[]>([]);
   readonly programs = signal<NodeDto[]>([]);
   readonly editing = signal<UserDto | null>(null);
+  readonly showPassword = signal(false);
   readonly roles = ROLES;
   q = '';
   showForm = false;
@@ -47,9 +54,32 @@ export class UsersPage implements OnInit {
         const university = universities[0];
         if (!university) return;
         this.api.listCampuses(university.id).subscribe((campuses) => {
-          const campus = campuses[0];
-          if (!campus) return;
-          this.api.listFaculties(campus.id).subscribe((f) => this.faculties.set(f));
+          if (!campuses.length) {
+            this.faculties.set([]);
+            return;
+          }
+          // Every campus: the old code only took campuses[0], so users of other seats
+          // (e.g. Sede principal) appeared with a blank faculty in this form.
+          forkJoin(campuses.map((campus) => this.api.listFaculties(campus.id))).subscribe({
+            next: (groups) => {
+              const several = campuses.length > 1;
+              const options = campuses.flatMap((campus, i) =>
+                groups[i].map((f) => ({
+                  id: f.id,
+                  label: several ? `${f.name} (${campus.name})` : f.name,
+                })),
+              );
+              options.sort((a, b) => a.label.localeCompare(b.label, 'es'));
+              this.faculties.set(options);
+              // Options arrive after the form may already be open: re-write the value so the
+              // <select> picks the matching option (string id, same as [value]).
+              const selected = this.form.controls.facultyId.value;
+              if (selected !== '' && selected != null) {
+                this.form.controls.facultyId.setValue(String(selected));
+              }
+            },
+            error: (e) => this.toast.apiError(e),
+          });
         });
       },
     });
@@ -83,24 +113,54 @@ export class UsersPage implements OnInit {
   create(): void {
     this.editing.set(null);
     this.formError.set('');
+    this.showPassword.set(false);
     this.form.reset({ name: '', email: '', password: '', role: DEFAULT_ROLE, facultyId: '', programId: '' });
     this.programs.set([]);
+    this.applyScopeForRole(DEFAULT_ROLE);
     this.showForm = true;
   }
 
   edit(u: UserDto): void {
     this.editing.set(u);
     this.formError.set('');
+    this.showPassword.set(false);
+    const role = u.roles[0] ?? DEFAULT_ROLE;
+    // Keep ids as strings so they match <option [value]="..."> (always string in the DOM).
     this.form.patchValue({
       name: u.name,
       email: u.email,
       password: '',
-      role: u.roles[0] ?? DEFAULT_ROLE,
-      facultyId: u.facultyId ?? '',
-      programId: u.programId ?? '',
+      role,
+      facultyId: u.facultyId != null ? String(u.facultyId) : '',
+      programId: u.programId != null ? String(u.programId) : '',
     });
-    this.loadFacultyPrograms();
+    this.applyScopeForRole(role);
+    if (!this.isGlobalRole(role)) {
+      this.loadFacultyPrograms();
+    }
     this.showForm = true;
+  }
+
+  onRoleChange(): void {
+    this.applyScopeForRole(this.form.controls.role.value);
+  }
+
+  /** Admin is global (RN-01): faculty and program stay empty and locked. */
+  isGlobalRole(role: RoleName = this.form.controls.role.value): boolean {
+    return role === 'ROLE_ADMIN';
+  }
+
+  private applyScopeForRole(role: RoleName): void {
+    if (this.isGlobalRole(role)) {
+      this.form.controls.facultyId.setValue('');
+      this.form.controls.programId.setValue('');
+      this.programs.set([]);
+      this.form.controls.facultyId.disable({ emitEvent: false });
+      this.form.controls.programId.disable({ emitEvent: false });
+      return;
+    }
+    this.form.controls.facultyId.enable({ emitEvent: false });
+    this.form.controls.programId.enable({ emitEvent: false });
   }
 
   save(): void {
@@ -113,8 +173,9 @@ export class UsersPage implements OnInit {
       return;
     }
     const v = this.form.getRawValue();
-    const facultyId = v.facultyId ? Number(v.facultyId) : null;
-    const programId = v.programId ? Number(v.programId) : null;
+    const global = this.isGlobalRole(v.role);
+    const facultyId = global || !v.facultyId ? null : Number(v.facultyId);
+    const programId = global || !v.programId ? null : Number(v.programId);
     if (v.role === 'ROLE_PROGRAM_HEAD' && !programId) {
       this.form.controls.programId.markAsTouched();
       this.formError.set(this.i18n.t('users.programRequired'));
@@ -169,6 +230,19 @@ export class UsersPage implements OnInit {
     this.api.setUserActive(u.id, !u.active).subscribe({
       next: () => {
         this.toast.ok('users.statusUpdated');
+        this.load(this.page()?.number ?? 0);
+      },
+      error: (e) => this.toast.apiError(e),
+    });
+  }
+
+  async remove(u: UserDto): Promise<void> {
+    if (u.active) return;
+    const ok = await this.confirm.ask('users.deleteTitle', 'users.deleteMessage', 'users.delete', { name: u.name });
+    if (!ok) return;
+    this.api.deleteUser(u.id).subscribe({
+      next: () => {
+        this.toast.ok('users.deleted', { name: u.name });
         this.load(this.page()?.number ?? 0);
       },
       error: (e) => this.toast.apiError(e),

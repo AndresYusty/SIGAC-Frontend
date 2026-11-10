@@ -31,11 +31,16 @@
               <span class="chip">{{ 'enums.role.' + r | t }}</span>
             }
           </td>
-          <td>{{ u.facultyName || '—' }}</td>
+          <td>{{ u.facultyName || ('users.noFaculty' | t) }}</td>
           <td><span class="badge" [class]="u.active ? 'ok' : 'muted'">{{ (u.active ? 'common.active' : 'common.inactive') | t }}</span></td>
-          <td class="row-actions">
+          <td class="row-actions users-actions">
             <button class="btn btn-ghost" type="button" (click)="edit(u)">{{ 'common.edit' | t }}</button>
             <button class="btn btn-ghost" type="button" (click)="toggle(u)">{{ (u.active ? 'users.deactivate' : 'users.activate') | t }}</button>
+            @if (u.active) {
+              <span class="users-actions__slot" aria-hidden="true"></span>
+            } @else {
+              <button class="btn btn-ghost btn-icon" type="button" [attr.aria-label]="'users.delete' | t" (click)="remove(u)">×</button>
+            }
           </td>
         </tr>
       }
@@ -55,11 +60,39 @@
       <label class="field"><span>{{ 'common.name' | t }}</span><input formControlName="name" /></label>
       <label class="field"><span>{{ 'common.email' | t }}</span><input formControlName="email" [readOnly]="!!editing()" /></label>
       @if (!editing()) {
-        <label class="field"><span>{{ 'common.password' | t }}</span><input type="password" formControlName="password" /></label>
+        <label class="field">
+          <span>{{ 'common.password' | t }}</span>
+          <div class="password-field">
+            <input
+              [type]="showPassword() ? 'text' : 'password'"
+              formControlName="password"
+              autocomplete="new-password"
+            />
+            <button
+              class="password-toggle"
+              type="button"
+              (click)="showPassword.set(!showPassword())"
+              [attr.aria-label]="(showPassword() ? 'common.hidePassword' : 'common.showPassword') | t"
+              [attr.title]="(showPassword() ? 'common.hidePassword' : 'common.showPassword') | t"
+            >
+              @if (showPassword()) {
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+                  <line x1="1" y1="1" x2="23" y2="23"/>
+                </svg>
+              } @else {
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                  <circle cx="12" cy="12" r="3"/>
+                </svg>
+              }
+            </button>
+          </div>
+        </label>
       }
       <label class="field">
         <span>{{ 'common.role' | t }}</span>
-        <select formControlName="role">
+        <select formControlName="role" (change)="onRoleChange()">
           @for (r of roles; track r) {
             <option [value]="r">{{ 'enums.role.' + r | t }}</option>
           }
@@ -68,10 +101,12 @@
       <label class="field">
         <span>{{ 'common.faculty' | t }}</span>
         <select formControlName="facultyId" (change)="loadFacultyPrograms()">
-          <option value="">{{ 'users.noFaculty' | t }}</option>
-          @for (f of faculties(); track f.id) {
-            <option [value]="f.id">{{ f.name }}</option>
+          @if (!isGlobalRole()) {
+            @for (f of faculties(); track f.id) {
+              <option [value]="f.id">{{ f.label }}</option>
+            }
           }
+          <option value="">{{ 'users.noFaculty' | t }}</option>
         </select>
       </label>
       <label class="field">
