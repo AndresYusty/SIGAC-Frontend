@@ -3,6 +3,7 @@
     <p class="kicker">{{ 'requests.form.kicker' | t }}</p>
     <h1>{{ (liveSessionId() ? 'requests.form.liveTitle' : (id() ? 'requests.form.editTitle' : 'requests.form.newTitle')) | t }}</h1>
     <p class="lead">{{ (liveSessionId() ? 'requests.form.liveLead' : 'requests.form.lead') | t }}</p>
+    <p class="muted">{{ 'requests.form.requiredHint' | t }}</p>
   </div>
   @if (liveSessionId(); as sessionId) {
     <a [routerLink]="['/sessions', sessionId, 'live']" class="btn btn-ghost">{{ 'common.back' | t }}</a>
@@ -15,7 +16,7 @@
   <section class="card grid">
     <h2>{{ 'requests.form.topic' | t }}</h2>
     <div class="grid grid-2">
-      <label class="field">
+      <label class="field required">
         <span>{{ 'requests.form.branch' | t }}</span>
         <select [value]="branch()" (change)="selectBranch($any($event.target).value)">
           <option value="">{{ 'requests.form.pickBranch' | t }}</option>
@@ -24,7 +25,7 @@
           }
         </select>
       </label>
-      <label class="field">
+      <label class="field required">
         <span>{{ 'requests.form.matter' | t }}</span>
         <select formControlName="requestType" (change)="selectTopic($any($event.target).value)">
           <option value="">{{ 'requests.form.pickTopic' | t }}</option>
@@ -35,7 +36,7 @@
       </label>
     </div>
     @if (topic()?.cancellationChoice) {
-      <label class="field">
+      <label class="field required">
         <span>{{ 'requests.form.cancellationKind' | t }}</span>
         <select formControlName="cancellationKind">
           <option value="">{{ 'requests.form.pickCancellation' | t }}</option>
@@ -45,7 +46,7 @@
       </label>
     }
     @if (topic()?.otherDetail) {
-      <label class="field">
+      <label class="field required">
         <span>{{ 'requests.form.otherDetail' | t }}</span>
         <input formControlName="otherDetail" />
       </label>
@@ -63,7 +64,7 @@
         <span>{{ 'requests.form.campus' | t }}</span>
         <input [value]="catalog()?.campus || ''" readonly />
       </label>
-      <label class="field">
+      <label class="field required">
         <span>{{ 'requests.form.date' | t }}</span>
         <input type="date" formControlName="filedOn" />
       </label>
@@ -95,16 +96,16 @@
   <section class="card grid">
     <h2>{{ 'requests.form.applicant' | t }}</h2>
     <div class="grid grid-2">
-      <label class="field">
+      <label class="field required">
         <span>{{ 'requests.form.requester' | t }}</span>
         <input formControlName="requester" />
       </label>
       @if (branch() === 'STUDENT') {
-        <label class="field">
+        <label class="field required">
           <span>{{ 'requests.form.studentCode' | t }}</span>
           <input formControlName="studentCode" />
         </label>
-        <label class="field">
+        <label class="field required">
           <span>{{ 'requests.form.identity' | t }}</span>
           <input formControlName="identityDocument" />
         </label>
@@ -113,11 +114,11 @@
           <input formControlName="identityIssuedIn" />
         </label>
       }
-      <label class="field">
+      <label class="field required">
         <span>{{ 'common.email' | t }}</span>
         <input type="email" formControlName="email" />
       </label>
-      <label class="field">
+      <label class="field required">
         <span>{{ 'requests.form.phone' | t }}</span>
         <input formControlName="phone" />
       </label>
@@ -145,7 +146,7 @@
         <table>
           <thead>
             <tr>
-              <th>{{ 'requests.form.courseName' | t }}</th>
+              <th class="required">{{ 'requests.form.courseName' | t }}</th>
               <th>{{ 'requests.form.group' | t }}</th>
               <th>{{ 'requests.form.subgroup' | t }}</th>
               <th>{{ 'requests.form.courseNumber' | t }}</th>
@@ -203,7 +204,7 @@
   }
 
   <section class="card grid">
-    <label class="field">
+    <label class="field required">
       <span>{{ 'requests.form.justification' | t }}</span>
       <textarea formControlName="justification" rows="5"></textarea>
     </label>
@@ -214,13 +215,22 @@
       <h2>{{ 'requests.form.documents' | t }}</h2>
       <p class="lead">{{ 'requests.form.documentsLead' | t }}</p>
       @for (code of current.documents; track code) {
-        <label class="field">
+        <div class="field required">
           <span>{{ 'enums.requestDocument.' + code | t }}</span>
-          @if (already(code); as saved) {
-            <span class="muted">{{ 'requests.form.already' | t: { name: saved.name } }}</span>
+          @if (picked(code); as file) {
+            <div class="doc-row">
+              <span class="muted">{{ file.name }}</span>
+              <button class="btn btn-ghost" type="button" (click)="previewLocal(file)">{{ 'common.view' | t }}</button>
+            </div>
+          } @else if (already(code); as saved) {
+            <div class="doc-row">
+              <span class="muted">{{ 'requests.form.already' | t: { name: saved.name } }}</span>
+              <button class="btn btn-ghost" type="button" (click)="previewSaved(saved)">{{ 'common.view' | t }}</button>
+              <button class="btn btn-ghost" type="button" (click)="downloadSaved(saved)">{{ 'common.download' | t }}</button>
+            </div>
           }
           <input type="file" accept="application/pdf" (change)="onFile(code, $event)" />
-        </label>
+        </div>
       }
     </section>
   }

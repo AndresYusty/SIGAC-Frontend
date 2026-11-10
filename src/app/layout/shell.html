@@ -44,6 +44,27 @@
   }
 </div>
 
+@if (docs.open()) {
+  <div class="modal-backdrop" (click)="docs.close()">
+    <div class="modal modal-document" (click)="$event.stopPropagation()">
+      <div class="agenda-head">
+        <h2>{{ docs.title() }}</h2>
+        <div class="row-actions">
+          <button class="btn btn-secondary" type="button" [disabled]="docs.loading()" (click)="docs.download()">{{ 'common.download' | t }}</button>
+          <button class="btn btn-ghost" type="button" (click)="docs.close()">{{ 'common.close' | t }}</button>
+        </div>
+      </div>
+      @if (docs.loading()) {
+        <p class="muted">{{ 'common.loading' | t }}</p>
+      } @else if (docs.imageUrl(); as image) {
+        <img class="document-preview" [src]="image" [alt]="docs.title()" />
+      } @else if (docs.frame(); as frame) {
+        <iframe class="document-frame" [src]="frame" [title]="docs.title()"></iframe>
+      }
+    </div>
+  </div>
+}
+
 @if (confirm.open()) {
   <div class="modal-backdrop" (click)="confirm.close(false)">
     <div class="modal" [class.modal-success]="confirm.success()" (click)="$event.stopPropagation()">

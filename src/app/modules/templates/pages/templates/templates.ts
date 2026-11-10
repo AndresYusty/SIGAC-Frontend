@@ -5,7 +5,7 @@ import { I18nService } from '@core/i18n/i18n.service';
 import { ToastService } from '@core/ui/toast.service';
 import { CouncilTypeDto, UsersApi } from '@modules/users';
 import { TranslatePipe } from '@shared/pipes/translate.pipe';
-import { blobUrl } from '@shared/utils/files';
+import { blobUrl, saveBlob } from '@shared/utils/files';
 import { TemplatesApi } from '../../templates.api';
 import { TemplateDto, TemplateVariableDto } from '../../templates.models';
 
@@ -31,6 +31,7 @@ export class TemplatesPage implements OnInit, OnDestroy {
   selected?: number;
   pdf?: SafeResourceUrl;
   private rawPdf?: string;
+  private previewBlob?: Blob;
 
   ngOnInit(): void {
     this.usersApi.listCouncilTypes().subscribe({
@@ -100,11 +101,17 @@ export class TemplatesPage implements OnInit, OnDestroy {
   preview(): void {
     this.api.previewTemplate(this.content).subscribe({
       next: (b) => {
+        this.previewBlob = b;
         if (this.rawPdf) URL.revokeObjectURL(this.rawPdf);
         this.rawPdf = blobUrl(b);
         this.pdf = this.sanitizer.bypassSecurityTrustResourceUrl(this.rawPdf);
       },
       error: (e) => this.toast.apiError(e),
     });
+  }
+
+  downloadPreview(): void {
+    if (!this.previewBlob) return;
+    saveBlob(this.previewBlob, `${this.name || 'plantilla'}.pdf`);
   }
 }

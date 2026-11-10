@@ -8,7 +8,8 @@
     <div class="row-actions">
       <span class="badge" [class]="tone[s.status]">{{ 'enums.sessionStatus.' + s.status | t }}</span>
       @if (s.agendaClosed) {
-        <button class="btn btn-secondary" type="button" (click)="downloadNotice()">{{ 'sessions.detail.noticePdf' | t }}</button>
+        <button class="btn btn-secondary" type="button" (click)="previewNotice()">{{ 'common.view' | t }}</button>
+        <button class="btn btn-ghost" type="button" (click)="downloadNotice()">{{ 'sessions.detail.noticePdf' | t }}</button>
       }
       @if ((s.status === 'CONVENED' || s.status === 'STARTED' || s.status === 'SUSPENDED') && !auth.has('ROLE_COUNCIL_SECRETARY')) {
         <a [routerLink]="['/sessions', s.id, 'live']" class="btn">{{ 'sessions.detail.liveRoom' | t }}</a>
@@ -133,6 +134,13 @@
             @if (item.description) {
               <p>{{ item.description }}</p>
             }
+            @for (file of item.attachments ?? []; track file.id) {
+              <div class="doc-row">
+                <span>{{ file.documentCode ? ('enums.requestDocument.' + file.documentCode | t) : file.name }}</span>
+                <button class="btn btn-ghost" type="button" (click)="previewAttachment(item.requestId!, file)">{{ 'common.view' | t }}</button>
+                <button class="btn btn-ghost" type="button" (click)="downloadAttachment(item.requestId!, file)">{{ 'common.download' | t }}</button>
+              </div>
+            }
             <div class="row-actions">
               <button class="btn btn-ghost" type="button" [attr.aria-label]="'sessions.detail.moveUp' | t" (click)="move(i, -1)">↑</button>
               <button class="btn btn-ghost" type="button" [attr.aria-label]="'sessions.detail.moveDown' | t" (click)="move(i, 1)">↓</button>
@@ -149,9 +157,18 @@
           <input [(ngModel)]="requestQuery" [placeholder]="'sessions.detail.searchRequests' | t" />
         </label>
         @for (request of visibleApproved(); track request.id) {
-          <div class="row-actions" style="margin-bottom: .5rem">
-            <span>{{ request.code }} · {{ request.title }}</span>
-            <button class="btn btn-secondary" type="button" (click)="addRequest(request.id)">{{ 'sessions.detail.addItem' | t }}</button>
+          <div style="margin-bottom: .5rem">
+            <div class="row-actions">
+              <span>{{ request.code }} · {{ request.title }}</span>
+              <button class="btn btn-secondary" type="button" (click)="addRequest(request.id)">{{ 'sessions.detail.addItem' | t }}</button>
+            </div>
+            @for (file of request.attachments; track file.id) {
+              <div class="doc-row">
+                <span>{{ file.documentCode ? ('enums.requestDocument.' + file.documentCode | t) : file.name }}</span>
+                <button class="btn btn-ghost" type="button" (click)="previewAttachment(request.id, file)">{{ 'common.view' | t }}</button>
+                <button class="btn btn-ghost" type="button" (click)="downloadAttachment(request.id, file)">{{ 'common.download' | t }}</button>
+              </div>
+            }
           </div>
         } @empty {
           <p class="muted">{{ (requestQuery.trim() ? 'sessions.detail.noneMatch' : 'sessions.detail.noneWaiting') | t }}</p>
@@ -229,7 +246,16 @@
         @for (item of s.items; track item.id; let i = $index) {
           <tr>
             <td>{{ item.position }}</td>
-            <td>{{ item.title }}@if (item.miscellaneous) { <span class="chip">{{ 'sessions.misc' | t }}</span> }@if (item.urgent) { <span class="chip">{{ 'sessions.urgent' | t }}</span> }</td>
+            <td>
+              {{ item.title }}@if (item.miscellaneous) { <span class="chip">{{ 'sessions.misc' | t }}</span> }@if (item.urgent) { <span class="chip">{{ 'sessions.urgent' | t }}</span> }
+              @for (file of item.attachments ?? []; track file.id) {
+                <div class="doc-row">
+                  <span>{{ file.documentCode ? ('enums.requestDocument.' + file.documentCode | t) : file.name }}</span>
+                  <button class="btn btn-ghost" type="button" (click)="previewAttachment(item.requestId!, file)">{{ 'common.view' | t }}</button>
+                  <button class="btn btn-ghost" type="button" (click)="downloadAttachment(item.requestId!, file)">{{ 'common.download' | t }}</button>
+                </div>
+              }
+            </td>
             <td>{{ item.requestCode || '—' }}</td>
             <td>{{ item.outcome ? ('enums.decisionOutcome.' + item.outcome | t) : ('sessions.detail.pending' | t) }}</td>
             <td class="row-actions">

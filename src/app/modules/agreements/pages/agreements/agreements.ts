@@ -6,6 +6,7 @@ import { AGREEMENT_WRITERS } from '@core/auth/role-groups';
 import { ConfirmService } from '@core/ui/confirm.service';
 import { Page } from '@core/http/api.models';
 import { I18nService } from '@core/i18n/i18n.service';
+import { DocumentViewerService } from '@core/ui/document-viewer.service';
 import { ToastService } from '@core/ui/toast.service';
 import { LocalDatePipe } from '@shared/pipes/local-date.pipe';
 import { TranslatePipe } from '@shared/pipes/translate.pipe';
@@ -25,6 +26,7 @@ export class AgreementsPage implements OnInit, OnDestroy {
   readonly i18n = inject(I18nService);
   private readonly auth = inject(AuthService);
   private readonly confirm = inject(ConfirmService);
+  private readonly docs = inject(DocumentViewerService);
   readonly canWrite = this.auth.has(...AGREEMENT_WRITERS);
   readonly admin = this.auth.has('ROLE_ADMIN');
   readonly types = signal<AgreementTypeDto[]>([]);
@@ -71,6 +73,16 @@ export class AgreementsPage implements OnInit, OnDestroy {
       next: () => {
         this.toast.ok('records.deleted');
         this.load(this.page()?.number ?? 0);
+      },
+      error: (e) => this.toast.apiError(e),
+    });
+  }
+
+  preview(a: AgreementSummaryDto): void {
+    this.api.download(a.id).subscribe({
+      next: (r) => {
+        if (!r.body) return;
+        this.docs.show(r.body, filenameFromDisposition(r.headers.get('Content-Disposition'), `${a.label}.pdf`));
       },
       error: (e) => this.toast.apiError(e),
     });

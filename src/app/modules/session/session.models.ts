@@ -30,4 +30,6 @@ export interface DecisionPayload {
   votesAgainst: number;
   abstentions: number;
   changeReason?: string;
+  /** What the council records about the point. It is not the request justification. */
+  pointDescription?: string;
 }

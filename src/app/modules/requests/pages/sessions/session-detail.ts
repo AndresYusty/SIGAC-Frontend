@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthService } from '@core/auth/auth.service';
 import { ConfirmService } from '@core/ui/confirm.service';
+import { DocumentViewerService } from '@core/ui/document-viewer.service';
 import { ToastService } from '@core/ui/toast.service';
 import { MinutesApi } from '@modules/minutes';
 import { CouncilTypeDto, UsersApi } from '@modules/users';
@@ -11,7 +12,7 @@ import { TranslatePipe } from '@shared/pipes/translate.pipe';
 import { saveBlob } from '@shared/utils/files';
 import { TONE } from '@shared/utils/labels';
 import { RequestsApi } from '../../requests.api';
-import { GuestPayload, RequestDto, SessionDto, SummonedDto } from '../../requests.models';
+import { AttachmentDto, GuestPayload, RequestDto, SessionDto, SummonedDto } from '../../requests.models';
 
 @Component({
   selector: 'app-session-detail',
@@ -27,6 +28,7 @@ export class SessionDetailPage implements OnInit {
   readonly auth = inject(AuthService);
   private readonly toast = inject(ToastService);
   private readonly confirm = inject(ConfirmService);
+  private readonly docs = inject(DocumentViewerService);
   readonly session = signal<SessionDto | null>(null);
   readonly approved = signal<RequestDto[]>([]);
   readonly people = signal<SummonedDto[]>([]);
@@ -232,6 +234,21 @@ export class SessionDetailPage implements OnInit {
         this.session.set(s);
         this.toast.ok('sessions.detail.agendaClosed');
       },
+      error: (e) => this.toast.apiError(e),
+    });
+  }
+
+  previewNotice(): void {
+    this.docs.show(this.api.downloadNotice(this.id()), 'Citación.pdf');
+  }
+
+  previewAttachment(requestId: number, file: AttachmentDto): void {
+    this.docs.show(this.api.downloadAttachment(requestId, file.id), file.name || 'documento.pdf');
+  }
+
+  downloadAttachment(requestId: number, file: AttachmentDto): void {
+    this.api.downloadAttachment(requestId, file.id).subscribe({
+      next: (b) => saveBlob(b, file.name || 'documento.pdf'),
       error: (e) => this.toast.apiError(e),
     });
   }

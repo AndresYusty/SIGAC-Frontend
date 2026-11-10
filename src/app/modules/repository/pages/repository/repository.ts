@@ -1,15 +1,14 @@
 import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
-import { Observable } from 'rxjs';
 import { FormsModule } from '@angular/forms';
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { Page } from '@core/http/api.models';
 import { I18nService } from '@core/i18n/i18n.service';
+import { DocumentViewerService } from '@core/ui/document-viewer.service';
 import { ToastService } from '@core/ui/toast.service';
 import { AgreementSummaryDto, AgreementTypeDto } from '@modules/agreements';
 import { CouncilTypeDto, UsersApi } from '@modules/users';
 import { LocalDatePipe } from '@shared/pipes/local-date.pipe';
 import { TranslatePipe } from '@shared/pipes/translate.pipe';
-import { blobUrl, saveBlob } from '@shared/utils/files';
+import { saveBlob } from '@shared/utils/files';
 import { LiveQuery } from '@shared/utils/live-query';
 import { RepositoryApi } from '../../repository.api';
 import { RepositoryMinutesDto } from '../../repository.models';
@@ -26,7 +25,7 @@ export class RepositoryPage implements OnInit, OnDestroy {
   private readonly api = inject(RepositoryApi);
   private readonly usersApi = inject(UsersApi);
   private readonly toast = inject(ToastService);
-  private readonly sanitizer = inject(DomSanitizer);
+  private readonly docs = inject(DocumentViewerService);
   private readonly i18n = inject(I18nService);
   readonly section = signal<Shelf>('minutes');
   serialNumber = '';
@@ -41,9 +40,6 @@ export class RepositoryPage implements OnInit, OnDestroy {
   readonly agreementTypes = signal<AgreementTypeDto[]>([]);
   readonly minutesPage = signal<Page<RepositoryMinutesDto> | null>(null);
   readonly agreementsPage = signal<Page<AgreementSummaryDto> | null>(null);
-  readonly viewerTitle = signal('');
-  readonly pdf = signal<SafeResourceUrl | undefined>(undefined);
-  private rawPdf?: string;
   private readonly query = new LiveQuery();
 
   ngOnInit(): void {
@@ -54,13 +50,11 @@ export class RepositoryPage implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.query.cancel();
-    this.clearPdf();
   }
 
   show(section: Shelf): void {
     if (this.section() === section) return;
     this.section.set(section);
-    this.clearPdf();
     this.load();
   }
 
@@ -82,8 +76,7 @@ export class RepositoryPage implements OnInit, OnDestroy {
   }
 
   viewMinutes(item: RepositoryMinutesDto): void {
-    this.viewerTitle.set(item.serialNumber);
-    this.open(this.api.viewMinutes(item.id));
+    this.docs.show(this.api.viewMinutes(item.id), `Acta ${item.serialNumber}.pdf`);
   }
 
   downloadMinutes(item: RepositoryMinutesDto): void {
@@ -94,8 +87,7 @@ export class RepositoryPage implements OnInit, OnDestroy {
   }
 
   viewAgreement(item: AgreementSummaryDto): void {
-    this.viewerTitle.set(item.label);
-    this.open(this.api.viewAgreement(item.id));
+    this.docs.show(this.api.viewAgreement(item.id), `${item.label}.pdf`);
   }
 
   downloadAgreement(item: AgreementSummaryDto): void {
@@ -135,20 +127,4 @@ export class RepositoryPage implements OnInit, OnDestroy {
     });
   }
 
-  private open(request: Observable<Blob>): void {
-    request.subscribe({
-      next: (b) => {
-        this.clearPdf();
-        this.rawPdf = blobUrl(b);
-        this.pdf.set(this.sanitizer.bypassSecurityTrustResourceUrl(this.rawPdf));
-      },
-      error: (e) => this.toast.apiError(e),
-    });
-  }
-
-  private clearPdf(): void {
-    if (this.rawPdf) URL.revokeObjectURL(this.rawPdf);
-    this.rawPdf = undefined;
-    this.pdf.set(undefined);
-  }
 }

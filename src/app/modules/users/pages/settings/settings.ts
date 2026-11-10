@@ -1,5 +1,6 @@
 import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { DocumentViewerService } from '@core/ui/document-viewer.service';
 import { ToastService } from '@core/ui/toast.service';
 import { TranslatePipe } from '@shared/pipes/translate.pipe';
 import { UsersApi } from '../../users.api';
@@ -14,6 +15,7 @@ import { CouncilTypeDto, LetterheadPart, LetterheadStatus, ParameterDto } from '
 export class SettingsPage implements OnInit, OnDestroy {
   private readonly api = inject(UsersApi);
   private readonly toast = inject(ToastService);
+  private readonly docs = inject(DocumentViewerService);
   readonly councilTypes = signal<CouncilTypeDto[]>([]);
   readonly parameters = signal<ParameterDto[]>([]);
   readonly letterhead = signal<LetterheadStatus | null>(null);
@@ -56,10 +58,23 @@ export class SettingsPage implements OnInit, OnDestroy {
     this.loadSheet();
   }
 
+  previewSheet(): void {
+    const file = this.sheetBlob;
+    if (!file) return;
+    this.docs.show(file, `Membrete.${file.type.includes('jpeg') ? 'jpg' : 'png'}`);
+  }
+
   downloadSheet(): void {
     const file = this.sheetBlob;
     if (!file) return;
     saveBlob(file, `Membrete.${file.type.includes('jpeg') ? 'jpg' : 'png'}`);
+  }
+
+  previewLogo(): void {
+    this.api.letterheadLogo().subscribe({
+      next: (file) => this.docs.show(file, `Logo.${file.type.includes('jpeg') ? 'jpg' : 'png'}`),
+      error: (e) => this.toast.apiError(e),
+    });
   }
 
   downloadLogo(): void {

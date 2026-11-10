@@ -41,6 +41,7 @@ export class AgreementEditorPage implements OnInit, OnDestroy {
   readonly defaults = signal<AgreementDefaultsDto | null>(null);
   readonly saving = signal(false);
   readonly pdf = signal<SafeResourceUrl | null>(null);
+  private previewBlob: Blob | null = null;
   readonly typeCode = signal('');
   readonly type = computed(() => this.types().find((t) => t.code === this.typeCode()));
   readonly tables = signal<EditableTable[]>([]);
@@ -180,13 +181,17 @@ export class AgreementEditorPage implements OnInit, OnDestroy {
     this.applyTables();
     this.api.preview(this.model).subscribe({
       next: (b) => {
+        this.previewBlob = b;
         if (this.rawPdf) URL.revokeObjectURL(this.rawPdf);
         this.rawPdf = blobUrl(b);
         this.pdf.set(
           this.sanitizer.bypassSecurityTrustResourceUrl(`${this.rawPdf}#toolbar=0&navpanes=0`),
         );
       },
-      error: () => this.pdf.set(null),
+      error: () => {
+        this.previewBlob = null;
+        this.pdf.set(null);
+      },
     });
   }
 
@@ -224,6 +229,11 @@ export class AgreementEditorPage implements OnInit, OnDestroy {
         this.confirm.tell(this.toast.apiErrorText(e));
       },
     });
+  }
+
+  downloadPreview(): void {
+    if (!this.previewBlob) return;
+    saveBlob(this.previewBlob, `${this.label() || 'acuerdo'}.pdf`);
   }
 
   download(): void {

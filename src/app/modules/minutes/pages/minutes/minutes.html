@@ -24,6 +24,8 @@
           <td>{{ m.faculty }}</td>
           <td>{{ m.sessionDate | localDate: 'dd/MM/yyyy' }}</td>
           <td class="row-actions">
+            <button class="btn btn-ghost" type="button" (click)="preview(m)">{{ 'common.view' | t }}</button>
+            <button class="btn btn-ghost" type="button" (click)="download(m)">{{ 'common.download' | t }}</button>
             <a [routerLink]="['/minutes', m.id]" class="btn btn-ghost">{{ auth.has('ROLE_ADMIN') ? ('records.edit' | t) : ('common.open' | t) }}</a>
             @if (auth.has('ROLE_ADMIN')) {
               <button class="btn btn-danger" type="button" (click)="remove(m)">{{ 'records.remove' | t }}</button>

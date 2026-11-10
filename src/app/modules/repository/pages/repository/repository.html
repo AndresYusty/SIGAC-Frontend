@@ -127,9 +127,3 @@
   </div>
 }
 
-@if (pdf()) {
-  <article class="card preview-card">
-    <h2>{{ viewerTitle() }}</h2>
-    <iframe class="preview-frame" [src]="pdf()" [title]="viewerTitle()"></iframe>
-  </article>
-}

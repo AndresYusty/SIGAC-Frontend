@@ -47,6 +47,7 @@ const EXACT: Record<string, string> = {
   'A point that already has a decision cannot be removed from the agenda': 'errors.server.decidedPoint',
   'The request is already on an agenda': 'errors.server.requestOnAgenda',
   'Para modificar la decisión indique el motivo del cambio': 'errors.server.decisionReason',
+  'La descripción del punto solo se puede editar con la sesión en curso o suspendida': 'errors.server.descriptionLocked',
   'The note does not contain valid text': 'errors.server.noteEmpty',
   'Para aprobar, los votos a favor tienen que ser más que los en contra': 'errors.server.approveMajority',
   'Para negar, los votos en contra tienen que ser más que los a favor': 'errors.server.denyMajority',

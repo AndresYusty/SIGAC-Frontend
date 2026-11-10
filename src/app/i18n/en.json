@@ -91,6 +91,7 @@
       "requestOnAgenda": "That request is already on an agenda.",
       "miscRequestWhileOpen": "A miscellaneous request can only be added while the session is in progress (current status: {{status}}).",
       "decisionReason": "To change the decision, enter the reason.",
+      "descriptionLocked": "The point description can only be edited while the session is in progress or suspended.",
       "noteEmpty": "The note does not contain valid text.",
       "tooManyVotes": "Votes cannot exceed the {{count}} members present with a vote.",
       "approveMajority": "To approve, votes in favor must outnumber votes against.",
@@ -179,7 +180,7 @@
       "xhtmlLine": "Line {{line}}: the document must be well-formed XHTML. Close every tag and use &#160; instead of &nbsp;.",
       "parseFailed": "The document could not be read as XHTML.",
       "periodInvalid": "The academic period must be 1(A) or 2(B).",
-      "identityRequired": "Complete the student code, identity document and place of issue.",
+      "identityRequired": "Complete the student code and identity document.",
       "counselorRequired": "Enter the name of the counselor teacher.",
       "otherRequired": "Specify what the request is about.",
       "cancellationRequired": "Select whether the cancellation is of a course or of the academic period.",
@@ -263,7 +264,8 @@
       "STUDENT": "Student procedures",
       "TEACHING": "Teaching matters",
       "CURRICULUM": "Curriculum management",
-      "RESEARCH": "Research"
+      "RESEARCH": "Research",
+      "SOCIAL": "Social outreach"
     },
     "requestTopic": {
       "PETITION": "Petition",
@@ -282,7 +284,11 @@
       "PROJECT_ENDORSEMENT": "Project endorsement",
       "CALL": "Call",
       "RESOURCES": "Resource allocation",
-      "SEEDBED": "Research seedbed"
+      "SEEDBED": "Research seedbed",
+      "SOCIAL_PROJECT": "Social outreach project endorsement",
+      "SOCIAL_PRACTICE": "Social practice",
+      "EXTENSION_AGREEMENT": "Extension agreement",
+      "SOCIAL_ACTIVITY": "Social outreach activity"
     },
     "requestDocument": {
       "PETITION": "Written petition",
@@ -302,7 +308,11 @@
       "PROJECT": "Project to endorse",
       "CALL_TERMS": "Call terms",
       "BUDGET": "Resource request",
-      "SEEDBED_PROPOSAL": "Seedbed proposal"
+      "SEEDBED_PROPOSAL": "Seedbed proposal",
+      "SOCIAL_PROJECT": "Social outreach project",
+      "SOCIAL_PRACTICE": "Social practice proposal",
+      "EXTENSION_AGREEMENT": "Extension agreement",
+      "SOCIAL_ACTIVITY": "Activity proposal"
     },
     "requestStatus": {
       "FILED": "Filed",
@@ -439,6 +449,7 @@
       "newTitle": "New request",
       "editTitle": "Correct request",
       "lead": "Form MI-FOR-028. Supporting files are PDFs of up to 10 MB and depend on the request.",
+      "requiredHint": "An asterisk marks the required fields.",
       "liveTitle": "Request during the session",
       "liveLead": "It is filed on the same form and goes straight onto the agenda as a miscellaneous point.",
       "requester": "Applicant name",
@@ -484,7 +495,7 @@
       "documentsLead": "Attach each document this request requires. If it is already uploaded, you can leave the file empty.",
       "already": "Already uploaded: {{name}}",
       "counselorRequired": "Enter the counselor teacher.",
-      "identityRequired": "Enter the student code, identity document and place of issue.",
+      "identityRequired": "Enter the student code and identity document.",
       "otherRequired": "Describe what the case is about.",
       "cancellationRequired": "Say whether the cancellation is of a course or of the period.",
       "documentsRequired": "A required document for this request is missing.",
@@ -756,6 +767,9 @@
       "abstentions": "Abstentions",
       "changeReason": "Reason for change",
       "changeReasonPlaceholder": "Explain why the recorded decision is being changed",
+      "descriptionPlaceholder": "What this point is about",
+      "pointDescription": "Point description",
+      "pointDescriptionPlaceholder": "Describe the point when the decision is taken",
       "recordDecision": "Record decision",
       "decisionRecorded": "Decision recorded",
       "debateNote": "Debate note",

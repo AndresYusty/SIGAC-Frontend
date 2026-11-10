@@ -80,6 +80,10 @@
             @if (auth.has('ROLE_COUNCIL_SECRETARY') && s.status === 'STARTED' && decisions[item.id]) {
               <p class="muted">{{ 'sessions.live.decideHint' | t }}</p>
               <p class="muted">{{ 'sessions.live.voteSeats' | t: { count: seats() } }}</p>
+              <label class="field">
+                <span>{{ 'sessions.live.pointDescription' | t }}</span>
+                <textarea rows="3" maxlength="4000" [(ngModel)]="decisions[item.id].pointDescription" [placeholder]="'sessions.live.pointDescriptionPlaceholder' | t"></textarea>
+              </label>
               <div class="grid grid-2">
                 <label class="field">
                   <span>{{ 'sessions.live.outcome' | t }}</span>
@@ -96,7 +100,7 @@
               @if (voteWarning()) {
                 <p class="error-text">{{ 'sessions.live.tooManyVotes' | t: { count: seats() } }}</p>
               }
-              @if (item.outcome) {
+              @if (needsChangeReason(item)) {
                 <label class="field">
                   <span>{{ 'sessions.live.changeReason' | t }}</span>
                   <input [(ngModel)]="decisions[item.id].changeReason" [placeholder]="'sessions.live.changeReasonPlaceholder' | t" />

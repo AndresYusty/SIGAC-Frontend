@@ -78,6 +78,7 @@
             <div>{{ a.name }}</div>
             <div class="muted">{{ formatBytes(a.sizeBytes) }}</div>
           </div>
+          <button class="btn btn-ghost" type="button" (click)="preview(a)">{{ 'common.view' | t }}</button>
           <button class="btn btn-ghost" type="button" (click)="download(a.id, a.name)">{{ 'common.download' | t }}</button>
         </div>
       }

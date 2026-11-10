@@ -9,6 +9,7 @@
       @if (auth.has('ROLE_ADMIN')) {
         <button class="btn btn-danger" type="button" (click)="remove()">{{ 'records.remove' | t }}</button>
       }
+      <button class="btn btn-secondary" type="button" [disabled]="!pdf()" (click)="download()">{{ 'common.download' | t }}</button>
       <a routerLink="/minutes" class="btn btn-ghost">{{ 'common.back' | t }}</a>
     </div>
   </div>

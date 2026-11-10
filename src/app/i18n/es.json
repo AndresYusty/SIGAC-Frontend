@@ -91,6 +91,7 @@
       "requestOnAgenda": "Esa solicitud ya está en un orden del día.",
       "miscRequestWhileOpen": "Una solicitud como punto vario solo se agrega con la sesión en curso (estado actual: {{status}}).",
       "decisionReason": "Para modificar la decisión indique el motivo del cambio.",
+      "descriptionLocked": "La descripción del punto solo se puede editar con la sesión en curso o suspendida.",
       "noteEmpty": "La nota no contiene texto válido.",
       "tooManyVotes": "Los votos no pueden superar a los {{count}} presentes con voto.",
       "approveMajority": "Para aprobar, los votos a favor tienen que ser más que los en contra.",
@@ -179,7 +180,7 @@
       "xhtmlLine": "Línea {{line}}: el documento debe ser XHTML bien formado. Cierre cada etiqueta y use &#160; en lugar de &nbsp;.",
       "parseFailed": "No se pudo interpretar el documento como XHTML.",
       "periodInvalid": "El periodo académico debe ser 1(A) o 2(B).",
-      "identityRequired": "Complete el código, el documento de identidad y el lugar de expedición.",
+      "identityRequired": "Complete el código y el documento de identidad.",
       "counselorRequired": "Indique el nombre del docente consejero.",
       "otherRequired": "Indique en qué consiste la solicitud.",
       "cancellationRequired": "Indique si la cancelación es de un curso o del periodo académico.",
@@ -263,7 +264,8 @@
       "STUDENT": "Trámites estudiantiles",
       "TEACHING": "Asuntos docentes",
       "CURRICULUM": "Gestión curricular",
-      "RESEARCH": "Investigación"
+      "RESEARCH": "Investigación",
+      "SOCIAL": "Proyección social"
     },
     "requestTopic": {
       "PETITION": "Petición",
@@ -282,7 +284,11 @@
       "PROJECT_ENDORSEMENT": "Aval de proyecto",
       "CALL": "Convocatoria",
       "RESOURCES": "Asignación de recursos",
-      "SEEDBED": "Semillero"
+      "SEEDBED": "Semillero",
+      "SOCIAL_PROJECT": "Aval de proyecto de proyección social",
+      "SOCIAL_PRACTICE": "Práctica social",
+      "EXTENSION_AGREEMENT": "Convenio de extensión",
+      "SOCIAL_ACTIVITY": "Actividad de proyección social"
     },
     "requestDocument": {
       "PETITION": "Escrito de la petición",
@@ -302,7 +308,11 @@
       "PROJECT": "Proyecto a avalar",
       "CALL_TERMS": "Términos de la convocatoria",
       "BUDGET": "Solicitud de recursos",
-      "SEEDBED_PROPOSAL": "Propuesta del semillero"
+      "SEEDBED_PROPOSAL": "Propuesta del semillero",
+      "SOCIAL_PROJECT": "Proyecto de proyección social",
+      "SOCIAL_PRACTICE": "Propuesta de práctica social",
+      "EXTENSION_AGREEMENT": "Convenio de extensión",
+      "SOCIAL_ACTIVITY": "Propuesta de la actividad"
     },
     "requestStatus": {
       "FILED": "Radicada",
@@ -439,6 +449,7 @@
       "newTitle": "Nueva solicitud",
       "editTitle": "Corregir solicitud",
       "lead": "Formato MI-FOR-028. Los soportes son PDF de hasta 10 MB y dependen del trámite.",
+      "requiredHint": "El asterisco marca los campos obligatorios.",
       "liveTitle": "Solicitud en la sesión",
       "liveLead": "Se radica con el mismo formato y entra de una vez al orden del día como punto vario.",
       "requester": "Nombre del solicitante",
@@ -484,7 +495,7 @@
       "documentsLead": "Adjunte cada documento que el trámite exige. Si ya está cargado, puede dejar el archivo en blanco.",
       "already": "Ya cargado: {{name}}",
       "counselorRequired": "Indique el docente consejero.",
-      "identityRequired": "Complete el código, el documento y el lugar de expedición.",
+      "identityRequired": "Complete el código y el documento.",
       "otherRequired": "Indique en qué consiste el caso.",
       "cancellationRequired": "Indique si la cancelación es de un curso o del periodo.",
       "documentsRequired": "Falta un soporte obligatorio de este trámite.",
@@ -756,6 +767,9 @@
       "abstentions": "Abstenciones",
       "changeReason": "Motivo del cambio",
       "changeReasonPlaceholder": "Indique por qué modifica la decisión registrada",
+      "descriptionPlaceholder": "De qué trata este punto",
+      "pointDescription": "Descripción del punto",
+      "pointDescriptionPlaceholder": "Describa el punto al tomar la decisión",
       "recordDecision": "Registrar decisión",
       "decisionRecorded": "Decisión registrada",
       "debateNote": "Nota de debate",

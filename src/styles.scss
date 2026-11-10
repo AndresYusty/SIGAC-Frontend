@@ -577,6 +577,12 @@ p {
   text-transform: uppercase;
 }
 
+.field.required > span::after,
+th.required::after {
+  content: " *";
+  color: var(--wine);
+}
+
 input,
 select,
 textarea {
@@ -602,6 +608,28 @@ select:focus,
 textarea:focus {
   outline: 2px solid var(--ochre-strong);
   border-color: var(--wine-mid);
+}
+
+input[readonly],
+textarea[readonly],
+select:disabled,
+textarea:disabled,
+input:disabled:not([type='checkbox']):not([type='radio']):not([type='file']):not([type='range']):not([type='color']) {
+  background: var(--gray-paper);
+  color: var(--gray);
+  -webkit-text-fill-color: var(--gray);
+  border-color: var(--gray-light);
+  cursor: default;
+  opacity: 1;
+}
+
+input[readonly]:focus,
+textarea[readonly]:focus,
+select:disabled:focus,
+textarea:disabled:focus,
+input:disabled:focus {
+  outline: none;
+  border-color: var(--gray-light);
 }
 
 .password-field {
@@ -912,6 +940,46 @@ tr:hover td {
   box-shadow: var(--shadow);
 }
 
+.modal-document {
+  width: min(960px, 100%);
+  height: min(88vh, 920px);
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-document .agenda-head {
+  align-items: center;
+}
+
+.modal-document h2 {
+  overflow-wrap: anywhere;
+}
+
+.document-frame {
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+  border: 1px solid var(--gray-light);
+  border-radius: 8px;
+  background: var(--gray-paper);
+}
+
+.document-preview {
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+  margin: auto;
+  object-fit: contain;
+}
+
+.doc-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem;
+  margin-top: 0.35rem;
+}
+
 .modal-success {
   text-align: center;
 }
@@ -1100,6 +1168,19 @@ tr:hover td {
   display: flex;
   flex-direction: column;
   gap: 0.65rem;
+}
+
+.point-desc {
+  margin: 0.35rem 0 0;
+}
+
+.point-desc span {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--gray);
 }
 
 .live-point h3 {

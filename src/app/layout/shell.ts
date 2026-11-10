@@ -4,6 +4,7 @@ import { RoleName } from '@core/auth/auth.models';
 import { AuthService } from '@core/auth/auth.service';
 import { AGREEMENT_ROLES, MINUTES_ROLES, REPOSITORY_ROLES, SESSION_ROLES, STAFF_ROLES, SUPPORT_CHIEFS } from '@core/auth/role-groups';
 import { ConfirmService } from '@core/ui/confirm.service';
+import { DocumentViewerService } from '@core/ui/document-viewer.service';
 import { ToastService } from '@core/ui/toast.service';
 import { LangSwitchComponent } from '@shared/components/lang-switch';
 import { TranslatePipe } from '@shared/pipes/translate.pipe';
@@ -23,6 +24,7 @@ export class ShellComponent {
   readonly auth = inject(AuthService);
   readonly toasts = inject(ToastService);
   readonly confirm = inject(ConfirmService);
+  readonly docs = inject(DocumentViewerService);
   readonly year = new Date().getFullYear();
 
   private readonly items: NavItem[] = [

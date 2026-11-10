@@ -59,6 +59,9 @@
         <button class="btn btn-ghost" type="button" (click)="save()">{{ 'templates.saveVersion' | t }}</button>
       </div>
       @if (pdf) {
+        <div class="row-actions" style="margin-top: 0.8rem">
+          <button class="btn btn-ghost" type="button" (click)="downloadPreview()">{{ 'common.download' | t }}</button>
+        </div>
         <iframe class="preview-frame" [src]="pdf" [title]="'templates.previewFrameTitle' | t"></iframe>
       }
     </article>

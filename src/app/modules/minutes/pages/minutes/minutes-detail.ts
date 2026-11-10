@@ -7,7 +7,7 @@ import { ConfirmService } from '@core/ui/confirm.service';
 import { ToastService } from '@core/ui/toast.service';
 import { LocalDatePipe } from '@shared/pipes/local-date.pipe';
 import { TranslatePipe } from '@shared/pipes/translate.pipe';
-import { blobUrl } from '@shared/utils/files';
+import { blobUrl, saveBlob } from '@shared/utils/files';
 import { TONE } from '@shared/utils/labels';
 import { RepositoryApi } from '@modules/repository';
 import { MinutesApi } from '../../minutes.api';
@@ -32,6 +32,7 @@ export class MinutesDetailPage implements OnInit, OnDestroy {
   note = '';
   readonly pdf = signal<SafeResourceUrl | undefined>(undefined);
   private rawPdf?: string;
+  private pdfBlob?: Blob;
   readonly tone = TONE;
 
   ngOnInit(): void {
@@ -104,8 +105,15 @@ export class MinutesDetailPage implements OnInit, OnDestroy {
     });
   }
 
+  download(): void {
+    const minutes = this.minutes();
+    if (!this.pdfBlob || !minutes) return;
+    saveBlob(this.pdfBlob, `${minutes.serialNumber}.pdf`);
+  }
+
   private setPdf(b: Blob): void {
     if (this.rawPdf) URL.revokeObjectURL(this.rawPdf);
+    this.pdfBlob = b;
     this.rawPdf = blobUrl(b);
     this.pdf.set(this.sanitizer.bypassSecurityTrustResourceUrl(this.rawPdf));
   }

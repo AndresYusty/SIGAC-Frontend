@@ -52,10 +52,14 @@ export class SessionLivePage implements OnInit, OnDestroy {
     return Number(this.route.snapshot.paramMap.get('id'));
   }
 
+  private show(s: SessionDto): void {
+    this.session.set(s);
+  }
+
   reload(silent = false): void {
     this.requestsApi.getSession(this.id()).subscribe({
       next: (s) => {
-        this.session.set(s);
+        this.show(s);
         for (const item of s.items) {
           this.decisions[item.id] ??= {
             outcome: item.outcome ?? 'APPROVED',
@@ -63,6 +67,7 @@ export class SessionLivePage implements OnInit, OnDestroy {
             votesAgainst: item.votesAgainst,
             abstentions: item.abstentions,
             changeReason: '',
+            pointDescription: item.decisionDescription ?? '',
           };
         }
         if (!silent && this.canEditAgenda()) this.loadApproved();
@@ -96,7 +101,7 @@ export class SessionLivePage implements OnInit, OnDestroy {
   addRequest(requestId: number): void {
     this.requestsApi.addAgendaItem(this.id(), requestId).subscribe({
       next: (s) => {
-        this.session.set(s);
+        this.show(s);
         this.approved.update((list) => list.filter((item) => item.id !== requestId));
         this.toast.ok('sessions.detail.itemAdded');
       },
@@ -111,7 +116,7 @@ export class SessionLivePage implements OnInit, OnDestroy {
     }
     this.requestsApi.addUrgentItem(this.id(), this.urgentTitle.trim(), this.urgentDescription.trim()).subscribe({
       next: (s) => {
-        this.session.set(s);
+        this.show(s);
         this.urgentTitle = '';
         this.urgentDescription = '';
         this.toast.ok('sessions.detail.itemAdded');
@@ -122,7 +127,7 @@ export class SessionLivePage implements OnInit, OnDestroy {
 
   removeItem(itemId: number): void {
     this.requestsApi.removeAgendaItem(this.id(), itemId).subscribe({
-      next: (s) => this.session.set(s),
+      next: (s) => this.show(s),
       error: (e) => this.toast.apiError(e),
     });
   }
@@ -133,7 +138,7 @@ export class SessionLivePage implements OnInit, OnDestroy {
     if (target < 0 || target >= items.length) return;
     [items[index], items[target]] = [items[target], items[index]];
     this.requestsApi.reorderAgendaItems(this.id(), items.map((item) => item.id)).subscribe({
-      next: (s) => this.session.set(s),
+      next: (s) => this.show(s),
       error: (e) => this.toast.apiError(e),
     });
   }
@@ -176,7 +181,7 @@ export class SessionLivePage implements OnInit, OnDestroy {
     }[action];
     call().subscribe({
       next: (s) => {
-        this.session.set(s);
+        this.show(s);
         this.reload();
       },
       error: (e) => this.toast.apiError(e),
@@ -210,6 +215,18 @@ export class SessionLivePage implements OnInit, OnDestroy {
     this.voteWarning.set(entered > allowed);
   }
 
+  /** The reason is only asked when a decision already saved is being changed. */
+  needsChangeReason(item: AgendaItemDto): boolean {
+    if (!item.outcome) return false;
+    const draft = this.decisions[item.id];
+    if (!draft) return false;
+    return draft.outcome !== item.outcome
+      || this.votes(draft.votesFor) !== item.votesFor
+      || this.votes(draft.votesAgainst) !== item.votesAgainst
+      || this.votes(draft.abstentions) !== item.abstentions
+      || (draft.pointDescription ?? '').trim() !== (item.decisionDescription ?? '').trim();
+  }
+
   recordDecision(item: AgendaItemDto): void {
     const draft = this.decisions[item.id];
     const inFavor = this.votes(draft.votesFor);
@@ -234,6 +251,7 @@ export class SessionLivePage implements OnInit, OnDestroy {
       votesAgainst: against,
       abstentions,
       changeReason: draft.changeReason?.trim() || undefined,
+      pointDescription: draft.pointDescription?.trim() || undefined,
     };
     this.api.recordDecision(this.id(), item.id, body).subscribe({
       next: () => {

@@ -5,13 +5,14 @@ import { AuthService } from '@core/auth/auth.service';
 import { translateServerText } from '@core/http/server-messages';
 import { I18nService } from '@core/i18n/i18n.service';
 import { ConfirmService } from '@core/ui/confirm.service';
+import { DocumentViewerService } from '@core/ui/document-viewer.service';
 import { ToastService } from '@core/ui/toast.service';
 import { LocalDatePipe } from '@shared/pipes/local-date.pipe';
 import { TranslatePipe } from '@shared/pipes/translate.pipe';
 import { saveBlob } from '@shared/utils/files';
 import { formatBytes, TONE } from '@shared/utils/labels';
 import { RequestsApi } from '../../requests.api';
-import { RequestDto, RequestHistoryDto } from '../../requests.models';
+import { AttachmentDto, RequestDto, RequestHistoryDto } from '../../requests.models';
 
 @Component({
   selector: 'app-request-detail',
@@ -26,6 +27,7 @@ export class RequestDetailPage implements OnInit {
   private readonly toast = inject(ToastService);
   private readonly i18n = inject(I18nService);
   private readonly confirm = inject(ConfirmService);
+  private readonly docs = inject(DocumentViewerService);
   readonly request = signal<RequestDto | null>(null);
   readonly history = signal<RequestHistoryDto[]>([]);
   reason = '';
@@ -54,6 +56,10 @@ export class RequestDetailPage implements OnInit {
       next: (h) => this.history.set(h),
       error: () => undefined,
     });
+  }
+
+  preview(file: AttachmentDto): void {
+    this.docs.show(this.api.downloadAttachment(this.id(), file.id), file.name || 'documento.pdf');
   }
 
   download(attachmentId: number, name: string): void {

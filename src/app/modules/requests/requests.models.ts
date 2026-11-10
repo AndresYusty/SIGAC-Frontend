@@ -1,7 +1,7 @@
 import { RoleName } from '@core/auth/auth.models';
 import { CouncilKind } from '@modules/users';
 
-export const REQUEST_BRANCHES = ['STUDENT', 'TEACHING', 'CURRICULUM', 'RESEARCH'] as const;
+export const REQUEST_BRANCHES = ['STUDENT', 'TEACHING', 'CURRICULUM', 'RESEARCH', 'SOCIAL'] as const;
 export const REQUEST_STATUSES = [
   'FILED',
   'RETURNED',
@@ -135,6 +135,8 @@ export interface AgendaItemDto {
   title: string;
   description: string | null;
   requestCode: string | null;
+  requestId: number | null;
+  attachments: AttachmentDto[];
   miscellaneous: boolean;
   urgent: boolean;
   outcome: DecisionOutcome | null;
@@ -143,6 +145,8 @@ export interface AgendaItemDto {
   abstentions: number;
   decidedBy: string | null;
   debateNotes: string | null;
+  /** Written when the decision is recorded. It is not the request justification. */
+  decisionDescription: string | null;
 }
 
 /** Expanded council guest: has voice but no vote and does not count for the quorum. */

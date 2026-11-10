@@ -2,9 +2,11 @@ import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthService } from '@core/auth/auth.service';
+import { DocumentViewerService } from '@core/ui/document-viewer.service';
 import { ToastService } from '@core/ui/toast.service';
 import { NodeDto, UsersApi } from '@modules/users';
 import { TranslatePipe } from '@shared/pipes/translate.pipe';
+import { saveBlob } from '@shared/utils/files';
 import { RequestsApi } from '../../requests.api';
 import {
   AttachmentDto,
@@ -37,6 +39,7 @@ export class RequestFormPage implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly toast = inject(ToastService);
+  private readonly docs = inject(DocumentViewerService);
   readonly auth = inject(AuthService);
 
   readonly id = signal<number | null>(null);
@@ -191,6 +194,29 @@ export class RequestFormPage implements OnInit {
     return this.existing().find((file) => file.documentCode === code);
   }
 
+  picked(code: string): File | undefined {
+    return this.files()[code];
+  }
+
+  previewLocal(file: File): void {
+    this.docs.show(file, file.name);
+  }
+
+  previewSaved(file: AttachmentDto): void {
+    const id = this.id();
+    if (!id) return;
+    this.docs.show(this.api.downloadAttachment(id, file.id), file.name || 'documento.pdf');
+  }
+
+  downloadSaved(file: AttachmentDto): void {
+    const id = this.id();
+    if (!id) return;
+    this.api.downloadAttachment(id, file.id).subscribe({
+      next: (blob) => saveBlob(blob, file.name || 'documento.pdf'),
+      error: (e) => this.toast.apiError(e),
+    });
+  }
+
   addCourse(): void {
     if (this.courses().length >= 6) return;
     this.courses.update((rows) => [...rows, emptyCourse()]);
@@ -210,15 +236,9 @@ export class RequestFormPage implements OnInit {
       this.form.markAllAsTouched();
       return;
     }
-    if (this.branch() === 'STUDENT' && !this.form.controls.counselorName.value.trim()) {
-      this.form.controls.counselorName.markAsTouched();
-      this.toast.error('requests.form.counselorRequired');
-      return;
-    }
     if (this.branch() === 'STUDENT' && (
       !this.form.controls.studentCode.value.trim()
       || !this.form.controls.identityDocument.value.trim()
-      || !this.form.controls.identityIssuedIn.value.trim()
     )) {
       this.form.markAllAsTouched();
       this.toast.error('requests.form.identityRequired');
@@ -310,10 +330,8 @@ export class RequestFormPage implements OnInit {
       : [Validators.maxLength(max)];
     this.form.controls.studentCode.setValidators(required(30));
     this.form.controls.identityDocument.setValidators(required(30));
-    this.form.controls.identityIssuedIn.setValidators(required(80));
-    this.form.controls.counselorName.setValidators(student
-      ? [Validators.required, Validators.maxLength(150)]
-      : [Validators.maxLength(150)]);
+    this.form.controls.identityIssuedIn.setValidators([Validators.maxLength(80)]);
+    this.form.controls.counselorName.setValidators([Validators.maxLength(150)]);
     this.form.controls.studentCode.updateValueAndValidity();
     this.form.controls.identityDocument.updateValueAndValidity();
     this.form.controls.identityIssuedIn.updateValueAndValidity();
