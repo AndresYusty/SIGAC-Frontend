@@ -1,0 +1,25 @@
+# SITE_ADDRESS = domain (e.g. sigac.usco.edu.co) -> automatic HTTPS with Let's Encrypt.
+# SITE_ADDRESS = :80 -> plain HTTP (behind an AWS load balancer that terminates TLS, or for testing by IP).
+{$SITE_ADDRESS::80} {
+	encode zstd gzip
+
+	handle /api/* {
+		reverse_proxy {$BACKEND_UPSTREAM:backend:8080}
+	}
+
+	handle {
+		root * /srv
+		try_files {path} /index.html
+		file_server
+	}
+
+	@hashed path_regexp \.[0-9a-f]{8,}\.(js|css|woff2?)$
+	header @hashed Cache-Control "public, max-age=31536000, immutable"
+	header /index.html Cache-Control "no-cache"
+
+	header {
+		X-Content-Type-Options nosniff
+		Referrer-Policy strict-origin-when-cross-origin
+		-Server
+	}
+}

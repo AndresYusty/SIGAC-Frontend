@@ -10,6 +10,15 @@ Angular 22 (standalone components, signals, lazy routes) client for the SIGAC ba
 | `npm run build`             | Production build into `dist/sigac-frontend`                          |
 | `npm run lint:architecture` | Checks the module boundaries described below                         |
 
+The API is always called with the relative path `/api/v1` (same domain): `proxy.conf.json` forwards it in
+development and Caddy (`Caddyfile`) in production.
+
+## Despliegue (deployment)
+
+`Dockerfile` builds the app (`npm ci && npm run build`) and serves `dist/sigac-frontend/browser` with Caddy,
+which also proxies `/api` to the backend. It runs as the `web` service of the `docker-compose.yml` described
+in the backend README (section "Despliegue").
+
 ## Frontend architecture: modular
 
 The app mirrors the backend modular monolith. Each feature lives in its own module and only exposes
