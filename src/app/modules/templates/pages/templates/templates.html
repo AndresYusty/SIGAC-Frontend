@@ -4,75 +4,150 @@
     <h1>{{ 'templates.title' | t }}</h1>
     <p class="lead">{{ 'templates.lead' | t }}</p>
   </div>
+  <div class="row-actions">
+    <button class="btn btn-secondary" type="button" [disabled]="loadingEditor()" (click)="startNew()">
+      {{ 'templates.newTemplate' | t }}
+    </button>
+  </div>
 </div>
-<div class="split">
-  <div class="grid">
-    <article class="card">
-      <div class="toolbar">
-        <label class="field grow">
-          <span>{{ 'templates.councilType' | t }}</span>
-          <select [(ngModel)]="councilTypeId" (ngModelChange)="load()">
-            @for (ct of councilTypes(); track ct.id) {
-              <option [ngValue]="ct.id">{{ ct.name }}</option>
-            }
-          </select>
+
+<div class="toolbar">
+  <label class="field" style="min-width: 16rem; max-width: 28rem">
+    <span>{{ 'templates.councilType' | t }}</span>
+    <select [ngModel]="councilTypeId()" (ngModelChange)="changeCouncilType($event)">
+      @for (ct of councilTypes(); track ct.id) {
+        <option [ngValue]="ct.id">{{ ct.name }}</option>
+      }
+    </select>
+  </label>
+</div>
+
+<article class="card" style="margin-bottom: 1rem">
+  <div class="agenda-head">
+    <h2>{{ 'templates.versions' | t }}</h2>
+    @if (loadingList()) {
+      <span class="muted">{{ 'common.loading' | t }}</span>
+    }
+  </div>
+  <div class="table-wrap compact">
+    <table>
+      <thead>
+        <tr>
+          <th>{{ 'common.name' | t }}</th>
+          <th>{{ 'templates.versionShort' | t }}</th>
+          <th>{{ 'common.status' | t }}</th>
+          <th>{{ 'common.actions' | t }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (tpl of list(); track tpl.id) {
+          <tr class="clickable" [class.is-selected]="selectedId() === tpl.id" (click)="open(tpl)">
+            <td><strong>{{ tpl.name }}</strong></td>
+            <td>v{{ tpl.version }}</td>
+            <td>
+              <span class="badge" [class]="tpl.active ? 'ok' : 'muted'">
+                {{ (tpl.active ? 'templates.active' : 'templates.historic') | t }}
+              </span>
+            </td>
+            <td class="row-actions" (click)="$event.stopPropagation()">
+              <button
+                class="btn btn-ghost"
+                type="button"
+                [disabled]="loadingEditor() && selectedId() === tpl.id"
+                (click)="open(tpl)"
+              >
+                {{ (loadingEditor() && selectedId() === tpl.id ? 'common.loading' : 'common.edit') | t }}
+              </button>
+              @if (!tpl.active) {
+                <button class="btn btn-ghost" type="button" (click)="activate(tpl.id, $event)">
+                  {{ 'templates.activate' | t }}
+                </button>
+              }
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+  @if (!loadingList() && !list().length) {
+    <div class="empty">
+      <h3>{{ 'templates.emptyTitle' | t }}</h3>
+      <p>{{ 'templates.emptyHint' | t }}</p>
+    </div>
+  }
+</article>
+
+<div class="split templates-desk">
+  <article class="card grid" #editorCard>
+    <div class="agenda-head">
+      <div>
+        <h2>
+          {{
+            (selectedId()
+              ? 'templates.editingVersion'
+              : 'templates.newTemplate') | t: { version: selectedVersion() ?? '' }
+          }}
+        </h2>
+        @if (loadingEditor()) {
+          <p class="muted">{{ 'templates.loadingContent' | t }}</p>
+        }
+      </div>
+      @if (selectedId()) {
+        <button class="btn btn-ghost" type="button" [disabled]="loadingEditor()" (click)="startNew()">
+          {{ 'templates.clearEditor' | t }}
+        </button>
+      }
+    </div>
+
+    <fieldset class="grid" [disabled]="loadingEditor()">
+      <div class="grid grid-2">
+        <label class="field">
+          <span>{{ 'common.name' | t }}</span>
+          <input [ngModel]="name()" (ngModelChange)="name.set($event)" />
+        </label>
+        <label class="field">
+          <span>{{ 'templates.comment' | t }}</span>
+          <input [ngModel]="comment()" (ngModelChange)="comment.set($event)" [placeholder]="'templates.commentHint' | t" />
         </label>
       </div>
-      <table>
-        <thead>
-          <tr>
-            <th>{{ 'common.name' | t }}</th>
-            <th>{{ 'templates.versionShort' | t }}</th>
-            <th>{{ 'common.status' | t }}</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (tpl of list(); track tpl.id) {
-            <tr>
-              <td>{{ tpl.name }}</td>
-              <td>{{ tpl.version }}</td>
-              <td>
-                <span class="badge" [class]="tpl.active ? 'ok' : 'muted'">{{ (tpl.active ? 'templates.active' : 'templates.historic') | t }}</span>
-              </td>
-              <td class="row-actions">
-                <button class="btn btn-ghost" type="button" (click)="open(tpl)">{{ 'common.edit' | t }}</button>
-                @if (!tpl.active) {
-                  <button class="btn btn-ghost" type="button" (click)="activate(tpl.id)">{{ 'templates.activate' | t }}</button>
-                }
-              </td>
-            </tr>
-          }
-        </tbody>
-      </table>
-    </article>
-    <article class="card">
-      <h2>{{ (selected ? 'templates.newVersion' : 'templates.newTemplate') | t }}</h2>
-      <label class="field"><span>{{ 'common.name' | t }}</span><input [(ngModel)]="name" /></label>
-      <label class="field"><span>{{ 'templates.comment' | t }}</span><input [(ngModel)]="comment" /></label>
       <label class="field">
         <span>{{ 'templates.content' | t }}</span>
-        <textarea class="editor" [(ngModel)]="content"></textarea>
+        <textarea
+          class="editor"
+          [ngModel]="content()"
+          (ngModelChange)="content.set($event)"
+          [attr.aria-busy]="loadingEditor()"
+        ></textarea>
       </label>
-      <div class="row-actions" style="margin-top: 0.8rem">
-        <button class="btn btn-ochre" type="button" (click)="preview()">{{ 'templates.previewPdf' | t }}</button>
-        <button class="btn btn-ghost" type="button" (click)="save()">{{ 'templates.saveVersion' | t }}</button>
-      </div>
-      @if (pdf) {
-        <div class="row-actions" style="margin-top: 0.8rem">
-          <button class="btn btn-ghost" type="button" (click)="downloadPreview()">{{ 'common.download' | t }}</button>
-        </div>
-        <iframe class="preview-frame" [src]="pdf" [title]="'templates.previewFrameTitle' | t"></iframe>
+    </fieldset>
+
+    <div class="row-actions">
+      <button class="btn btn-ochre" type="button" [disabled]="loadingEditor() || previewing()" (click)="preview()">
+        {{ (previewing() ? 'common.loading' : 'templates.previewPdf') | t }}
+      </button>
+      <button class="btn" type="button" [disabled]="loadingEditor() || saving()" (click)="save()">
+        {{ (saving() ? 'common.saving' : 'templates.saveVersion') | t }}
+      </button>
+      @if (pdf()) {
+        <button class="btn btn-ghost" type="button" (click)="downloadPreview()">{{ 'common.download' | t }}</button>
       }
-    </article>
-  </div>
-  <article class="card">
-    <h2>{{ 'templates.variables' | t }}</h2>
-    @for (v of variables(); track v.name) {
-      <div class="timeline-item" style="margin-bottom: 0.7rem">
-        <code>{{ '$' + '{' + v.name + '}' }}</code>
-        <div class="muted">{{ v.description }} · {{ v.example }}</div>
-      </div>
+    </div>
+
+    @if (pdf(); as src) {
+      <iframe class="preview-frame" [src]="src" [title]="'templates.previewFrameTitle' | t"></iframe>
     }
+  </article>
+
+  <article class="card templates-vars">
+    <h2>{{ 'templates.variables' | t }}</h2>
+    <p class="muted">{{ 'templates.variablesHint' | t }}</p>
+    <div class="vars-list">
+      @for (v of variables(); track v.name) {
+        <button class="btn btn-ghost var-btn" type="button" (click)="insertVariable(v.name)">
+          <code>{{ '$' + '{' + v.name + '}' }}</code>
+          <span class="muted">{{ v.description }}</span>
+        </button>
+      }
+    </div>
   </article>
 </div>

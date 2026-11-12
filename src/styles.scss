@@ -732,6 +732,18 @@ textarea {
   min-height: 240px;
 }
 
+.table-wrap.compact {
+  min-height: 0;
+}
+
+tbody tr.clickable {
+  cursor: pointer;
+}
+
+tbody tr.is-selected td {
+  background: color-mix(in srgb, var(--wine, #7a1f2b) 9%, #fff);
+}
+
 table {
   width: 100%;
   min-width: 760px;
@@ -1091,11 +1103,48 @@ tr:hover td {
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 1rem;
   width: 100%;
+  align-items: start;
 }
 
 .agenda-desk {
   margin-bottom: 1rem;
-  align-items: start;
+}
+
+.templates-desk {
+  grid-template-columns: minmax(0, 1.55fr) minmax(16rem, 0.7fr);
+}
+
+.templates-vars {
+  position: sticky;
+  top: 1rem;
+  max-height: calc(100vh - 2rem);
+  overflow: auto;
+}
+
+.templates-vars .vars-list {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.templates-vars .var-btn {
+  justify-content: flex-start;
+  text-align: left;
+  height: auto;
+  padding: 0.45rem 0.6rem;
+  white-space: normal;
+}
+
+.templates-vars .var-btn .muted {
+  display: block;
+  font-weight: 400;
+  margin-top: 0.15rem;
+}
+
+.templates-desk fieldset {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
 }
 
 .point {
