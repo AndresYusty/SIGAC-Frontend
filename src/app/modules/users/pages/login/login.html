@@ -16,10 +16,12 @@
     <p class="auth-legal">{{ 'app.location' | t }}</p>
   </div>
   <div class="auth-panel">
-    <app-lang-switch />
     <form class="auth-card" [formGroup]="form" (ngSubmit)="submit()">
-      <p class="kicker">{{ 'login.kicker' | t }}</p>
-      <span class="logo-plate">
+      <div class="auth-card-top">
+        <p class="kicker">{{ 'login.kicker' | t }}</p>
+        <app-lang-switch />
+      </div>
+      <span class="logo-plate auth-card-mark">
         <img class="auth-card-logo" src="/USCO_Logo.png" [alt]="'app.university' | t" />
       </span>
       <h2>{{ 'login.title' | t }}</h2>

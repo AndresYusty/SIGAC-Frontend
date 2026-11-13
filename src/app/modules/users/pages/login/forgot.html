@@ -16,9 +16,11 @@
     <p class="auth-legal">{{ 'app.accreditation' | t }}</p>
   </div>
   <div class="auth-panel">
-    <app-lang-switch />
     <form class="auth-card" [formGroup]="form" (ngSubmit)="submit()">
-      <p class="kicker">{{ 'forgot.kicker' | t }}</p>
+      <div class="auth-card-top">
+        <p class="kicker">{{ 'forgot.kicker' | t }}</p>
+        <app-lang-switch />
+      </div>
       <h2>{{ 'forgot.title' | t }}</h2>
       <div class="field">
         <label for="email">{{ 'common.email' | t }}</label>
