@@ -783,6 +783,9 @@
       "resendNotice": "Resend notice",
       "resendNoticeTitle": "Resend notice",
       "resendNoticeMessage": "The PDF and ZIP will be regenerated and emailed again to those summoned.",
+      "noticeSendingTitle": "Sending notice",
+      "noticeSendingMessage": "The PDF is being generated and the email is being sent to those summoned. Please wait.",
+      "noticeSentMessage": "The notice email was sent to those summoned.",
       "noticeResent": "Notice resent"
     },
     "live": {

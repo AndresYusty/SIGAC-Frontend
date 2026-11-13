@@ -783,6 +783,9 @@
       "resendNotice": "Reenviar citación",
       "resendNoticeTitle": "Reenviar citación",
       "resendNoticeMessage": "Se volverá a generar el PDF y el ZIP, y se enviarán otra vez a los citados.",
+      "noticeSendingTitle": "Enviando citación",
+      "noticeSendingMessage": "Se está generando el PDF y enviando el correo a los citados. Espere un momento.",
+      "noticeSentMessage": "El correo de citación se envió a los citados.",
       "noticeResent": "Citación reenviada"
     },
     "live": {

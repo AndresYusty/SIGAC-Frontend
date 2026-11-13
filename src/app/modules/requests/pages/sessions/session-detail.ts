@@ -232,12 +232,16 @@ export class SessionDetailPage implements OnInit {
 
   async closeAgenda(): Promise<void> {
     if (!(await this.confirm.ask('sessions.detail.closeAgendaTitle', 'sessions.detail.closeAgendaMessage', 'sessions.detail.closeAgendaTitle'))) return;
+    this.confirm.wait('sessions.detail.noticeSendingTitle', 'sessions.detail.noticeSendingMessage');
     this.api.closeAgenda(this.id()).subscribe({
       next: (s) => {
         this.session.set(s);
-        this.toast.ok('sessions.detail.agendaClosed');
+        this.confirm.tellKey('sessions.detail.agendaClosed', true, 'sessions.detail.noticeSentMessage');
       },
-      error: (e) => this.toast.apiError(e),
+      error: (e) => {
+        this.confirm.dismiss();
+        this.toast.apiError(e);
+      },
     });
   }
 
@@ -246,14 +250,16 @@ export class SessionDetailPage implements OnInit {
       return;
     }
     this.resendingNotice.set(true);
+    this.confirm.wait('sessions.detail.noticeSendingTitle', 'sessions.detail.noticeSendingMessage');
     this.api.resendNotice(this.id()).subscribe({
       next: (s) => {
         this.session.set(s);
         this.resendingNotice.set(false);
-        this.toast.ok('sessions.detail.noticeResent');
+        this.confirm.tellKey('sessions.detail.noticeResent', true, 'sessions.detail.noticeSentMessage');
       },
       error: (e) => {
         this.resendingNotice.set(false);
+        this.confirm.dismiss();
         this.toast.apiError(e);
       },
     });
