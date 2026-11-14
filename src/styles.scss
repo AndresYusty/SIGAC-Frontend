@@ -348,10 +348,19 @@ p {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 0.75rem;
   padding: 0.7rem 1.4rem;
   position: sticky;
   top: 0;
   z-index: 8;
+}
+
+.topbar-start {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
+  flex: 1;
 }
 
 .topbar .uni {
@@ -361,6 +370,88 @@ p {
 
 .topbar .uni b {
   color: var(--wine);
+}
+
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: nowrap;
+  gap: 0.45rem;
+  flex-shrink: 0;
+}
+
+.menu-toggle,
+.icon-btn,
+.sidebar-backdrop,
+.topbar-brand {
+  display: none;
+}
+
+.menu-toggle,
+.icon-btn {
+  width: 2.45rem;
+  height: 2.45rem;
+  border: 1px solid var(--gray-light);
+  border-radius: 10px;
+  background: #fff;
+  color: var(--wine);
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.menu-toggle svg,
+.icon-btn svg {
+  width: 1.25rem;
+  height: 1.25rem;
+  display: block;
+}
+
+.menu-toggle:hover,
+.icon-btn:hover {
+  background: var(--wine-light);
+}
+
+.icon-btn-danger {
+  color: var(--wine);
+  border-color: var(--wine-soft);
+}
+
+.topbar-brand {
+  align-items: center;
+  gap: 0.65rem;
+  min-width: 0;
+}
+
+.topbar-brand .logo-plate {
+  padding: 0.28rem;
+}
+
+.topbar-brand img {
+  width: 34px;
+  height: auto;
+  display: block;
+}
+
+.topbar-brand strong {
+  display: block;
+  font-family: var(--display);
+  color: var(--wine);
+  font-size: 0.98rem;
+  line-height: 1.15;
+}
+
+.topbar-brand span {
+  display: block;
+  color: var(--gray);
+  font-size: 0.75rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 11rem;
 }
 
 .lang-switch {
@@ -1577,14 +1668,94 @@ tr:hover td {
     grid-template-columns: 1fr;
   }
 
-  .sidebar {
-    height: auto;
+  .app-shell {
     position: relative;
   }
 
+  .sidebar-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    border: 0;
+    padding: 0;
+    margin: 0;
+    background: rgba(30, 38, 43, 0.45);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+    z-index: 40;
+  }
+
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: min(86vw, var(--sidebar));
+    height: 100dvh;
+    z-index: 50;
+    transform: translateX(-105%);
+    transition: transform 0.22s ease;
+    box-shadow: none;
+    border-right: 0;
+  }
+
+  .app-shell.menu-open .sidebar {
+    transform: translateX(0);
+    box-shadow: 12px 0 30px rgba(30, 38, 43, 0.22);
+    border-right: 4px solid var(--ochre-strong);
+  }
+
+  .app-shell.menu-open .sidebar-backdrop {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
   .nav {
-    flex-direction: row;
-    flex-wrap: wrap;
+    flex-direction: column;
+    flex-wrap: nowrap;
+  }
+
+  .menu-toggle {
+    display: inline-flex;
+  }
+
+  .topbar-brand {
+    display: flex;
+  }
+
+  .topbar .uni,
+  .topbar-text-btn {
+    display: none;
+  }
+
+  .icon-btn {
+    display: inline-flex;
+  }
+
+  .topbar {
+    padding: 0.55rem 0.75rem;
+  }
+
+  .topbar-actions {
+    gap: 0.35rem;
+  }
+
+  .topbar-actions .lang-switch button {
+    padding: 0.38rem 0.55rem;
+    min-height: 2.2rem;
+  }
+
+  .page {
+    padding: 1rem 0.85rem 1.6rem;
+  }
+
+  .footer-note {
+    padding-inline: 0.85rem;
+  }
+
+  body:has(.app-shell.menu-open) {
+    overflow: hidden;
   }
 
   .auth-screen {

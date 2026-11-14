@@ -100,7 +100,7 @@
       </label>
       <label class="field">
         <span>{{ 'common.faculty' | t }}</span>
-        <select formControlName="facultyId" (change)="loadFacultyPrograms()">
+        <select formControlName="facultyId" (change)="loadFacultyPrograms($event)">
           @if (!isGlobalRole()) {
             @for (f of faculties(); track f.id) {
               <option [value]="f.id">{{ f.label }}</option>
@@ -112,7 +112,9 @@
       <label class="field">
         <span>{{ 'common.program' | t }}</span>
         <select formControlName="programId">
-          <option value="">{{ 'common.none' | t }}</option>
+          <option value="">
+            {{ !form.controls.facultyId.value && !isGlobalRole() ? ('users.pickFacultyFirst' | t) : ('common.none' | t) }}
+          </option>
           @for (p of programs(); track p.id) {
             <option [value]="p.id">{{ p.name }}</option>
           }

@@ -28,7 +28,10 @@
     "audit": "Audit",
     "profile": "My profile",
     "logout": "Sign out",
-    "agreements": "Agreements"
+    "agreements": "Agreements",
+    "menu": "Main menu",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu"
   },
   "errors": {
     "passwordPolicy": "The password must be at least 8 characters long and include letters and numbers.",
@@ -589,6 +592,7 @@
     "statusUpdated": "Status updated",
     "passwordRequired": "Password is required",
     "programRequired": "A program head must be assigned to a program.",
+    "pickFacultyFirst": "Choose the faculty first",
     "invalid": "Check the fields. The email must be valid and the required data cannot be empty.",
     "support": {
       "kicker": "Jurisdiction",

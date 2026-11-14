@@ -1,5 +1,13 @@
-<div class="app-shell">
-  <aside class="sidebar">
+<div class="app-shell" [class.menu-open]="menuOpen()">
+  <button
+    class="sidebar-backdrop"
+    type="button"
+    tabindex="-1"
+    [attr.aria-hidden]="!menuOpen()"
+    (click)="closeMenu()"
+  ></button>
+
+  <aside class="sidebar" id="app-sidebar">
     <div class="sidebar-brand">
       <span class="logo-plate">
         <img src="/USCO_Logo.png" [alt]="'app.logoAlt' | t" />
@@ -9,9 +17,14 @@
         <span>{{ 'app.tagline' | t }}</span>
       </div>
     </div>
-    <nav class="nav">
+    <nav class="nav" [attr.aria-label]="'nav.menu' | t">
       @for (item of nav(); track item.path) {
-        <a [routerLink]="item.path" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: item.path === '/' }">{{ item.labelKey | t }}</a>
+        <a
+          [routerLink]="item.path"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: item.path === '/' }"
+          (click)="closeMenu()"
+        >{{ item.labelKey | t }}</a>
       }
     </nav>
     <div class="sidebar-user">
@@ -24,11 +37,55 @@
 
   <div class="workspace">
     <header class="topbar">
-      <div class="uni">{{ 'app.accreditation' | t }} · <b>{{ 'app.city' | t }}</b></div>
-      <div class="row-actions">
+      <div class="topbar-start">
+        <button
+          class="menu-toggle"
+          type="button"
+          [attr.aria-expanded]="menuOpen()"
+          aria-controls="app-sidebar"
+          [attr.aria-label]="(menuOpen() ? 'nav.closeMenu' : 'nav.openMenu') | t"
+          (click)="toggleMenu()"
+        >
+          @if (menuOpen()) {
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true">
+              <path d="M6 6l12 12M18 6L6 18" />
+            </svg>
+          } @else {
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true">
+              <path d="M4 7h16M4 12h16M4 17h16" />
+            </svg>
+          }
+        </button>
+
+        <div class="topbar-brand">
+          <span class="logo-plate">
+            <img src="/USCO_Logo.png" [alt]="'app.logoAlt' | t" />
+          </span>
+          <div>
+            <strong>SIGAC</strong>
+            <span>{{ auth.user()?.name }}</span>
+          </div>
+        </div>
+
+        <div class="uni">{{ 'app.accreditation' | t }} · <b>{{ 'app.city' | t }}</b></div>
+      </div>
+
+      <div class="topbar-actions">
         <app-lang-switch />
-        <a routerLink="/profile" class="btn btn-ghost">{{ 'nav.profile' | t }}</a>
-        <button class="btn btn-secondary" type="button" (click)="logout()">{{ 'nav.logout' | t }}</button>
+        <a routerLink="/profile" class="btn btn-ghost topbar-text-btn">{{ 'nav.profile' | t }}</a>
+        <a routerLink="/profile" class="icon-btn" [attr.aria-label]="'nav.profile' | t" [attr.title]="'nav.profile' | t">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="8" r="3.5" />
+            <path d="M5.5 19.2a6.5 6.5 0 0 1 13 0" />
+          </svg>
+        </a>
+        <button class="btn btn-secondary topbar-text-btn" type="button" (click)="logout()">{{ 'nav.logout' | t }}</button>
+        <button class="icon-btn icon-btn-danger" type="button" [attr.aria-label]="'nav.logout' | t" [attr.title]="'nav.logout' | t" (click)="logout()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M10 7V5a2 2 0 0 1 2-2h7v18h-7a2 2 0 0 1-2-2v-2" />
+            <path d="M15 12H4m0 0 3-3m-3 3 3 3" />
+          </svg>
+        </button>
       </div>
     </header>
     <main class="page">

@@ -85,17 +85,29 @@ export class UsersPage implements OnInit {
     });
   }
 
-  loadFacultyPrograms(ev?: Event): void {
+  /** Loads programs of the selected faculty. Pass $event from the select so the new value is used. */
+  loadFacultyPrograms(ev?: Event, clearProgram = true): void {
     const raw = ev ? (ev.target as HTMLSelectElement).value : this.form.controls.facultyId.value;
     const id = Number(raw);
-    if (ev) {
+    if (clearProgram) {
       this.form.controls.programId.setValue('');
     }
     if (!id) {
       this.programs.set([]);
+      this.syncProgramEnabled();
       return;
     }
-    this.api.listPrograms(id).subscribe({ next: (p) => this.programs.set(p) });
+    this.api.listPrograms(id).subscribe({
+      next: (p) => {
+        this.programs.set(p);
+        this.syncProgramEnabled();
+      },
+      error: (e) => {
+        this.programs.set([]);
+        this.syncProgramEnabled();
+        this.toast.apiError(e);
+      },
+    });
   }
 
   load(n = 0): void {
@@ -135,8 +147,11 @@ export class UsersPage implements OnInit {
       programId: u.programId != null ? String(u.programId) : '',
     });
     this.applyScopeForRole(role);
-    if (!this.isGlobalRole(role)) {
-      this.loadFacultyPrograms();
+    if (!this.isGlobalRole(role) && u.facultyId != null) {
+      // Keep the current program until the list for that faculty arrives.
+      this.loadFacultyPrograms(undefined, false);
+    } else {
+      this.programs.set([]);
     }
     this.showForm = true;
   }
@@ -160,6 +175,15 @@ export class UsersPage implements OnInit {
       return;
     }
     this.form.controls.facultyId.enable({ emitEvent: false });
+    this.syncProgramEnabled();
+  }
+
+  /** Program stays locked until a faculty is chosen (and for the admin role). */
+  private syncProgramEnabled(): void {
+    if (this.isGlobalRole() || !this.form.controls.facultyId.value) {
+      this.form.controls.programId.disable({ emitEvent: false });
+      return;
+    }
     this.form.controls.programId.enable({ emitEvent: false });
   }
 

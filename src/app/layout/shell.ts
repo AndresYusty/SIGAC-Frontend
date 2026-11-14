@@ -1,4 +1,4 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, HostListener, inject, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { RoleName } from '@core/auth/auth.models';
 import { AuthService } from '@core/auth/auth.service';
@@ -26,6 +26,7 @@ export class ShellComponent {
   readonly confirm = inject(ConfirmService);
   readonly docs = inject(DocumentViewerService);
   readonly year = new Date().getFullYear();
+  readonly menuOpen = signal(false);
 
   private readonly items: NavItem[] = [
     { path: '/', labelKey: 'nav.home' },
@@ -44,7 +45,21 @@ export class ShellComponent {
 
   readonly nav = computed(() => this.items.filter((i) => !i.roles || this.auth.has(...i.roles)));
 
+  toggleMenu(): void {
+    this.menuOpen.update((open) => !open);
+  }
+
+  closeMenu(): void {
+    this.menuOpen.set(false);
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscape(): void {
+    this.closeMenu();
+  }
+
   logout(): void {
+    this.closeMenu();
     this.auth.logout();
   }
 }

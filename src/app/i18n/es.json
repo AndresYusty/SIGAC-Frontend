@@ -28,7 +28,10 @@
     "audit": "Auditoría",
     "profile": "Mi perfil",
     "logout": "Cerrar sesión",
-    "agreements": "Acuerdos"
+    "agreements": "Acuerdos",
+    "menu": "Menú principal",
+    "openMenu": "Abrir menú",
+    "closeMenu": "Cerrar menú"
   },
   "errors": {
     "passwordPolicy": "La contraseña debe tener al menos 8 caracteres e incluir letras y números.",
@@ -589,6 +592,7 @@
     "statusUpdated": "Estado actualizado",
     "passwordRequired": "La contraseña es obligatoria",
     "programRequired": "El jefe de programa requiere un programa.",
+    "pickFacultyFirst": "Elija primero la facultad",
     "invalid": "Revise los campos. El correo debe ser válido y los datos obligatorios no pueden quedar vacíos.",
     "support": {
       "kicker": "Jurisdicción",
