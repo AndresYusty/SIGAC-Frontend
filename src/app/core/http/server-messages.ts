@@ -19,7 +19,7 @@ const EXACT: Record<string, string> = {
   'Only the user who filed the request can modify it': 'errors.server.requestOwnerOnly',
   'El programa no pertenece a la facultad de la radicación': 'errors.server.programFilingFaculty',
   'The attachment was altered: its SHA-256 fingerprint does not match the recorded one': 'errors.server.attachmentAltered',
-  'Only documents in PDF format are allowed': 'errors.server.pdfOnly',
+  'Only PDF, Word or Excel documents are allowed': 'errors.server.documentFormat',
   'Could not process the attached files': 'errors.server.attachmentsFailed',
   'You can only file requests for your program': 'errors.server.ownProgramOnly',
   'The Program does not belong to your Faculty': 'errors.server.programNotYours',
@@ -182,8 +182,8 @@ const PATTERNS: Pattern[] = [
     params: (m) => ({ name: m[1], max: m[2] }),
   },
   {
-    re: /^The file '(.+)' is not a valid PDF$/,
-    key: 'errors.server.fileNotPdf',
+    re: /^The file '(.+)' does not match its format$/,
+    key: 'errors.server.fileFormatMismatch',
     params: (m) => ({ name: m[1] }),
   },
   {

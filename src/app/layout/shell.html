@@ -117,6 +117,11 @@
         <img class="document-preview" [src]="image" [alt]="docs.title()" />
       } @else if (docs.frame(); as frame) {
         <iframe class="document-frame" [src]="frame" [title]="docs.title()"></iframe>
+      } @else if (docs.unsupported()) {
+        <div class="document-unsupported">
+          <p class="lead">{{ 'common.noPreview' | t }}</p>
+          <button class="btn" type="button" (click)="docs.download()">{{ 'common.download' | t }}</button>
+        </div>
       }
     </div>
   </div>

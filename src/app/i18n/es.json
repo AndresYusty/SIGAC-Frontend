@@ -57,9 +57,9 @@
       "requestLocked": "La solicitud no se puede modificar en estado {{status}}.",
       "programFilingFaculty": "El programa no pertenece a la facultad de la radicación.",
       "attachmentAltered": "El anexo fue alterado: su huella SHA-256 no coincide con la registrada.",
-      "pdfOnly": "Solo se permiten documentos en formato PDF.",
+      "documentFormat": "Solo se permiten documentos PDF, Word (.doc, .docx) o Excel (.xls, .xlsx).",
       "fileTooLarge": "El documento «{{name}}» supera el límite de {{max}} MB.",
-      "fileNotPdf": "El archivo «{{name}}» no es un PDF válido.",
+      "fileFormatMismatch": "El archivo «{{name}}» no corresponde a su formato (PDF, Word o Excel). Puede estar dañado o tener la extensión cambiada.",
       "fileUnreadable": "No se pudo leer el archivo «{{name}}».",
       "attachmentsFailed": "No se pudieron procesar los archivos adjuntos.",
       "ownProgramOnly": "Solo puede radicar solicitudes de su programa.",
@@ -256,6 +256,7 @@
     "type": "Tipo",
     "user": "Usuario",
     "view": "Ver",
+    "noPreview": "Este tipo de archivo no se puede mostrar aquí. Descárguelo para abrirlo en Word o Excel.",
     "yes": "Sí"
   },
   "enums": {
@@ -520,6 +521,7 @@
       "justification": "Justificación del solicitante",
       "documents": "Soportes obligatorios",
       "documentsLead": "Adjunte cada documento que el trámite exige. Si ya está cargado, puede dejar el archivo en blanco.",
+      "documentsFormats": "Formatos aceptados: PDF, Word (.doc, .docx) y Excel (.xls, .xlsx).",
       "already": "Ya cargado: {{name}}",
       "counselorRequired": "Indique el docente consejero.",
       "identityRequired": "Complete el código y el documento.",

@@ -15,6 +15,8 @@ export class DocumentViewerService {
   readonly loading = signal(false);
   readonly frame = signal<SafeResourceUrl | null>(null);
   readonly imageUrl = signal<string | null>(null);
+  /** Word/Excel and other types the browser cannot render inline: only the download is offered. */
+  readonly unsupported = signal(false);
 
   private blob: Blob | null = null;
   private raw: string | null = null;
@@ -57,12 +59,15 @@ export class DocumentViewerService {
     this.blob = blob;
     this.raw = URL.createObjectURL(blob);
     const image = blob.type.startsWith('image/') || /\.(png|jpe?g|gif|webp)$/i.test(this.filename);
+    const pdf = blob.type === 'application/pdf' || /\.pdf$/i.test(this.filename);
     if (image) {
       this.imageUrl.set(this.raw);
       this.frame.set(null);
-    } else {
+    } else if (pdf) {
       this.frame.set(this.sanitizer.bypassSecurityTrustResourceUrl(this.raw));
       this.imageUrl.set(null);
+    } else {
+      this.unsupported.set(true);
     }
     this.loading.set(false);
   }
@@ -73,5 +78,6 @@ export class DocumentViewerService {
     this.blob = null;
     this.frame.set(null);
     this.imageUrl.set(null);
+    this.unsupported.set(false);
   }
 }

@@ -8,7 +8,7 @@ import { AgreementsApi } from '@modules/agreements/agreements.api';
 import { AgreementTypeDto } from '@modules/agreements/agreements.models';
 import { NodeDto, UsersApi } from '@modules/users';
 import { TranslatePipe } from '@shared/pipes/translate.pipe';
-import { saveBlob } from '@shared/utils/files';
+import { DOCUMENT_ACCEPT, isAllowedDocument, saveBlob } from '@shared/utils/files';
 import { RequestsApi } from '../../requests.api';
 import {
   AttachmentDto,
@@ -62,6 +62,7 @@ export class RequestFormPage implements OnInit {
   readonly programs = signal<NodeDto[]>([]);
   readonly existing = signal<AttachmentDto[]>([]);
   readonly files = signal<Record<string, File>>({});
+  readonly documentAccept = DOCUMENT_ACCEPT;
   readonly courses = signal<CourseDraft[]>([emptyCourse()]);
   readonly agreementTypes = signal<AgreementTypeDto[]>([]);
   readonly saving = signal(false);
@@ -256,7 +257,12 @@ export class RequestFormPage implements OnInit {
 
   onFile(code: string, ev: Event): void {
     const input = ev.target as HTMLInputElement;
-    const file = input.files?.[0];
+    let file = input.files?.[0];
+    if (file && !isAllowedDocument(file.name)) {
+      this.toast.error('errors.server.documentFormat');
+      input.value = '';
+      file = undefined;
+    }
     this.files.update((current) => {
       const next = { ...current };
       if (file) next[code] = file;

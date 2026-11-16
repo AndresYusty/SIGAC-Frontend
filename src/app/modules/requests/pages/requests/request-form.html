@@ -223,6 +223,7 @@
     <section class="card grid">
       <h2>{{ 'requests.form.documents' | t }}</h2>
       <p class="lead">{{ 'requests.form.documentsLead' | t }}</p>
+      <p class="muted">{{ 'requests.form.documentsFormats' | t }}</p>
       @for (code of current.documents; track code) {
         <div class="field required">
           <span>{{ 'enums.requestDocument.' + code | t }}</span>
@@ -238,7 +239,7 @@
               <button class="btn btn-ghost" type="button" (click)="downloadSaved(saved)">{{ 'common.download' | t }}</button>
             </div>
           }
-          <input type="file" accept="application/pdf" (change)="onFile(code, $event)" />
+          <input type="file" [accept]="documentAccept" (change)="onFile(code, $event)" />
         </div>
       }
     </section>

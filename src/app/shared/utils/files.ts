@@ -7,6 +7,24 @@ export function saveBlob(blob: Blob, filename: string): void {
   URL.revokeObjectURL(url);
 }
 
+/** Request supports accepted by the backend (RN-08). */
+export const DOCUMENT_EXTENSIONS = ['pdf', 'doc', 'docx', 'xls', 'xlsx'];
+
+/** Value for <input type="file" accept>: extensions plus MIME types for mobile pickers. */
+export const DOCUMENT_ACCEPT = [
+  ...DOCUMENT_EXTENSIONS.map((ext) => `.${ext}`),
+  'application/pdf',
+  'application/msword',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  'application/vnd.ms-excel',
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+].join(',');
+
+export function isAllowedDocument(name: string | null | undefined): boolean {
+  const ext = /\.([^.]+)$/.exec(name ?? '')?.[1]?.toLowerCase();
+  return !!ext && DOCUMENT_EXTENSIONS.includes(ext);
+}
+
 export function blobUrl(blob: Blob): string {
   return URL.createObjectURL(blob);
 }

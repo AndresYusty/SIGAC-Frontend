@@ -57,9 +57,9 @@
       "requestLocked": "The request cannot be modified in status {{status}}.",
       "programFilingFaculty": "The program does not belong to the faculty of the filing.",
       "attachmentAltered": "The attachment was altered: its SHA-256 fingerprint does not match the recorded one.",
-      "pdfOnly": "Only PDF documents are allowed.",
+      "documentFormat": "Only PDF, Word (.doc, .docx) or Excel (.xls, .xlsx) documents are allowed.",
       "fileTooLarge": "The document “{{name}}” exceeds the limit of {{max}} MB.",
-      "fileNotPdf": "The file “{{name}}” is not a valid PDF.",
+      "fileFormatMismatch": "The file “{{name}}” does not match its format (PDF, Word or Excel). It may be damaged or renamed.",
       "fileUnreadable": "Could not read the file “{{name}}”.",
       "attachmentsFailed": "Could not process the attached files.",
       "ownProgramOnly": "You can only file requests for your program.",
@@ -256,6 +256,7 @@
     "type": "Type",
     "user": "User",
     "view": "View",
+    "noPreview": "This file type cannot be shown here. Download it to open it in Word or Excel.",
     "yes": "Yes"
   },
   "enums": {
@@ -520,6 +521,7 @@
       "justification": "Applicant's justification",
       "documents": "Required documents",
       "documentsLead": "Attach each document this request requires. If it is already uploaded, you can leave the file empty.",
+      "documentsFormats": "Accepted formats: PDF, Word (.doc, .docx) and Excel (.xls, .xlsx).",
       "already": "Already uploaded: {{name}}",
       "counselorRequired": "Enter the counselor teacher.",
       "identityRequired": "Enter the student code and identity document.",
