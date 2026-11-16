@@ -8,7 +8,7 @@ import { AgreementsApi } from '@modules/agreements/agreements.api';
 import { AgreementTypeDto } from '@modules/agreements/agreements.models';
 import { NodeDto, UsersApi } from '@modules/users';
 import { TranslatePipe } from '@shared/pipes/translate.pipe';
-import { DOCUMENT_ACCEPT, isAllowedDocument, saveBlob } from '@shared/utils/files';
+import { canPreview, DOCUMENT_ACCEPT, isAllowedDocument, saveBlob } from '@shared/utils/files';
 import { RequestsApi } from '../../requests.api';
 import {
   AttachmentDto,
@@ -63,6 +63,7 @@ export class RequestFormPage implements OnInit {
   readonly existing = signal<AttachmentDto[]>([]);
   readonly files = signal<Record<string, File>>({});
   readonly documentAccept = DOCUMENT_ACCEPT;
+  readonly canPreview = canPreview;
   readonly courses = signal<CourseDraft[]>([emptyCourse()]);
   readonly agreementTypes = signal<AgreementTypeDto[]>([]);
   readonly saving = signal(false);

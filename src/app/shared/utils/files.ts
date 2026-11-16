@@ -25,6 +25,11 @@ export function isAllowedDocument(name: string | null | undefined): boolean {
   return !!ext && DOCUMENT_EXTENSIONS.includes(ext);
 }
 
+/** PDFs and images render in the in-app viewer; Word/Excel can only be downloaded. Unnamed legacy files are PDFs. */
+export function canPreview(name: string | null | undefined): boolean {
+  return !name || /\.(pdf|png|jpe?g|gif|webp)$/i.test(name.trim());
+}
+
 export function blobUrl(blob: Blob): string {
   return URL.createObjectURL(blob);
 }

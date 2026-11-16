@@ -11,7 +11,7 @@ import { MinutesApi } from '@modules/minutes';
 import { CouncilTypeDto, UsersApi } from '@modules/users';
 import { LocalDatePipe } from '@shared/pipes/local-date.pipe';
 import { TranslatePipe } from '@shared/pipes/translate.pipe';
-import { saveBlob } from '@shared/utils/files';
+import { canPreview, saveBlob } from '@shared/utils/files';
 import { TONE } from '@shared/utils/labels';
 import { RequestsApi } from '../../requests.api';
 import { AttachmentDto, GuestPayload, RequestDto, SessionDto, SummonedDto } from '../../requests.models';
@@ -45,6 +45,7 @@ export class SessionDetailPage implements OnInit {
   urgentDescription = '';
   guest: GuestPayload = { name: '', email: '', affiliation: '' };
   readonly tone = TONE;
+  readonly canPreview = canPreview;
   readonly councilTypes = signal<CouncilTypeDto[]>([]);
   councilTypeId = 0;
   scheduledAt = '';

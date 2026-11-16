@@ -141,12 +141,14 @@
             @for (file of item.attachments ?? []; track file.id) {
               <div class="doc-row">
                 <span>{{ file.documentCode ? ('enums.requestDocument.' + file.documentCode | t) : file.name }}</span>
-                <button class="btn btn-ghost btn-icon" type="button" [attr.aria-label]="'common.view' | t" [title]="'common.view' | t" (click)="previewAttachment(item.requestId!, file)">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                    <circle cx="12" cy="12" r="3"/>
-                  </svg>
-                </button>
+                @if (canPreview(file.name)) {
+                  <button class="btn btn-ghost btn-icon" type="button" [attr.aria-label]="'common.view' | t" [title]="'common.view' | t" (click)="previewAttachment(item.requestId!, file)">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                      <circle cx="12" cy="12" r="3"/>
+                    </svg>
+                  </button>
+                }
                 <button class="btn btn-ghost btn-icon" type="button" [attr.aria-label]="'common.download' | t" [title]="'common.download' | t" (click)="downloadAttachment(item.requestId!, file)">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
@@ -195,12 +197,14 @@
                   @for (file of request.attachments; track file.id) {
                     <div class="doc-row">
                       <span>{{ file.documentCode ? ('enums.requestDocument.' + file.documentCode | t) : file.name }}</span>
-                      <button class="btn btn-ghost btn-icon" type="button" [attr.aria-label]="'common.view' | t" [title]="'common.view' | t" (click)="previewAttachment(request.id, file)">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                          <circle cx="12" cy="12" r="3"/>
-                        </svg>
-                      </button>
+                      @if (canPreview(file.name)) {
+                        <button class="btn btn-ghost btn-icon" type="button" [attr.aria-label]="'common.view' | t" [title]="'common.view' | t" (click)="previewAttachment(request.id, file)">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                            <circle cx="12" cy="12" r="3"/>
+                          </svg>
+                        </button>
+                      }
                       <button class="btn btn-ghost btn-icon" type="button" [attr.aria-label]="'common.download' | t" [title]="'common.download' | t" (click)="downloadAttachment(request.id, file)">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                           <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
@@ -295,12 +299,14 @@
               @for (file of item.attachments ?? []; track file.id) {
                 <div class="doc-row">
                   <span>{{ file.documentCode ? ('enums.requestDocument.' + file.documentCode | t) : file.name }}</span>
-                  <button class="btn btn-ghost btn-icon" type="button" [attr.aria-label]="'common.view' | t" [title]="'common.view' | t" (click)="previewAttachment(item.requestId!, file)">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                      <circle cx="12" cy="12" r="3"/>
-                    </svg>
-                  </button>
+                  @if (canPreview(file.name)) {
+                    <button class="btn btn-ghost btn-icon" type="button" [attr.aria-label]="'common.view' | t" [title]="'common.view' | t" (click)="previewAttachment(item.requestId!, file)">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                        <circle cx="12" cy="12" r="3"/>
+                      </svg>
+                    </button>
+                  }
                   <button class="btn btn-ghost btn-icon" type="button" [attr.aria-label]="'common.download' | t" [title]="'common.download' | t" (click)="downloadAttachment(item.requestId!, file)">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                       <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>

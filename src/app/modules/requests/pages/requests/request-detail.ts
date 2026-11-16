@@ -9,7 +9,7 @@ import { DocumentViewerService } from '@core/ui/document-viewer.service';
 import { ToastService } from '@core/ui/toast.service';
 import { LocalDatePipe } from '@shared/pipes/local-date.pipe';
 import { TranslatePipe } from '@shared/pipes/translate.pipe';
-import { saveBlob } from '@shared/utils/files';
+import { canPreview, saveBlob } from '@shared/utils/files';
 import { formatBytes, TONE } from '@shared/utils/labels';
 import { RequestsApi } from '../../requests.api';
 import { AttachmentDto, RequestDto, RequestHistoryDto } from '../../requests.models';
@@ -33,6 +33,7 @@ export class RequestDetailPage implements OnInit {
   reason = '';
   readonly tone = TONE;
   readonly formatBytes = formatBytes;
+  readonly canPreview = canPreview;
 
   reasonText(reason: string): string {
     return translateServerText(reason, this.i18n);

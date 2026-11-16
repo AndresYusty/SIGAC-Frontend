@@ -230,12 +230,16 @@
           @if (picked(code); as file) {
             <div class="doc-row">
               <span class="muted">{{ file.name }}</span>
-              <button class="btn btn-ghost" type="button" (click)="previewLocal(file)">{{ 'common.view' | t }}</button>
+              @if (canPreview(file.name)) {
+                <button class="btn btn-ghost" type="button" (click)="previewLocal(file)">{{ 'common.view' | t }}</button>
+              }
             </div>
           } @else if (already(code); as saved) {
             <div class="doc-row">
               <span class="muted">{{ 'requests.form.already' | t: { name: saved.name } }}</span>
-              <button class="btn btn-ghost" type="button" (click)="previewSaved(saved)">{{ 'common.view' | t }}</button>
+              @if (canPreview(saved.name)) {
+                <button class="btn btn-ghost" type="button" (click)="previewSaved(saved)">{{ 'common.view' | t }}</button>
+              }
               <button class="btn btn-ghost" type="button" (click)="downloadSaved(saved)">{{ 'common.download' | t }}</button>
             </div>
           }
